@@ -1,0 +1,62 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.full-height {
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 24px;
+  padding-top: 88px; /* Additional top padding for fixed app bar */
+}
+
+@media (min-width: 900px) {
+  .main-content {
+    padding-left: 280px; /* Space for the sidebar on desktop */
+  }
+}
+
+.centered-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.flex-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/* Transition animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

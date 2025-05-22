@@ -1,0 +1,1 @@
+{  "name": "taskmaster-admin-tool",  "version": "1.0.0",  "description": "Tool to create admin account for TaskMaster",  "main": "index.js",  "dependencies": {    "mongoose": "^6.9.0",    "bcryptjs": "^2.4.3",    "dotenv": "^16.0.3"  }} 

@@ -1,0 +1,76 @@
+// models/followupModel.js
+const mongoose = require('mongoose');
+
+const followupSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  emailId: {
+    type: String,
+    required: true
+  },
+  threadId: {
+    type: String
+  },
+  subject: {
+    type: String,
+    required: true
+  },
+  contactName: {
+    type: String
+  },
+  contactEmail: {
+    type: String
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'in-progress', 'completed', 'ignored'],
+    default: 'pending'
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'urgent'],
+    default: 'medium'
+  },
+  dueDate: {
+    type: Date,
+    required: true
+  },
+  notes: {
+    type: String
+  },
+  reason: {
+    type: String
+  },
+  keyPoints: {
+    type: [String],
+    default: []
+  },
+  completedAt: {
+    type: Date
+  },
+  completionNotes: {
+    type: String
+  },
+  relatedTasks: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Task'
+  }],
+  aiGenerated: {
+    type: Boolean,
+    default: true
+  }
+}, {
+  timestamps: true
+});
+
+// Indexes for better query performance
+followupSchema.index({ user: 1, status: 1 });
+followupSchema.index({ user: 1, dueDate: 1 });
+followupSchema.index({ emailId: 1 });
+
+const Followup = mongoose.model('Followup', followupSchema);
+
+module.exports = Followup;

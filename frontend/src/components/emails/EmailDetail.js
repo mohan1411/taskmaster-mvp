@@ -1,0 +1,452 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  IconButton,
+  Divider,
+  Chip,
+  Stack,
+  CircularProgress,
+  Alert,
+  AlertTitle,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  LinearProgress
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  Person as PersonIcon,
+  Email as EmailIcon,
+  AttachFile as AttachmentIcon,
+  Task as TaskIcon,
+  NotificationsActive as FollowUpIcon,
+  Schedule as ScheduleIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon
+} from '@mui/icons-material';
+import { format } from 'date-fns';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import CustomDatePicker from '../common/CustomDatePicker';
+import emailService from '../../services/emailService';
+import followupService from '../../services/followupService';
+
+const EmailDetail = ({ email, onClose, onRefresh }) => {
+  // Loading states
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [isDetectingFollowUp, setIsDetectingFollowUp] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  // State for task count
+  const [taskCount, setTaskCount] = useState(0);
+  
+  // Follow-up dialog state
+  const [openFollowUpDialog, setOpenFollowUpDialog] = useState(false);
+  const [followUpData, setFollowUpData] = useState({
+    reason: '',
+    keyPoints: [],
+    priority: 'medium',
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    notes: ''
+  });
+  const [newKeyPoint, setNewKeyPoint] = useState('');
+  
+  // Get task count when email changes
+  useEffect(() => {
+    const fetchTaskCount = async () => {
+      if (email && email.taskExtracted) {
+        try {
+          // Try to use the API endpoint if available
+          try {
+            const response = await fetch(`/api/tasks/count?emailSource=${email.messageId}`);
+            const data = await response.json();
+            setTaskCount(data.count || 0);
+          } catch (apiError) {
+            // If API is not yet implemented, use a default value
+            console.log('Task count API not yet available, using default count');
+            setTaskCount(3); // Default value until API is implemented
+          }
+        } catch (err) {
+          console.error('Error fetching task count:', err);
+          setTaskCount(0);
+        }
+      }
+    };
+    
+    fetchTaskCount();
+  }, [email]);
+
+  // Extract tasks from email
+  const handleExtractTasks = async () => {
+    try {
+      setIsExtracting(true);
+      setError(null);
+      setSuccess(null);
+      
+      const response = await emailService.extractTasksFromEmail(email._id);
+      
+      if (response.alreadyExtracted) {
+        // Handle case where tasks were already extracted
+        setSuccess(`This email already has ${response.extractedTasks.length} tasks extracted.`);
+      } else if (response.extractedTasks && response.extractedTasks.length > 0) {
+        setSuccess(`Successfully extracted ${response.extractedTasks.length} tasks!`);
+        if (onRefresh) onRefresh();
+      } else {
+        setError('No tasks found in this email.');
+      }
+    } catch (err) {
+      console.error('Error extracting tasks:', err);
+      setError('Failed to extract tasks. Please try again.');
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  // Detect follow-up needs
+  const handleDetectFollowUp = async () => {
+    try {
+      setIsDetectingFollowUp(true);
+      setError(null);
+      setSuccess(null);
+      
+      const response = await followupService.detectFollowUp(email._id);
+      
+      if (response.needsFollowUp) {
+        // Pre-fill follow-up dialog with AI suggestions
+        setFollowUpData({
+          reason: response.reason || '',
+          keyPoints: response.keyPoints || [],
+          priority: 'medium',
+          dueDate: new Date(response.suggestedDate || Date.now() + 7 * 24 * 60 * 60 * 1000),
+          notes: response.reason || ''
+        });
+        setOpenFollowUpDialog(true);
+      } else {
+        setError('No follow-up needed for this email based on AI analysis.');
+      }
+    } catch (err) {
+      console.error('Error detecting follow-up:', err);
+      setError('Failed to analyze email for follow-up. Please try again.');
+    } finally {
+      setIsDetectingFollowUp(false);
+    }
+  };
+
+  // Manually create follow-up
+  const handleCreateFollowUp = () => {
+    setOpenFollowUpDialog(true);
+  };
+
+  // Save follow-up
+  const handleSaveFollowUp = async () => {
+    try {
+      setError(null);
+      
+      const data = {
+        emailId: email.messageId,
+        threadId: email.threadId,
+        subject: email.subject,
+        contactName: email.sender.name,
+        contactEmail: email.sender.email,
+        priority: followUpData.priority,
+        dueDate: followUpData.dueDate,
+        notes: followUpData.notes,
+        reason: followUpData.reason,
+        keyPoints: followUpData.keyPoints
+      };
+      
+      // Close the dialog immediately to improve perceived responsiveness
+      setOpenFollowUpDialog(false);
+      
+      // Then make the API call
+      await followupService.createFollowUp(data);
+      
+      // Show success message
+      setSuccess('Follow-up created successfully!');
+      
+      // Refresh the UI if needed
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      console.error('Error creating follow-up:', err);
+      setError('Failed to create follow-up. Please try again.');
+    }
+  };
+
+  // Add key point
+  const handleAddKeyPoint = () => {
+    if (newKeyPoint.trim()) {
+      setFollowUpData(prev => ({
+        ...prev,
+        keyPoints: [...prev.keyPoints, newKeyPoint.trim()]
+      }));
+      setNewKeyPoint('');
+    }
+  };
+
+  // Remove key point
+  const handleRemoveKeyPoint = (index) => {
+    setFollowUpData(prev => ({
+      ...prev,
+      keyPoints: prev.keyPoints.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return format(new Date(dateString), 'PPpp');
+  };
+
+  if (!email) return null;
+
+  return (
+    <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Header */}
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h6" component="h2">
+            {email.subject || '(No Subject)'}
+          </Typography>
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        
+        {/* Email metadata */}
+        <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <PersonIcon fontSize="small" sx={{ mr: 0.5 }} />
+            <Typography variant="body2" color="text.secondary">
+              {email.sender.name} ({email.sender.email})
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <ScheduleIcon fontSize="small" sx={{ mr: 0.5 }} />
+            <Typography variant="body2" color="text.secondary">
+              {formatDate(email.receivedAt)}
+            </Typography>
+          </Box>
+        </Stack>
+        
+        {/* Status indicators */}
+        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+          {!email.isRead && (
+            <Chip label="Unread" size="small" color="info" variant="outlined" />
+          )}
+          {email.hasAttachments && (
+            <Chip 
+              icon={<AttachmentIcon />} 
+              label="Has Attachments" 
+              size="small" 
+              variant="outlined" 
+            />
+          )}
+          {email.taskExtracted && (
+            <Chip 
+              icon={<TaskIcon />} 
+              label="Tasks Extracted" 
+              size="small" 
+              color="primary" 
+              variant="outlined" 
+              title="This email has tasks extracted that are in your task list"
+            />
+          )}
+          {email.needsFollowUp && (
+            <Chip 
+              icon={<FollowUpIcon />} 
+              label="Needs Follow-up" 
+              size="small" 
+              color="warning" 
+              variant="outlined" 
+              title="This email requires a follow-up response"
+            />
+          )}
+          {email.taskExtracted && email.needsFollowUp && (
+            <Chip 
+              icon={<InfoIcon />} 
+              label="Multiple Actions" 
+              size="small" 
+              color="success" 
+              variant="outlined" 
+              title="This email requires both tasks and follow-up"
+            />
+          )}
+        </Stack>
+      </Box>
+      
+      {/* Action buttons */}
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<TaskIcon />}
+            onClick={handleExtractTasks}
+            disabled={isExtracting || email.taskExtracted}
+            title="Extract actionable tasks from this email content and add them to your task list"
+          >
+            {isExtracting ? 'Extracting...' : 'Extract Tasks'}
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            startIcon={<FollowUpIcon />}
+            onClick={handleDetectFollowUp}
+            disabled={isDetectingFollowUp || email.needsFollowUp}
+            title="Analyze if this email requires a follow-up response"
+          >
+            {isDetectingFollowUp ? 'Analyzing...' : 'Detect Follow-up'}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<FollowUpIcon />}
+            onClick={handleCreateFollowUp}
+            title="Manually create a follow-up reminder for this email"
+          >
+            Create Follow-up
+          </Button>
+        </Stack>
+      </Box>
+      
+      {/* Multiple Action Guidance */}
+      {email.taskExtracted && email.needsFollowUp && (
+        <Alert severity="info" sx={{ m: 2 }}>
+          <AlertTitle>This email requires multiple actions</AlertTitle>
+          <Typography variant="body2">
+            <strong>• Tasks:</strong> {taskCount > 0 ? `${taskCount} tasks have been extracted and added to your task list` : 'Tasks have been extracted from this email'}
+            <br />
+            <strong>• Follow-up:</strong> This email needs a follow-up response {email.followUpDueDate ? `by ${format(new Date(email.followUpDueDate), 'MMM d, yyyy')}` : 'soon'}
+          </Typography>
+          <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              onClick={() => setOpenFollowUpDialog(true)}
+            >
+              View Follow-up Details
+            </Button>
+          </Box>
+        </Alert>
+      )}
+      
+      {/* Loading indicators */}
+      {(isExtracting || isDetectingFollowUp) && <LinearProgress />}
+      
+      {/* Error/Success messages */}
+      {error && (
+        <Alert severity="error" sx={{ m: 2 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert severity="success" sx={{ m: 2 }} onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
+      )}
+      
+      {/* Email content */}
+      <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
+        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+          {email.body || email.snippet || 'Loading email content...'}
+        </Typography>
+      </Box>
+      
+      {/* Follow-up dialog */}
+      <Dialog open={openFollowUpDialog} onClose={() => setOpenFollowUpDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Create Follow-up</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 2 }}>
+            <TextField
+              label="Reason for Follow-up"
+              fullWidth
+              value={followUpData.reason}
+              onChange={(e) => setFollowUpData(prev => ({ ...prev, reason: e.target.value }))}
+              multiline
+              rows={2}
+            />
+            
+            <FormControl fullWidth>
+              <InputLabel>Priority</InputLabel>
+              <Select
+                value={followUpData.priority}
+                label="Priority"
+                onChange={(e) => setFollowUpData(prev => ({ ...prev, priority: e.target.value }))}
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+                <MenuItem value="urgent">Urgent</MenuItem>
+              </Select>
+            </FormControl>
+            
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <CustomDatePicker
+                label="Due Date"
+                value={followUpData.dueDate}
+                onChange={(date) => setFollowUpData(prev => ({ ...prev, dueDate: date }))}
+                fullWidth
+              />
+            </LocalizationProvider>
+            
+            <Box>
+              <Typography variant="subtitle1" gutterBottom>
+                Key Points to Address
+              </Typography>
+              <Box sx={{ display: 'flex', mb: 1 }}>
+                <TextField
+                  label="Add key point"
+                  value={newKeyPoint}
+                  onChange={(e) => setNewKeyPoint(e.target.value)}
+                  size="small"
+                  sx={{ flexGrow: 1, mr: 1 }}
+                />
+                <Button onClick={handleAddKeyPoint} variant="outlined" disabled={!newKeyPoint.trim()}>
+                  Add
+                </Button>
+              </Box>
+              <Stack spacing={1}>
+                {followUpData.keyPoints.map((point, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                      • {point}
+                    </Typography>
+                    <IconButton size="small" onClick={() => handleRemoveKeyPoint(index)}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+            
+            <TextField
+              label="Notes"
+              fullWidth
+              value={followUpData.notes}
+              onChange={(e) => setFollowUpData(prev => ({ ...prev, notes: e.target.value }))}
+              multiline
+              rows={3}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenFollowUpDialog(false)}>Cancel</Button>
+          <Button onClick={handleSaveFollowUp} variant="contained" color="primary">
+            Create Follow-up
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Paper>
+  );
+};
+
+export default EmailDetail;

@@ -1,0 +1,71 @@
+/**
+ * Followup Model Schema Update
+ * This script adds a unique index to prevent duplicate followups
+ */
+const mongoose = require('mongoose');
+
+const followupSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  emailId: {
+    type: String
+  },
+  threadId: {
+    type: String
+  },
+  subject: {
+    type: String,
+    trim: true
+  },
+  contactName: {
+    type: String
+  },
+  contactEmail: {
+    type: String
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'in-progress', 'completed', 'ignored'],
+    default: 'pending'
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high'],
+    default: 'medium'
+  },
+  dueDate: {
+    type: Date,
+    default: Date.now
+  },
+  completedAt: {
+    type: Date
+  },
+  notes: {
+    type: String
+  },
+  reason: {
+    type: String
+  },
+  keyPoints: [String],
+  completionNotes: {
+    type: String
+  },
+  relatedTasks: [String],
+  aiGenerated: {
+    type: Boolean,
+    default: false
+  }
+}, {
+  timestamps: true
+});
+
+// Create a compound unique index on user and emailId
+// This prevents duplicate followups for the same email
+followupSchema.index({ user: 1, emailId: 1 }, { unique: true });
+
+const Followup = mongoose.model('Followup', followupSchema);
+
+module.exports = Followup;

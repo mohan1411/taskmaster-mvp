@@ -1,0 +1,49 @@
+graph TB
+    subgraph Frontend
+        A[FollowUpsPage] --> B[FollowUpWidget]
+        A --> C[FollowUpReminders]
+        
+        D[EmailsPage] --> E[EmailDetail]
+        E --> F[Follow-up Detection Button]
+        E --> G[Follow-up Creation Dialog]
+        
+        H[DashboardPage] --> B
+        H --> C
+        
+        I[followupService] --> A
+        I --> B
+        I --> C
+        I --> E
+        
+        J[emailService] --> D
+        J --> E
+    end
+    
+    subgraph Backend
+        K[followupController] --> L[Followup Model]
+        M[emailController] --> N[Email Model]
+        
+        K --> O[OpenAI API]
+        
+        P[followupRoutes] --> K
+        Q[emailRoutes] --> M
+        Q --> K
+        
+        R[authMiddleware] --> P
+        R --> Q
+    end
+    
+    subgraph Database
+        L --> S[(MongoDB)]
+        N --> S
+    end
+    
+    I --> P
+    J --> Q
+    
+    style A fill:#e3f2fd
+    style D fill:#e3f2fd
+    style H fill:#e3f2fd
+    style K fill:#f3e5f5
+    style M fill:#f3e5f5
+    style S fill:#e8f5e9

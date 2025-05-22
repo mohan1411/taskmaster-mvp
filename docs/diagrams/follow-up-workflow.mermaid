@@ -1,0 +1,51 @@
+graph TD
+    A[Email Received] --> B{User Action}
+    B --> C[Click Detect Follow-up]
+    B --> D[Manual Create Follow-up]
+    
+    C --> E[AI Analyzes Email]
+    E --> F{Follow-up Needed?}
+    
+    F -->|Yes| G[Show AI Suggestions]
+    F -->|No| H[Notify User - No Follow-up Needed]
+    
+    G --> I[User Reviews Suggestions]
+    I --> J{Accept Suggestions?}
+    
+    J -->|Yes| K[Create Follow-up with AI Data]
+    J -->|No| L[User Edits Suggestions]
+    L --> K
+    
+    D --> M[User Fills Form]
+    M --> K
+    
+    K --> N[Follow-up Created]
+    N --> O[Track in System]
+    
+    O --> P{Due Date Check}
+    P -->|Due Today| Q[Show in Reminders]
+    P -->|Overdue| R[Mark as Overdue]
+    P -->|Future| S[Monitor Status]
+    
+    Q --> T{User Action}
+    R --> T
+    S --> P
+    
+    T --> U[Complete Follow-up]
+    T --> V[Snooze Follow-up]
+    T --> W[Edit Follow-up]
+    
+    U --> X[Add Completion Notes]
+    X --> Y[Mark as Completed]
+    
+    V --> Z[Update Due Date]
+    Z --> O
+    
+    W --> AA[Update Details]
+    AA --> O
+
+    style A fill:#e1f5fe
+    style N fill:#e8f5e9
+    style Y fill:#e8f5e9
+    style H fill:#fff3e0
+    style R fill:#ffebee
