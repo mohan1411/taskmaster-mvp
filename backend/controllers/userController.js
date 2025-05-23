@@ -5,6 +5,9 @@ const config = require('../config/config');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const client = new OAuth2Client(config.googleClientId);
 
@@ -22,7 +25,39 @@ const generateRefreshToken = (id) => {
   });
 };
 
-// Create email transporter
+// Configure multer for avatar uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, '../uploads/avatars');
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, req.user._id + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Check file type
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
 const createTransporter = () => {
   // For development, use a test email service like Ethereal
   // In production, use a real email service
@@ -448,6 +483,177 @@ const verifyResetToken = async (req, res) => {
   }
 };
 
+// @desc    Upload user avatar
+// @route   POST /api/users/upload-avatar
+// @access  Private
+const uploadAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Delete old avatar file if exists
+    if (user.avatar && user.avatar.includes('/uploads/avatars/')) {
+      const oldFilePath = path.join(__dirname, '..', user.avatar);
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+
+    // Update user with new avatar path
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    user.avatar = avatarUrl;
+    await user.save();
+
+    res.json({
+      message: 'Avatar uploaded successfully',
+      avatarUrl: avatarUrl
+    });
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Delete user avatar
+// @route   DELETE /api/users/avatar
+// @access  Private
+const deleteAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Delete avatar file if exists
+    if (user.avatar && user.avatar.includes('/uploads/avatars/')) {
+      const filePath = path.join(__dirname, '..', user.avatar);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    // Remove avatar from user
+    user.avatar = null;
+    await user.save();
+
+    res.json({
+      message: 'Avatar deleted successfully'
+    });
+  } catch (error) {
+    console.error('Avatar deletion error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Send email verification
+// @route   POST /api/users/send-verification-email
+// @access  Private
+const sendVerificationEmail = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ message: 'Email is already verified' });
+    }
+
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+    const verificationTokenExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+    // Save to user
+    user.emailVerificationToken = verificationToken;
+    user.emailVerificationExpire = verificationTokenExpiry;
+    await user.save();
+
+    // Create verification URL
+    const verificationUrl = `${config.frontendUrl}/verify-email/${verificationToken}`;
+
+    // Create email message
+    const message = `
+      <h1>Verify Your Email Address</h1>
+      <p>Please click on the following link to verify your email address:</p>
+      <a href="${verificationUrl}" clicktracking="off">${verificationUrl}</a>
+      <p>If you did not create an account, please ignore this email.</p>
+      <p>This link is valid for 24 hours.</p>
+    `;
+
+    try {
+      // Send email
+      const transporter = createTransporter();
+      
+      await transporter.sendMail({
+        to: user.email,
+        from: process.env.EMAIL_FROM || 'noreply@taskmaster.com',
+        subject: 'TaskMaster Email Verification',
+        html: message
+      });
+
+      res.json({ message: 'Verification email sent successfully' });
+    } catch (emailError) {
+      console.error('Email error:', emailError);
+      user.emailVerificationToken = undefined;
+      user.emailVerificationExpire = undefined;
+      await user.save();
+
+      return res.status(500).json({ message: 'Could not send verification email' });
+    }
+  } catch (error) {
+    console.error('Send verification email error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Verify email with token
+// @route   GET /api/users/verify-email/:token
+// @access  Public
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // Find user by verification token and check if it's expired
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired verification token' });
+    }
+
+    // Mark email as verified
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
+    await user.save();
+
+    res.json({
+      message: 'Email verified successfully',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified
+      }
+    });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -458,5 +664,10 @@ module.exports = {
   googleAuth,
   forgotPassword,
   resetPassword,
-  verifyResetToken
+  verifyResetToken,
+  uploadAvatar,
+  deleteAvatar,
+  sendVerificationEmail,
+  verifyEmail,
+  upload
 };

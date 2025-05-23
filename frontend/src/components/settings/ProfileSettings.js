@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -12,18 +12,111 @@ import {
   Snackbar,
   CircularProgress,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  IconButton,
+  Badge,
+  Chip
 } from '@mui/material';
+import {
+  PhotoCamera as PhotoCameraIcon,
+  Delete as DeleteIcon,
+  Email as EmailIcon,
+  CheckCircle as CheckCircleIcon,
+  Warning as WarningIcon
+} from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import api from '../../services/api';
 
 const ProfileSettings = () => {
   const { user, updateProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState(null);
   const [changePassword, setChangePassword] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [emailVerifying, setEmailVerifying] = useState(false);
+  const fileInputRef = useRef(null);
+  
+  // Handle avatar upload
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+    
+    try {
+      setAvatarUploading(true);
+      setError(null);
+      
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await api.post('/api/users/upload-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Update user context with new avatar URL
+      await updateProfile({ avatar: response.data.avatarUrl });
+      
+      setSuccessMessage('Avatar uploaded successfully!');
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+  
+  // Handle avatar deletion
+  const handleAvatarDelete = async () => {
+    try {
+      setAvatarUploading(true);
+      setError(null);
+      
+      await api.delete('/api/users/avatar');
+      
+      // Update user context to remove avatar
+      await updateProfile({ avatar: null });
+      
+      setSuccessMessage('Avatar deleted successfully!');
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete avatar');
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+  
+  // Handle email verification
+  const handleEmailVerification = async () => {
+    try {
+      setEmailVerifying(true);
+      setError(null);
+      
+      await api.post('/api/users/send-verification-email');
+      
+      setSuccessMessage('Verification email sent! Please check your inbox and spam folder.');
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send verification email');
+    } finally {
+      setEmailVerifying(false);
+    }
+  };
   
   // Custom validation function instead of using Yup's when
   const validate = (values) => {
@@ -84,6 +177,7 @@ const ProfileSettings = () => {
         // Call update profile
         await updateProfile(updateData);
         
+        setSuccessMessage('Profile updated successfully!');
         setSuccess(true);
         
         // Reset password fields
@@ -109,6 +203,7 @@ const ProfileSettings = () => {
   // Handle success notification close
   const handleSuccessClose = () => {
     setSuccess(false);
+    setSuccessMessage('');
   };
   
   return (
@@ -126,12 +221,12 @@ const ProfileSettings = () => {
       
       <Snackbar
         open={success}
-        autoHideDuration={6000}
+        autoHideDuration={8000}
         onClose={handleSuccessClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert onClose={handleSuccessClose} severity="success">
-          Profile updated successfully!
+          {successMessage || 'Operation completed successfully!'}
         </Alert>
       </Snackbar>
       
@@ -139,16 +234,91 @@ const ProfileSettings = () => {
         <Grid container spacing={3}>
           {/* Avatar section */}
           <Grid item xs={12} md={3} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Avatar
-              sx={{ width: 100, height: 100, mb: 2 }}
-              src={user?.avatar || ''}
-              alt={user?.name || 'User'}
-            >
-              {user?.name?.[0] || 'U'}
-            </Avatar>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-              {user?.isEmailVerified ? 'Email Verified' : 'Email Not Verified'}
-            </Typography>
+            <Box sx={{ position: 'relative', mb: 2 }}>
+              <Avatar
+                sx={{ width: 100, height: 100 }}
+                src={user?.avatar || ''}
+                alt={user?.name || 'User'}
+              >
+                {user?.name?.[0] || 'U'}
+              </Avatar>
+              
+              {/* Upload button */}
+              <IconButton
+                sx={{
+                  position: 'absolute',
+                  bottom: -8,
+                  right: -8,
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  },
+                }}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={avatarUploading}
+              >
+                {avatarUploading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <PhotoCameraIcon />
+                )}
+              </IconButton>
+              
+              {/* Delete button (show only if user has avatar) */}
+              {user?.avatar && (
+                <IconButton
+                  sx={{
+                    position: 'absolute',
+                    top: -8,
+                    right: -8,
+                    backgroundColor: 'error.main',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: 'error.dark',
+                    },
+                  }}
+                  onClick={handleAvatarDelete}
+                  disabled={avatarUploading}
+                  size="small"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+            
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              style={{ display: 'none' }}
+            />
+            
+            {/* Email verification status */}
+            <Box sx={{ textAlign: 'center' }}>
+              <Chip
+                icon={user?.isEmailVerified ? <CheckCircleIcon /> : <WarningIcon />}
+                label={user?.isEmailVerified ? 'Email Verified' : 'Email Not Verified'}
+                color={user?.isEmailVerified ? 'success' : 'warning'}
+                size="small"
+                sx={{ mb: 1 }}
+              />
+              
+              {!user?.isEmailVerified && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<EmailIcon />}
+                  onClick={handleEmailVerification}
+                  disabled={emailVerifying}
+                  sx={{ mt: 1 }}
+                >
+                  {emailVerifying ? 'Sending...' : 'Verify Email'}
+                </Button>
+              )}
+            </Box>
           </Grid>
           
           {/* Form fields */}

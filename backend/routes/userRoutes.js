@@ -10,7 +10,12 @@ const {
   googleAuth,
   forgotPassword,
   resetPassword,
-  verifyResetToken
+  verifyResetToken,
+  uploadAvatar,
+  deleteAvatar,
+  sendVerificationEmail,
+  verifyEmail,
+  upload
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -22,10 +27,14 @@ router.post('/google', googleAuth);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.get('/verify-reset-token/:token', verifyResetToken);
+router.get('/verify-email/:token', verifyEmail);
 
 // Protected routes
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 router.post('/logout', protect, logoutUser);
+router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
+router.delete('/avatar', protect, deleteAvatar);
+router.post('/send-verification-email', protect, sendVerificationEmail);
 
 module.exports = router;

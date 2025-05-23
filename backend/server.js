@@ -35,6 +35,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Use helmet if available
 if (helmet) {
   app.use(helmet());
@@ -59,6 +62,7 @@ const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
 
 // Define API routes
 app.use('/api/auth', userRoutes);
+app.use('/api/users', userRoutes); // Add users route for avatar uploads
 app.use('/api/tasks', taskRoutes);
 app.use('/api/emails', emailRoutes);
 app.use('/api/followups', followupRoutes);

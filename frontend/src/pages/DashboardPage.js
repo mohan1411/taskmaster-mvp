@@ -42,14 +42,6 @@ const priorityColors = {
   urgent: 'error'
 };
 
-// HARDCODED VALUES TO MATCH TASKS PAGE
-const HARDCODED_STATS = {
-  pendingTasks: 6,
-  overdueCount: 5,
-  followUpCount: 1,
-  unreadEmailCount: 0
-};
-
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -57,53 +49,132 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Use hardcoded values to ensure dashboard matches Tasks page
-  const [stats] = useState(HARDCODED_STATS);
+  // Real stats from API calls
+  const [stats, setStats] = useState({
+    pendingTasks: 0,
+    overdueCount: 0,
+    followUpCount: 0,
+    unreadEmailCount: 0
+  });
   
   const [taskData, setTaskData] = useState({
     recentTasks: [],
     dueTasks: []
   });
   
-  // Load dashboard data - simplified to just load the task data, stats are hardcoded
+  // Load dashboard data - fetch real statistics from API
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         setError(null);
         
-        // Get pending tasks for display in the dashboard
+        // Fetch real statistics
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Get active/pending tasks count
+        let pendingTasksCount = 0;
+        let overdueTasksCount = 0;
         try {
+          // Get all active tasks - remove limit to get actual count
           const tasksResponse = await api.get('/api/tasks', {
             params: {
-              limit: 10,
               status: 'pending,in-progress'
+              // Removed limit to get all tasks for accurate counting
             }
           });
           
+          console.log('Tasks API Response:', tasksResponse.data);
+          
           if (tasksResponse.data && tasksResponse.data.tasks) {
-            // Get today's date for filtering
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const allTasks = tasksResponse.data.tasks;
+            pendingTasksCount = allTasks.length;
+            
+            console.log(`Found ${allTasks.length} total active tasks`);
+            
+            // Count overdue tasks
+            overdueTasksCount = allTasks.filter(task => {
+              if (!task.dueDate) return false;
+              const dueDate = new Date(task.dueDate);
+              return dueDate < today;
+            }).length;
+            
+            console.log(`Found ${overdueTasksCount} overdue tasks`);
+            
+            // Get today's date for filtering due today tasks
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
             
             // Filter for tasks due today
-            const dueTasks = tasksResponse.data.tasks.filter(task => {
+            const dueTasks = allTasks.filter(task => {
               if (!task.dueDate) return false;
               const dueDate = new Date(task.dueDate);
               return dueDate >= today && dueDate < tomorrow;
             });
             
+            console.log(`Found ${dueTasks.length} tasks due today`);
+            
             // Update task data
             setTaskData({
-              recentTasks: tasksResponse.data.tasks.slice(0, 5),
+              recentTasks: allTasks.slice(0, 5),
               dueTasks: dueTasks
             });
           }
         } catch (taskErr) {
           console.error('Error fetching task data:', taskErr);
         }
+        
+        // Get follow-ups count - try both with and without status filter for debugging
+        let followUpCount = 0;
+        try {
+          // First, try to get ALL follow-ups to see what exists
+          const allFollowUpsResponse = await api.get('/api/followups');
+          console.log('ALL Follow-ups API Response:', allFollowUpsResponse.data);
+          
+          if (allFollowUpsResponse.data && allFollowUpsResponse.data.followups) {
+            console.log(`Total follow-ups in database: ${allFollowUpsResponse.data.followups.length}`);
+            console.log('Follow-up statuses:', allFollowUpsResponse.data.followups.map(f => f.status));
+            
+            // Count only active follow-ups (not completed or ignored)
+            const activeFollowUps = allFollowUpsResponse.data.followups.filter(f => 
+              f.status !== 'completed' && f.status !== 'ignored'
+            );
+            followUpCount = activeFollowUps.length;
+            console.log(`Found ${followUpCount} active follow-ups (excluding completed/ignored)`);
+          }
+        } catch (followUpErr) {
+          console.error('Error fetching follow-up data:', followUpErr);
+        }
+        
+        // Get unread emails count (if available)
+        let unreadEmailCount = 0;
+        try {
+          const emailResponse = await api.get('/api/emails/stats');
+          if (emailResponse.data && emailResponse.data.unreadCount !== undefined) {
+            unreadEmailCount = emailResponse.data.unreadCount;
+          }
+        } catch (emailErr) {
+          console.log('Email stats not available:', emailErr.message);
+          // This is optional, so don't show as error
+        }
+        
+        // Update stats with real data
+        setStats({
+          pendingTasks: pendingTasksCount,
+          overdueCount: overdueTasksCount,
+          followUpCount: followUpCount,
+          unreadEmailCount: unreadEmailCount
+        });
+        
+        // Debug log to check what we're actually getting
+        console.log('Dashboard Stats Debug:', {
+          pendingTasksCount,
+          overdueTasksCount,
+          followUpCount,
+          unreadEmailCount,
+          totalTasksReceived: tasksResponse?.data?.tasks?.length || 0
+        });
         
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
