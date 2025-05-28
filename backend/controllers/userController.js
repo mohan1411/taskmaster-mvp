@@ -391,8 +391,8 @@ const forgotPassword = async (req, res) => {
       
       await transporter.sendMail({
         to: user.email,
-        from: process.env.EMAIL_FROM || 'noreply@taskmaster.com',
-        subject: 'TaskMaster Password Reset',
+        from: process.env.EMAIL_FROM || 'noreply@fizztask.com',
+        subject: 'FizzTask Password Reset',
         html: message
       });
 
@@ -596,8 +596,8 @@ const sendVerificationEmail = async (req, res) => {
       
       await transporter.sendMail({
         to: user.email,
-        from: process.env.EMAIL_FROM || 'noreply@taskmaster.com',
-        subject: 'TaskMaster Email Verification',
+        from: process.env.EMAIL_FROM || 'noreply@fizztask.com',
+        subject: 'FizzTask Email Verification',
         html: message
       });
 

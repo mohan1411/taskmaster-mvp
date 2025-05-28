@@ -1,6 +1,6 @@
-# TaskMaster MVP
+# FizzTask
 
-A comprehensive task management system with AI-powered email integration and smart follow-up reminders.
+Add fizz to your tasks! A comprehensive task management system with AI-powered email integration and smart follow-up reminders that makes productivity exciting.
 
 ## 🚀 Features
 
@@ -38,8 +38,8 @@ A comprehensive task management system with AI-powered email integration and sma
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/taskmaster-mvp.git
-   cd taskmaster-mvp
+   git clone https://github.com/YOUR_USERNAME/fizztask.git
+   cd fizztask
    ```
 
 2. **Install backend dependencies**
@@ -60,7 +60,7 @@ A comprehensive task management system with AI-powered email integration and sma
    ```env
    NODE_ENV=development
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/taskmaster
+   MONGODB_URI=mongodb://localhost:27017/fizztask
    JWT_SECRET=your_jwt_secret_here
    OPENAI_API_KEY=your_openai_api_key_here
    ```
@@ -88,10 +88,10 @@ A comprehensive task management system with AI-powered email integration and sma
 ### Option 2: Use the provided batch files (Windows)
 ```bash
 # Start both servers
-start-taskmaster.bat
+start-fizztask.bat
 
 # Stop servers
-stop-taskmaster.bat
+stop-fizztask.bat
 ```
 
 The application will be available at:
@@ -157,7 +157,7 @@ Configure reminder settings per follow-up:
 ## 📁 Project Structure
 
 ```
-taskmaster-mvp/
+fizztask/
 ├── backend/
 │   ├── controllers/     # Route controllers
 │   ├── models/         # Database models
@@ -222,7 +222,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Mohan**
 - Project Manager & Developer
-- TaskMaster Solutions
+- FizzTask Solutions
 
 ## 🙏 Acknowledgments
 

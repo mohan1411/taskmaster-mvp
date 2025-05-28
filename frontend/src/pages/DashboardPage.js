@@ -243,7 +243,7 @@ const DashboardPage = () => {
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
-          Welcome to TaskMaster{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
+          Welcome to FizzTask{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
         </Typography>
         <Typography variant="body1" color="text.secondary" gutterBottom>
           Here's your productivity overview for today.

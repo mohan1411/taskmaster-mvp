@@ -1,0 +1,13 @@
+@echo off
+cd /d "%~dp0"
+echo Stopping TaskMaster server...
+call stop-taskmaster.bat
+echo Waiting for server to stop...
+timeout /t 5 /nobreak > nul
+echo Updating server.js with unified processing routes...
+cd backend
+node update-server.js
+cd ..
+echo Starting TaskMaster with unified processing...
+call start-taskmaster.bat
+echo Integration complete!

@@ -69,7 +69,7 @@ const NotificationSettings = () => {
       
       if (permission === 'granted') {
         // Show test notification
-        new Notification('TaskMaster', {
+        new Notification('FizzTask', {
           body: 'Browser notifications are now enabled!',
           icon: '/favicon.ico'
         });
@@ -112,7 +112,7 @@ const NotificationSettings = () => {
     switch (type) {
       case 'browser':
         if (Notification.permission === 'granted') {
-          new Notification('TaskMaster Test', {
+          new Notification('FizzTask Test', {
             body: 'This is a test browser notification',
             icon: '/favicon.ico'
           });

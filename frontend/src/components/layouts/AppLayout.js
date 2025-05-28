@@ -126,7 +126,7 @@ const AppLayout = () => {
   const getCurrentPageTitle = () => {
     const path = location.pathname;
     const item = menuItems.find((item) => item.path === path);
-    return item ? item.text : 'TaskMaster';
+    return item ? item.text : 'FizzTask';
   };
   
   const drawer = (
@@ -134,7 +134,7 @@ const AppLayout = () => {
       <DrawerHeader>
         <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            TaskMaster
+            FizzTask
           </Typography>
           <IconButton
             onClick={handleDrawerDesktopToggle}

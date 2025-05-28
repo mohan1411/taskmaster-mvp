@@ -1,7 +1,7 @@
 {
-  "name": "taskmaster-backend",
+  "name": "fizztask-backend",
   "version": "1.0.0",
-  "description": "TaskMaster API backend",
+  "description": "FizzTask API backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

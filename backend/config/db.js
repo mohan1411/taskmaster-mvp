@@ -6,7 +6,7 @@ mongoose.set('strictQuery', false);
 const connectDB = async () => {
   try {
     // Log the connection string (partially hidden for security)
-    const connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/taskmaster';
+    const connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/fizztask';
     console.log(`Connecting to MongoDB: ${connectionString.includes('@') ? 
       connectionString.replace(/\/\/(.+?)@/, '//***@') : 
       connectionString}`);

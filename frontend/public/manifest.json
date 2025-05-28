@@ -1,6 +1,6 @@
 {
-  "short_name": "TaskMaster",
-  "name": "TaskMaster - Small Business AI Assistant",
+  "short_name": "FizzTask",
+  "name": "FizzTask - Add Fizz to Your Tasks",
   "icons": [
     {
       "src": "favicon.ico",

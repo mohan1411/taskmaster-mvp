@@ -91,7 +91,7 @@ const RegisterPage = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up for TaskMaster
+            Sign up for FizzTask
           </Typography>
           
           {(error || authError) && (
@@ -184,8 +184,8 @@ const RegisterPage = () => {
             <Box mt={5}>
               <Typography variant="body2" color="text.secondary" align="center">
                 {'© '}
-                <Link color="inherit" href="#">
-                  TaskMaster
+                <Link color="inherit" href="https://fizztask.com">
+                  FizzTask
                 </Link>{' '}
                 {new Date().getFullYear()}
               </Typography>

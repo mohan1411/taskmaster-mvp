@@ -112,7 +112,7 @@ const LoginPage = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in to TaskMaster
+            Sign in to FizzTask
           </Typography>
           
           {(error || authError) && (
@@ -188,8 +188,8 @@ const LoginPage = () => {
             <Box mt={5}>
               <Typography variant="body2" color="text.secondary" align="center">
                 {'© '}
-                <Link color="inherit" href="#">
-                  TaskMaster
+                <Link color="inherit" href="https://fizztask.com">
+                  FizzTask
                 </Link>{' '}
                 {new Date().getFullYear()}
               </Typography>

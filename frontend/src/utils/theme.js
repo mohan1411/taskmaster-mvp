@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-// Create a custom theme with TaskMaster colors
+// Create a custom theme with FizzTask colors
 const theme = createTheme({
   palette: {
     primary: {
