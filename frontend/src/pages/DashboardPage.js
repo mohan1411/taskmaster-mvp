@@ -76,9 +76,10 @@ const DashboardPage = () => {
         // Get active/pending tasks count
         let pendingTasksCount = 0;
         let overdueTasksCount = 0;
+        let tasksResponse = null;
         try {
           // Get all active tasks - remove limit to get actual count
-          const tasksResponse = await api.get('/api/tasks', {
+          tasksResponse = await api.get('/api/tasks', {
             params: {
               status: 'pending,in-progress'
               // Removed limit to get all tasks for accurate counting
