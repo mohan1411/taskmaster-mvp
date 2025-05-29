@@ -24,6 +24,7 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/refresh', refreshToken);
 router.post('/google', googleAuth);
+router.get('/google/callback', googleAuth); // Add callback route
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.get('/verify-reset-token/:token', verifyResetToken);

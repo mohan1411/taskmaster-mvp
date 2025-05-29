@@ -284,6 +284,12 @@ const logoutUser = async (req, res) => {
 // @access  Public
 const googleAuth = async (req, res) => {
   try {
+    // Handle OAuth callback (GET request with code parameter)
+    if (req.method === 'GET' && req.query.code) {
+      return handleGoogleCallback(req, res);
+    }
+    
+    // Handle direct token verification (POST request)
     const { tokenId } = req.body;
     
     // Verify Google token
@@ -347,6 +353,82 @@ const googleAuth = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Handle Google OAuth callback
+const handleGoogleCallback = async (req, res) => {
+  try {
+    const { code } = req.query;
+    
+    if (!code) {
+      return res.status(400).json({ message: 'Authorization code missing' });
+    }
+
+    // Exchange code for tokens
+    const { tokens } = await client.getToken({
+      code,
+      client_id: config.googleClientId,
+      client_secret: config.googleClientSecret,
+      redirect_uri: config.googleCallbackUrl
+    });
+
+    // Verify the ID token
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: config.googleClientId
+    });
+
+    const { email_verified, name, email, picture, sub } = ticket.getPayload();
+
+    if (!email_verified) {
+      return res.redirect(`${config.appUrl}/login?error=email_not_verified`);
+    }
+
+    // Find existing user or create new one
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        googleId: sub,
+        avatar: picture,
+        isEmailVerified: true
+      });
+
+      // Create default settings for the user
+      await Settings.create({
+        user: user._id
+      });
+    } else {
+      // Update existing user with Google data if not already set
+      if (!user.googleId) {
+        user.googleId = sub;
+        user.isEmailVerified = true;
+        if (!user.avatar) {
+          user.avatar = picture;
+        }
+        await user.save();
+      }
+    }
+
+    // Generate tokens
+    const token = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Store refresh token in user document
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Redirect to frontend with tokens
+    const redirectUrl = `${config.appUrl}/login?token=${token}&refreshToken=${refreshToken}&name=${encodeURIComponent(user.name)}`;
+    res.redirect(redirectUrl);
+
+  } catch (error) {
+    console.error('Google OAuth callback error:', error);
+    res.redirect(`${config.appUrl}/login?error=oauth_failed`);
   }
 };
 
