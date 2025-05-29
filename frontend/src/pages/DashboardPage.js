@@ -195,12 +195,11 @@ const DashboardPage = () => {
     fetchDashboardData();
   }, []);
   
-  // Stat card renderer
+  // Stat card renderer - exact copy of what should work
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
       sx={{ 
         height: '100%',
-        minHeight: '100px',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'transform 0.2s',
         '&:hover': onClick ? { transform: 'translateY(-4px)', boxShadow: 3 } : {}
@@ -248,15 +247,7 @@ const DashboardPage = () => {
   }
   
   return (
-    <Container 
-      maxWidth="lg" 
-      sx={{ 
-        py: 4, 
-        px: { xs: 2, sm: 3 },
-        maxWidth: '1200px !important',
-        width: '100%'
-      }}
-    >
+    <Box sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto', px: 3, py: 4 }}>
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
@@ -283,43 +274,35 @@ const DashboardPage = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Stats Overview
       </Typography>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<CheckCircleOutline />}
-            title="Active Tasks"
-            value={stats.pendingTasks}
-            onClick={() => navigate('/tasks')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<ErrorIcon />}
-            title="Overdue Tasks"
-            value={stats.overdueCount}
-            color="error"
-            onClick={() => navigate('/tasks')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<NotificationIcon />}
-            title="Follow-ups"
-            value={stats.followUpCount}
-            color="secondary"
-            onClick={() => navigate('/followups')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<EmailIcon />}
-            title="Unread Emails"
-            value={stats.unreadEmailCount}
-            color="info"
-            onClick={() => navigate('/emails')}
-          />
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 2, mb: 3 }}>
+        <StatCard 
+          icon={<CheckCircleOutline />}
+          title="Active Tasks"
+          value={stats.pendingTasks}
+          onClick={() => navigate('/tasks')}
+        />
+        <StatCard 
+          icon={<ErrorIcon />}
+          title="Overdue Tasks"
+          value={stats.overdueCount}
+          color="error"
+          onClick={() => navigate('/tasks')}
+        />
+        <StatCard 
+          icon={<NotificationIcon />}
+          title="Follow-ups"
+          value={stats.followUpCount}
+          color="secondary"
+          onClick={() => navigate('/followups')}
+        />
+        <StatCard 
+          icon={<EmailIcon />}
+          title="Unread Emails"
+          value={stats.unreadEmailCount}
+          color="info"
+          onClick={() => navigate('/emails')}
+        />
+      </Box>
       
       {/* Two column layout */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
