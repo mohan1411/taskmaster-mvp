@@ -1,10 +1,17 @@
 /* Dashboard-specific styles to override everything */
 .dashboard-page {
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 32px 24px !important;
+  width: 100vw !important;
+  max-width: none !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+  padding: 32px calc(50vw - 600px) !important; /* Center content in 1200px */
   box-sizing: border-box !important;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-page {
+    padding: 32px 24px !important;
+  }
 }
 
 .dashboard-stats-grid {
