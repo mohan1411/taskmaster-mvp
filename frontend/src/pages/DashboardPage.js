@@ -450,7 +450,7 @@ const DashboardPage = () => {
           </CardActions>
         )}
       </Card>
-    </Container>
+    </Box>
   );
 };
 
