@@ -199,25 +199,24 @@ const DashboardPage = () => {
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
       sx={{ 
-        height: '120px', // Reduced height to match development
+        height: '100%',
+        minHeight: '100px',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'transform 0.2s',
         '&:hover': onClick ? { transform: 'translateY(-4px)', boxShadow: 3 } : {}
       }}
       onClick={onClick}
     >
-      <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <CardContent sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          {React.cloneElement(icon, { color: color || 'primary', fontSize: 'medium' })}
-          <Typography sx={{ ml: 1 }} color="text.secondary" variant="body2" noWrap>
+          {React.cloneElement(icon, { color: color || 'primary', fontSize: 'large' })}
+          <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
             {title}
           </Typography>
         </Box>
-        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h4" component="div" sx={{ fontWeight: '500', fontSize: '2rem' }}>
-            {value}
-          </Typography>
-        </Box>
+        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+          {value}
+        </Typography>
       </CardContent>
     </Card>
   );
@@ -249,7 +248,15 @@ const DashboardPage = () => {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container 
+      maxWidth="lg" 
+      sx={{ 
+        py: 4, 
+        px: { xs: 2, sm: 3 },
+        maxWidth: '1200px !important',
+        width: '100%'
+      }}
+    >
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
@@ -273,7 +280,7 @@ const DashboardPage = () => {
       </Paper>
       
       {/* Stats section */}
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Stats Overview
       </Typography>
       <Grid container spacing={2} sx={{ mb: 3 }}>
