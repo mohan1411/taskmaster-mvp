@@ -1070,6 +1070,12 @@ const checkGmailConnection = async (req, res) => {
 // @access  Private
 const getGmailAuthUrl = async (req, res) => {
   try {
+    console.log('=== Gmail Auth URL Generation ===');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Google Client ID:', config.googleClientId ? 'Set' : 'Missing');
+    console.log('Google Client Secret:', config.googleClientSecret ? 'Set' : 'Missing');
+    console.log('Google Callback URL from config:', config.googleCallbackUrl);
+    
     // Set up OAuth2 client
     const oauth2Client = new google.auth.OAuth2(
       config.googleClientId,
@@ -1088,6 +1094,9 @@ const getGmailAuthUrl = async (req, res) => {
       ],
       prompt: 'consent'  // Force consent screen to ensure we get a refresh token
     });
+    
+    console.log('Generated Auth URL:', authUrl);
+    console.log('===================================');
     
     res.json({ authUrl });
   } catch (error) {
