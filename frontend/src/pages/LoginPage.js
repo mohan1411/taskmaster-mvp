@@ -30,7 +30,7 @@ const validationSchema = Yup.object({
 });
 
 const LoginPage = () => {
-  const { login, error: authError } = useAuth();
+  const { login, error: authError, setUserData } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -38,13 +38,48 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  // Check for session expired message
+  // Check for OAuth callback with tokens in URL parameters
   React.useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    const refreshToken = urlParams.get('refreshToken');
+    const name = urlParams.get('name');
+    
+    // Handle OAuth callback with tokens
+    if (token && refreshToken) {
+      try {
+        // Create user object from URL parameters
+        const userData = {
+          token,
+          refreshToken,
+          name: decodeURIComponent(name || 'User')
+        };
+        
+        // Use AuthContext method to properly set user data
+        setUserData(userData);
+        
+        // Navigate to dashboard
+        navigate('/dashboard');
+        return;
+      } catch (error) {
+        console.error('Error handling OAuth callback:', error);
+        setError('OAuth login failed. Please try again.');
+        setOpenSnackbar(true);
+      }
+    }
+    
+    // Check for session expired message
     if (location.search.includes('session=expired')) {
       setError('Your session has expired. Please login again.');
       setOpenSnackbar(true);
     }
-  }, [location]);
+    
+    // Check for OAuth error
+    if (location.search.includes('error=')) {
+      setError('Google login failed. Please try again.');
+      setOpenSnackbar(true);
+    }
+  }, [location, navigate]);
 
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);

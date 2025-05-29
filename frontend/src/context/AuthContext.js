@@ -20,7 +20,9 @@ export const AuthProvider = ({ children }) => {
           setUser(userData);
           
           // Set default Authorization header for API requests
-          api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+          if (userData.token) {
+            api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+          }
         }
       } catch (err) {
         console.error('Error loading user from storage:', err);
@@ -33,6 +35,15 @@ export const AuthProvider = ({ children }) => {
 
     loadUser();
   }, []);
+
+  // Set user data (for OAuth callback handling)
+  const setUserData = (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    if (userData.token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+    }
+    setUser(userData);
+  };
 
   // Register new user
   const register = async (name, email, password) => {
@@ -212,7 +223,8 @@ export const AuthProvider = ({ children }) => {
     googleAuth,
     logout,
     refreshToken,
-    updateProfile
+    updateProfile,
+    setUserData
   };
 
   return (
