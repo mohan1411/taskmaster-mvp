@@ -24,6 +24,7 @@ router.route('/')
 router.post('/sync', syncEmails);
 router.get('/labels', getEmailLabels);
 router.get('/analytics', getEmailAnalytics);
+router.get('/stats', getEmailAnalytics); // Add stats alias
 router.post('/connect-gmail', connectGmail);
 router.get('/check-connection', checkGmailConnection);
 router.get('/auth-url', getGmailAuthUrl);
