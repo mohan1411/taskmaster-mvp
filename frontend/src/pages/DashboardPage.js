@@ -33,6 +33,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import FollowUpWidget from '../components/followups/FollowUpWidget';
+import './Dashboard.css';
 
 // Task priority colors
 const priorityColors = {
@@ -247,20 +248,7 @@ const DashboardPage = () => {
   }
   
   return (
-    <Box 
-      className="dashboard-container"
-      sx={{ 
-        width: '100%', 
-        maxWidth: '1200px !important', 
-        margin: '0 auto', 
-        py: 4, 
-        px: 3,
-        '& .MuiContainer-root': {
-          maxWidth: '1200px !important',
-          padding: '0 24px !important'
-        }
-      }}
-    >
+    <div className="dashboard-page">
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
@@ -287,48 +275,60 @@ const DashboardPage = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Stats Overview
       </Typography>
-      <Grid container spacing={2} sx={{ mb: 3, maxWidth: '100%' }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<CheckCircleOutline />}
-            title="Active Tasks"
-            value={stats.pendingTasks}
-            onClick={() => navigate('/tasks')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<ErrorIcon />}
-            title="Overdue Tasks"
-            value={stats.overdueCount}
-            color="error"
-            onClick={() => navigate('/tasks')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<NotificationIcon />}
-            title="Follow-ups"
-            value={stats.followUpCount}
-            color="secondary"
-            onClick={() => navigate('/followups')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            icon={<EmailIcon />}
-            title="Unread Emails"
-            value={stats.unreadEmailCount}
-            color="info"
-            onClick={() => navigate('/emails')}
-          />
-        </Grid>
-      </Grid>
+      <div className="dashboard-stats-grid">
+        <div className="dashboard-stat-card" onClick={() => navigate('/tasks')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <CheckCircleOutline color="primary" fontSize="large" />
+            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
+              Active Tasks
+            </Typography>
+          </Box>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            {stats.pendingTasks}
+          </Typography>
+        </div>
+        
+        <div className="dashboard-stat-card" onClick={() => navigate('/tasks')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <ErrorIcon color="error" fontSize="large" />
+            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
+              Overdue Tasks
+            </Typography>
+          </Box>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            {stats.overdueCount}
+          </Typography>
+        </div>
+        
+        <div className="dashboard-stat-card" onClick={() => navigate('/followups')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <NotificationIcon color="secondary" fontSize="large" />
+            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
+              Follow-ups
+            </Typography>
+          </Box>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            {stats.followUpCount}
+          </Typography>
+        </div>
+        
+        <div className="dashboard-stat-card" onClick={() => navigate('/emails')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <EmailIcon color="info" fontSize="large" />
+            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
+              Unread Emails
+            </Typography>
+          </Box>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            {stats.unreadEmailCount}
+          </Typography>
+        </div>
+      </div>
       
       {/* Two column layout */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <div className="dashboard-grid-container">
         {/* Due Today section */}
-        <Grid item xs={12} md={6}>
+        <div>
           {taskData.dueTasks && taskData.dueTasks.length > 0 ? (
             <Card sx={{ height: '100%', minHeight: '400px' }}>
               <CardContent>
@@ -393,13 +393,13 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           )}
-        </Grid>
+        </div>
         
         {/* Follow-ups section */}
-        <Grid item xs={12} md={6}>
+        <div>
           <FollowUpWidget />
-        </Grid>
-      </Grid>
+        </div>
+      </div>
       
       {/* Recent tasks section - Force visibility */}
       <Card sx={{ mb: 4, display: 'block !important', visibility: 'visible !important' }}>
@@ -471,7 +471,7 @@ const DashboardPage = () => {
           </CardActions>
         )}
       </Card>
-    </Box>
+    </div>
   );
 };
 
