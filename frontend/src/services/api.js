@@ -2,10 +2,17 @@ import axios from 'axios';
 
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '',
+  baseURL: process.env.REACT_APP_API_URL || 'https://taskmaster-mvp-production.up.railway.app',
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Debug logging
+console.log('API Configuration:', {
+  nodeEnv: process.env.NODE_ENV,
+  apiUrl: process.env.REACT_APP_API_URL,
+  finalBaseUrl: process.env.REACT_APP_API_URL || 'https://taskmaster-mvp-production.up.railway.app'
 });
 
 // Add a response interceptor to handle token refresh

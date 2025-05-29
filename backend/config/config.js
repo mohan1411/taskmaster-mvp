@@ -13,9 +13,20 @@ const config = {
   mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/fizztask',
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  googleCallbackUrl: process.env.NODE_ENV === 'production' 
-    ? 'https://fizztask.com/auth/gmail/callback'
-    : process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/gmail/callback',
+  googleCallbackUrl: (() => {
+    console.log('=== Google Callback URL Configuration ===');
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('GOOGLE_CALLBACK_URL env var:', process.env.GOOGLE_CALLBACK_URL);
+    
+    const callbackUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://fizztask.com/auth/gmail/callback'
+      : process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/gmail/callback';
+    
+    console.log('Final callback URL:', callbackUrl);
+    console.log('==========================================');
+    
+    return callbackUrl;
+  })(),
   openaiApiKey: process.env.OPENAI_API_KEY,
   email: {
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',

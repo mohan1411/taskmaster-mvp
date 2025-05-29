@@ -18,6 +18,17 @@ const { protect } = require('../middleware/authMiddleware');
 // All routes are protected
 router.use(protect);
 
+// Debug route to check config
+router.get('/debug-config', (req, res) => {
+  const config = require('../config/config');
+  res.json({
+    nodeEnv: process.env.NODE_ENV,
+    googleCallbackUrl: config.googleCallbackUrl,
+    googleCallbackUrlEnv: process.env.GOOGLE_CALLBACK_URL,
+    allEnvVars: Object.keys(process.env).filter(key => key.includes('GOOGLE'))
+  });
+});
+
 router.route('/')
   .get(getEmails);
 
