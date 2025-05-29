@@ -47,6 +47,7 @@ const theme = createTheme({
       'Arial',
       'sans-serif',
     ].join(','),
+    fontSize: 14, // Explicit base font size
     h1: {
       fontSize: '2.5rem',
       fontWeight: 500,
@@ -60,7 +61,7 @@ const theme = createTheme({
       fontWeight: 500,
     },
     h4: {
-      fontSize: '1.5rem',
+      fontSize: '2rem', // Explicit h4 size for stat cards
       fontWeight: 500,
     },
     h5: {
@@ -76,6 +77,10 @@ const theme = createTheme({
     },
     body2: {
       fontSize: '0.875rem',
+    },
+    subtitle2: {
+      fontSize: '0.875rem',
+      fontWeight: 500,
     },
   },
   components: {

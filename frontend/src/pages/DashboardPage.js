@@ -199,23 +199,25 @@ const DashboardPage = () => {
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
       sx={{ 
-        height: '140px', // Fixed height for consistency
+        height: '120px', // Reduced height to match development
         cursor: onClick ? 'pointer' : 'default',
         transition: 'transform 0.2s',
         '&:hover': onClick ? { transform: 'translateY(-4px)', boxShadow: 3 } : {}
       }}
       onClick={onClick}
     >
-      <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          {React.cloneElement(icon, { color: color || 'primary', fontSize: 'large' })}
-          <Typography sx={{ ml: 1 }} color="text.secondary" variant="subtitle2" noWrap>
+      <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          {React.cloneElement(icon, { color: color || 'primary', fontSize: 'medium' })}
+          <Typography sx={{ ml: 1 }} color="text.secondary" variant="body2" noWrap>
             {title}
           </Typography>
         </Box>
-        <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-          {value}
-        </Typography>
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="h4" component="div" sx={{ fontWeight: '500', fontSize: '2rem' }}>
+            {value}
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -247,7 +249,7 @@ const DashboardPage = () => {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4, minHeight: '100vh' }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
@@ -274,7 +276,7 @@ const DashboardPage = () => {
       <Typography variant="h6" gutterBottom>
         Stats Overview
       </Typography>
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard 
             icon={<CheckCircleOutline />}
