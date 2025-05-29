@@ -247,7 +247,20 @@ const DashboardPage = () => {
   }
   
   return (
-    <Container maxWidth={false} sx={{ maxWidth: '1200px', margin: '0 auto', py: 4, px: 3 }}>
+    <Box 
+      className="dashboard-container"
+      sx={{ 
+        width: '100%', 
+        maxWidth: '1200px !important', 
+        margin: '0 auto', 
+        py: 4, 
+        px: 3,
+        '& .MuiContainer-root': {
+          maxWidth: '1200px !important',
+          padding: '0 24px !important'
+        }
+      }}
+    >
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
@@ -274,7 +287,7 @@ const DashboardPage = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Stats Overview
       </Typography>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Grid container spacing={2} sx={{ mb: 3, maxWidth: '100%' }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard 
             icon={<CheckCircleOutline />}
@@ -458,7 +471,7 @@ const DashboardPage = () => {
           </CardActions>
         )}
       </Card>
-    </Container>
+    </Box>
   );
 };
 
