@@ -168,13 +168,20 @@ const DashboardPage = () => {
           unreadEmailCount: unreadEmailCount
         });
         
-        // Debug log to check what we're actually getting
-        console.log('Dashboard Stats Debug:', {
+        // Debug log to check what we're actually setting
+        console.log('🔍 Setting Stats:', {
           pendingTasksCount,
           overdueTasksCount,
           followUpCount,
           unreadEmailCount,
           totalTasksReceived: tasksResponse?.data?.tasks?.length || 0
+        });
+        
+        console.log('🔍 Stats state after setting:', {
+          pendingTasks: pendingTasksCount,
+          overdueCount: overdueTasksCount,
+          followUpCount: followUpCount,
+          unreadEmailCount: unreadEmailCount
         });
         
       } catch (err) {
@@ -192,21 +199,21 @@ const DashboardPage = () => {
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
       sx={{ 
-        height: '100%',
+        height: '140px', // Fixed height for consistency
         cursor: onClick ? 'pointer' : 'default',
         transition: 'transform 0.2s',
         '&:hover': onClick ? { transform: 'translateY(-4px)', boxShadow: 3 } : {}
       }}
       onClick={onClick}
     >
-      <CardContent sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+      <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           {React.cloneElement(icon, { color: color || 'primary', fontSize: 'large' })}
-          <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
+          <Typography sx={{ ml: 1 }} color="text.secondary" variant="subtitle2" noWrap>
             {title}
           </Typography>
         </Box>
-        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
           {value}
         </Typography>
       </CardContent>
@@ -240,7 +247,7 @@ const DashboardPage = () => {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, minHeight: '100vh' }}>
       {/* Welcome section */}
       <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
@@ -267,7 +274,7 @@ const DashboardPage = () => {
       <Typography variant="h6" gutterBottom>
         Stats Overview
       </Typography>
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard 
             icon={<CheckCircleOutline />}
@@ -306,11 +313,11 @@ const DashboardPage = () => {
       </Grid>
       
       {/* Two column layout */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* Due Today section */}
         <Grid item xs={12} md={6}>
           {taskData.dueTasks && taskData.dueTasks.length > 0 ? (
-            <Card sx={{ height: '100%' }}>
+            <Card sx={{ height: '100%', minHeight: '400px' }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom display="flex" alignItems="center">
                   <AlarmIcon color="warning" sx={{ mr: 1 }} />
@@ -381,20 +388,20 @@ const DashboardPage = () => {
         </Grid>
       </Grid>
       
-      {/* Recent tasks section */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
+      {/* Recent tasks section - Force visibility */}
+      <Card sx={{ mb: 4, display: 'block !important', visibility: 'visible !important' }}>
+        <CardContent sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom display="flex" alignItems="center">
             <CheckCircleOutline color="primary" sx={{ mr: 1 }} />
             Recent Tasks
           </Typography>
-          <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ mb: 3 }} />
           
           {taskData.recentTasks && taskData.recentTasks.length > 0 ? (
             <Grid container spacing={2}>
               {taskData.recentTasks.map((task) => (
                 <Grid item xs={12} sm={6} md={4} key={task._id}>
-                  <Card variant="outlined">
+                  <Card variant="outlined" sx={{ height: '100%' }}>
                     <CardContent>
                       <Typography variant="subtitle1" component="div" noWrap>
                         {task.title}
@@ -424,10 +431,9 @@ const DashboardPage = () => {
           ) : (
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <TaskIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>No Tasks Yet</Typography>
+              <Typography variant="h6" gutterBottom>No Recent Tasks</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
-                Start by connecting your Gmail account, sync your emails, and extract tasks from them. 
-                You can also create tasks manually.
+                Your recent tasks will appear here once you start creating or extracting tasks from emails.
               </Typography>
               <Stack direction="row" spacing={2} justifyContent="center">
                 <Button variant="contained" onClick={() => navigate('/emails')}>
@@ -441,7 +447,7 @@ const DashboardPage = () => {
           )}
         </CardContent>
         {taskData.recentTasks && taskData.recentTasks.length > 0 && (
-          <CardActions sx={{ justifyContent: 'flex-end' }}>
+          <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
             <Button 
               size="small" 
               endIcon={<ArrowForward />}

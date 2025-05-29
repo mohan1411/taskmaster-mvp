@@ -10,9 +10,10 @@ import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 
 // Debug theme loading
-console.log('Theme loaded:', theme);
-console.log('Environment:', process.env.NODE_ENV);
-console.log('API URL:', process.env.REACT_APP_API_URL);
+console.log('🎨 Theme loaded:', theme);
+console.log('🎨 Theme palette:', theme.palette);
+console.log('🎨 Environment:', process.env.NODE_ENV);
+console.log('🎨 API URL:', process.env.REACT_APP_API_URL);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
