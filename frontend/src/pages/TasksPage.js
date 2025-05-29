@@ -16,6 +16,7 @@ import TaskList from '../components/tasks/TaskList';
 import TaskModal from '../components/tasks/TaskModal';
 import DeleteConfirmationDialog from '../components/common/DeleteConfirmationDialog';
 import taskService from '../services/taskService';
+import '../styles/GlobalPages.css';
 
 const TasksPage = () => {
   // Tasks state
@@ -322,8 +323,8 @@ const TasksPage = () => {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
+    <div className="page-container">
+      <div className="page-content">
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" component="h1" gutterBottom>
@@ -449,8 +450,8 @@ const TasksPage = () => {
             {notification.message}
           </Alert>
         </Snackbar>
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 

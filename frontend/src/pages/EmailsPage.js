@@ -37,6 +37,7 @@ import EmailDetail from '../components/emails/EmailDetail';
 import emailService from '../services/emailService';
 import taskService from '../services/taskService';
 import followupService from '../services/followupService';
+import '../styles/GlobalPages.css';
 
 const EmailsPage = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -269,218 +270,6 @@ const handleDetectFollowUp = async (emailId) => {
     setSelectedEmail(null);
   };
 
-  return (
-    <Container maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Emails
-        </Typography>
-        
-        {/* Gmail Connection */}
-        <GmailConnect 
-          onConnected={(refreshed) => handleConnectionChange(true, refreshed)} 
-          onDisconnected={() => handleConnectionChange(false)} 
-        />
-        
-        {/* Error message */}
-        {error && (
-          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        
-        {isConnected && (
-          <>
-            {/* Email actions */}
-            <Box sx={{ mt: 3, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <TextField
-                placeholder="Search emails..."
-                variant="outlined"
-                size="small"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={handleSearch}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{ width: '300px' }}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SyncIcon />}
-                onClick={handleSyncEmails}
-                disabled={isSyncing}
-              >
-                {isSyncing ? (
-                  <>
-                    <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-                    Syncing Emails...
-                  </>
-                ) : (
-                  'Sync Emails from Gmail'
-                )}
-              </Button>
-            </Box>
-
-            {/* Email List and Detail */}
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={selectedEmail ? 6 : 12}>
-                <Paper sx={{ p: 3 }}>
-                  {isLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                  <CircularProgress />
-                </Box>
-              ) : emails.length === 0 ? (
-                <Box sx={{ p: 4, textAlign: 'center' }}>
-                  <EmailIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                  <Typography variant="h6" color="text.secondary">
-                    No emails found
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Try syncing your emails or adjusting your search filters
-                  </Typography>
-                </Box>
-              ) : (
-                <>
-                  <List sx={{ width: '100%' }}>
-                    {emails.map((email) => (
-                      <React.Fragment key={email._id}>
-                        <ListItem 
-                          alignItems="flex-start" 
-                          onClick={() => handleSelectEmail(email)}
-                          sx={{ 
-                            cursor: 'pointer',
-                            bgcolor: email.isRead ? 'inherit' : 'rgba(25, 118, 210, 0.08)',
-                            '&:hover': {
-                              bgcolor: 'rgba(0, 0, 0, 0.04)'
-                            }
-                          }}
-                        >
-                          <ListItemAvatar>
-                            <Avatar alt={email.sender.name || 'Unknown'} src="/static/images/avatar/1.jpg" />
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography
-                                  component="span"
-                                  variant="subtitle1"
-                                  fontWeight={email.isRead ? 'normal' : 'bold'}
-                                >
-                                  {email.subject || '(No Subject)'}
-                                </Typography>
-                                <Typography
-                                  component="span"
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {formatDate(email.receivedAt)}
-                                </Typography>
-                              </Box>
-                            }
-                            secondary={
-                              <>
-                                <Typography
-                                  component="span"
-                                  variant="body2"
-                                  color="text.primary"
-                                >
-                                  {email.sender.name} ({email.sender.email})
-                                </Typography>
-                                <Typography
-                                  component="p"
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mt: 0.5 }}
-                                >
-                                  {email.snippet}
-                                </Typography>
-                                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
-                                  {email.labels.map((label) => (
-                                    <Chip
-                                      key={label}
-                                      label={label.replace('CATEGORY_', '')}
-                                      size="small"
-                                      icon={<LabelIcon />}
-                                      variant="outlined"
-                                      sx={{ mr: 0.5, mb: 0.5 }}
-                                    />
-                                  ))}
-                                  
-                                  {email.taskExtracted && (
-                                    <Chip
-                                      icon={<TaskIcon />}
-                                      label="Tasks Extracted"
-                                      size="small"
-                                      color="primary"
-                                      variant="outlined"
-                                      sx={{ mr: 0.5, mb: 0.5 }}
-                                      title="This email has tasks extracted that are in your task list"
-                                    />
-                                  )}
-                                  
-                                  
-                                  {email.needsFollowUp && (
-                                    <Chip
-                                      icon={<FollowUpIcon />}
-                                      label="Needs Follow-up"
-                                      size="small"
-                                      color="warning"
-                                      variant="outlined"
-                                      sx={{ mr: 0.5, mb: 0.5 }}
-                                      title="This email requires a follow-up response"
-                                    />
-                                  )}
-                                  
-                                  {email.taskExtracted && email.needsFollowUp && (
-                                    <Chip
-                                      icon={<InfoIcon />}
-                                      label="Multiple Actions"
-                                      size="small"
-                                      color="success"
-                                      variant="outlined"
-                                      sx={{ mr: 0.5, mb: 0.5 }}
-                                      title="This email requires both tasks and follow-up"
-                                    />
-                                  )}
-                                  
-                                  <Box sx={{ flexGrow: 1 }} />
-                                  
-                                  <IconButton 
-                                    color="primary" 
-                                    size="small"
-                                    onClick={() => handleExtractTasks(email._id)}
-                                    title="Extract actionable tasks from this email content and add them to your task list"
-                                    disabled={email.taskExtracted}
-                                  >
-                                    <TaskIcon />
-                                  </IconButton>
-                                  
-                                  <IconButton 
-                                    color="warning" 
-                                    size="small"
-                                    onClick={() => handleDetectFollowUp(email._id)}
-                                    title="Analyze if this email requires a follow-up response"
-                                    disabled={email.needsFollowUp}
-                                  >
-                                    <FollowUpIcon />
-                                  </IconButton>
-                                </Box>
-                              </>
-                            }
-                          />
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                      </React.Fragment>
-                    ))}
-                  </List>
-                  
-                  {/* Pagination */}
                   <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>
                     <Pagination
                       count={totalPages}
@@ -519,8 +308,8 @@ const handleDetectFollowUp = async (emailId) => {
             </Typography>
           </Paper>
         )}
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 

@@ -34,6 +34,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import FollowUpWidget from '../components/followups/FollowUpWidget';
 import './Dashboard.css';
+import '../styles/GlobalPages.css';
 
 // Task priority colors
 const priorityColors = {

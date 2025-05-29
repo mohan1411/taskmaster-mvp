@@ -58,23 +58,23 @@ const theme = createTheme({
     ].join(','),
     fontSize: 14, // Explicit base font size
     h1: {
-      fontSize: '2.5rem',
+      fontSize: '2.25rem', // Reduced from 2.5rem
       fontWeight: 500,
     },
     h2: {
-      fontSize: '2rem',
+      fontSize: '1.875rem', // Reduced from 2rem
       fontWeight: 500,
     },
     h3: {
-      fontSize: '1.75rem',
+      fontSize: '1.5rem', // Reduced from 1.75rem
       fontWeight: 500,
     },
     h4: {
-      fontSize: '2rem', // Explicit h4 size for stat cards
+      fontSize: '1.625rem', // Reduced from 2rem for stat cards
       fontWeight: 500,
     },
     h5: {
-      fontSize: '1.25rem',
+      fontSize: '1.125rem',
       fontWeight: 500,
     },
     h6: {
@@ -82,13 +82,17 @@ const theme = createTheme({
       fontWeight: 500,
     },
     body1: {
-      fontSize: '1rem',
+      fontSize: '0.875rem', // Reduced from 1rem
     },
     body2: {
-      fontSize: '0.875rem',
+      fontSize: '0.8125rem', // Reduced from 0.875rem
+    },
+    subtitle1: {
+      fontSize: '0.875rem', // Reduced 
+      fontWeight: 500,
     },
     subtitle2: {
-      fontSize: '0.875rem',
+      fontSize: '0.8125rem', // Reduced from 0.875rem
       fontWeight: 500,
     },
   },

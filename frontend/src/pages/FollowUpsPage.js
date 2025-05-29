@@ -55,6 +55,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import CustomDatePicker from '../components/common/CustomDatePicker';
 import followupService from '../services/followupService';
 import FollowUpDetail from '../components/followups/FollowUpDetail';
+import '../styles/GlobalPages.css';
 
 const FollowUpsPage = () => {
   // URL parameters
@@ -443,7 +444,8 @@ const FollowUpsPage = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <div className="page-container">
+      <div className="page-content">
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
         <Grid container spacing={2} alignItems="center">
@@ -982,7 +984,8 @@ const FollowUpsPage = () => {
       </Snackbar>
       </>
       )}
-    </Container>
+      </div>
+    </div>
   );
 };
 
