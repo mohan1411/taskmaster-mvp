@@ -1,8 +1,18 @@
 import axios from 'axios';
 
+// Force the correct API URL for production
+const getApiUrl = () => {
+  // In production, always use Railway backend
+  if (window.location.hostname === 'fizztask.com') {
+    return 'https://taskmaster-mvp-production.up.railway.app';
+  }
+  // Otherwise use environment variable or default
+  return process.env.REACT_APP_API_URL || 'https://taskmaster-mvp-production.up.railway.app';
+};
+
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://taskmaster-mvp-production.up.railway.app',
+  baseURL: getApiUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,9 +20,10 @@ const api = axios.create({
 
 // Debug logging
 console.log('API Configuration:', {
+  hostname: window.location.hostname,
   nodeEnv: process.env.NODE_ENV,
-  apiUrl: process.env.REACT_APP_API_URL,
-  finalBaseUrl: process.env.REACT_APP_API_URL || 'https://taskmaster-mvp-production.up.railway.app'
+  apiUrlEnv: process.env.REACT_APP_API_URL,
+  finalBaseUrl: getApiUrl()
 });
 
 // Add a response interceptor to handle token refresh
