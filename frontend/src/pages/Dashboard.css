@@ -1,17 +1,16 @@
 /* Dashboard-specific styles to override everything */
 .dashboard-page {
-  width: 100vw !important;
+  position: fixed !important;
+  top: 64px !important; /* Below app bar */
+  left: 240px !important; /* After sidebar */
+  right: 0 !important;
+  bottom: 0 !important;
+  width: calc(100vw - 240px) !important;
   max-width: none !important;
-  margin-left: calc(-50vw + 50%) !important;
-  margin-right: calc(-50vw + 50%) !important;
-  padding: 32px calc(50vw - 600px) !important; /* Center content in 1200px */
+  margin: 0 !important;
+  padding: 32px !important;
   box-sizing: border-box !important;
-}
-
-@media (max-width: 1200px) {
-  .dashboard-page {
-    padding: 32px 24px !important;
-  }
+  overflow-y: auto !important;
 }
 
 .dashboard-stats-grid {
@@ -19,9 +18,24 @@
   grid-template-columns: repeat(4, 1fr) !important;
   gap: 16px !important;
   margin-bottom: 24px !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 1440px) {
+  .dashboard-stats-grid {
+    max-width: 100% !important;
+  }
 }
 
 @media (max-width: 900px) {
+  .dashboard-page {
+    left: 0 !important;
+    width: 100vw !important;
+    top: 56px !important;
+  }
+  
   .dashboard-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
@@ -55,6 +69,9 @@
   grid-template-columns: 1fr 1fr !important;
   gap: 24px !important;
   margin-bottom: 32px !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 @media (max-width: 900px) {
