@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Container,
   Box,
   Typography,
   Grid,
@@ -20,7 +19,6 @@ import {
   MenuItem,
   Stack,
   IconButton,
-  Tooltip,
   Pagination,
   Alert,
   Snackbar,
@@ -32,14 +30,12 @@ import {
   ListItemText,
   ListItemIcon,
   CircularProgress,
-  Avatar,
   Divider
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   Schedule as ScheduleIcon,
   Email as EmailIcon,
@@ -49,7 +45,7 @@ import {
   Assignment as AssignmentIcon,
   FlagOutlined as FlagIcon
 } from '@mui/icons-material';
-import { format, formatDistanceToNow, isToday, isPast, isTomorrow } from 'date-fns';
+import { format, isToday, isPast, isTomorrow } from 'date-fns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import CustomDatePicker from '../components/common/CustomDatePicker';
@@ -437,9 +433,11 @@ const FollowUpsPage = () => {
   // Error boundary
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
+      <div className="page-container">
+        <div className="page-content">
+          <Alert severity="error">{error}</Alert>
+        </div>
+      </div>
     );
   }
 

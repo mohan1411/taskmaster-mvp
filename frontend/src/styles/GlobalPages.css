@@ -1,19 +1,16 @@
-/* Global page layout styles for consistent design across all pages */
+/* Updated Global page layout styles for consistent design across all pages */
 
 /* Base page container - applies to all main content pages */
 .page-container {
-  position: fixed !important;
-  top: 64px !important; /* Below app bar */
-  left: 240px !important; /* After sidebar */
-  right: 0 !important;
-  bottom: 0 !important;
-  width: calc(100vw - 240px) !important;
-  max-width: none !important;
-  margin: 0 !important;
+  position: relative !important;
+  min-height: calc(100vh - 64px) !important; /* Account for app bar */
+  margin-left: 240px !important; /* After sidebar */
+  margin-top: 64px !important; /* Below app bar */
   padding: 24px 32px !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
   background-color: #f5f5f5 !important;
+  width: calc(100vw - 240px) !important;
 }
 
 /* Content wrapper with max-width for better readability */
@@ -21,6 +18,7 @@
   max-width: 1200px !important;
   margin: 0 auto !important;
   width: 100% !important;
+  min-height: 100% !important;
 }
 
 /* Typography adjustments for better proportions */
@@ -88,9 +86,9 @@
 /* Mobile responsiveness */
 @media (max-width: 900px) {
   .page-container {
-    left: 0 !important;
+    margin-left: 0 !important;
     width: 100vw !important;
-    top: 56px !important;
+    margin-top: 56px !important;
     padding: 16px !important;
   }
   
@@ -127,4 +125,48 @@
   justify-content: center !important;
   align-items: center !important;
   height: 200px !important;
+}
+
+/* Production environment specific adjustments */
+@media screen {
+  .page-container {
+    /* Use viewport-relative units for better cross-environment compatibility */
+    position: relative !important;
+    margin-left: 240px !important;
+    margin-top: 64px !important;
+    width: calc(100vw - 240px) !important;
+    min-height: calc(100vh - 64px) !important;
+    padding: 24px 32px !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    background-color: #f5f5f5 !important;
+  }
+}
+
+/* Fallback for environments with layout issues */
+.page-container.fallback-layout {
+  position: static !important;
+  margin: 0 !important;
+  padding: 24px !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: auto !important;
+}
+
+/* Ensure content is visible and not cut off */
+.page-content {
+  overflow: visible !important;
+  min-height: auto !important;
+  padding-bottom: 50px !important; /* Extra bottom padding to prevent cut-off */
+}
+
+/* Fix for common Material-UI container issues */
+.page-container .MuiContainer-root {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.page-container .MuiBox-root {
+  max-width: none !important;
 }
