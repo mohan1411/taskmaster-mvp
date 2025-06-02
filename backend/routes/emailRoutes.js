@@ -15,10 +15,7 @@ const {
 const { detectFollowUp } = require('../controllers/followupController');
 const { protect } = require('../middleware/authMiddleware');
 
-// All routes are protected
-router.use(protect);
-
-// Debug route to check config
+// Debug route to check config (no auth required for testing)
 router.get('/debug-config', (req, res) => {
   const config = require('../config/config');
   res.json({
@@ -28,6 +25,9 @@ router.get('/debug-config', (req, res) => {
     allEnvVars: Object.keys(process.env).filter(key => key.includes('GOOGLE'))
   });
 });
+
+// All routes are protected except debug
+router.use(protect);
 
 router.route('/')
   .get(getEmails);

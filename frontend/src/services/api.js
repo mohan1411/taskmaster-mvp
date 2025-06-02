@@ -1,12 +1,23 @@
 import axios from 'axios';
 
-// HARDCODED FIX FOR PRODUCTION
-const API_BASE_URL = 'https://taskmaster-mvp-production.up.railway.app';
+// Environment-based API URL configuration
+const getApiBaseUrl = () => {
+  // In development, use the environment variable or default to localhost
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  }
+  
+  // In production, use the production URL
+  return 'https://taskmaster-mvp-production.up.railway.app';
+};
 
-console.log('🚀 FORCED API CONFIG:', {
+const API_BASE_URL = getApiBaseUrl();
+
+console.log('🚀 API CONFIG:', {
   baseURL: API_BASE_URL,
+  environment: process.env.NODE_ENV,
   hostname: window.location.hostname,
-  env: process.env.REACT_APP_API_URL
+  env_var: process.env.REACT_APP_API_URL
 });
 
 // Create an axios instance with default config

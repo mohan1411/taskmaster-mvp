@@ -549,15 +549,47 @@ const extractTasksFromEmail = async (req, res) => {
       
       console.log('Extraction result from AI:', result);
       
-      if (result.success) {
+      if (result.success && result.extractedTasks && result.extractedTasks.length > 0) {
+        // *** FIX: Actually save tasks to database ***
+        const Task = mongoose.model('Task');
+        const savedTasks = [];
+        
+        for (const taskData of result.extractedTasks) {
+          try {
+            // Create task in database
+            const newTask = await Task.create({
+              title: taskData.title,
+              description: taskData.description || `Task extracted from email: ${email.subject}`,
+              user: req.user._id,
+              status: 'pending',
+              priority: taskData.priority || 'medium',
+              category: taskData.category || 'Email',
+              emailSource: email.messageId,
+              emailId: email.messageId,
+              dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
+            
+            console.log('✅ Task saved to database:', newTask._id, newTask.title);
+            savedTasks.push(newTask);
+            
+          } catch (taskCreateError) {
+            console.error('❌ Error creating task in database:', taskCreateError);
+            // Continue with other tasks even if one fails
+          }
+        }
+        
         // Mark email as processed
         email.taskExtracted = true;
         await email.save();
         
-        // Return the extracted tasks
-        console.log('Sending successful response with tasks:', result.extractedTasks);
+        console.log(`✅ Successfully saved ${savedTasks.length} tasks to database`);
+        
+        // Return the saved tasks
         return res.json({
-          extractedTasks: result.extractedTasks,
+          message: `Successfully extracted and saved ${savedTasks.length} tasks`,
+          extractedTasks: savedTasks,
           emailId: email.messageId,
           alreadyExtracted: false
         });
