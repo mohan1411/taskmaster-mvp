@@ -396,17 +396,13 @@ const TaskList = ({
                         size="small" 
                       />
                       <Chip 
-                        label={task.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} 
+                        label={isOverdue(task) && task.status !== 'completed' ? 
+                          `${task.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} (Overdue)` : 
+                          task.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                        } 
                         color={getStatusColor(task.status, task)} 
                         size="small" 
                       />
-                      {isOverdue(task) && (
-                        <Chip 
-                          label="Overdue" 
-                          color="error" 
-                          size="small" 
-                        />
-                      )}
                     </Stack>
                     
                     {task.description && (

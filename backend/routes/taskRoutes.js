@@ -25,6 +25,9 @@ router.route('/:id')
   .put(updateTask)
   .delete(deleteTask);
 
+// Add PATCH route for status updates
+router.patch('/:id/status', updateTask);
+
 router.post('/extract', extractTasksFromText);
 router.post('/save-extracted', saveExtractedTasks);
 router.get('/analytics', getTaskAnalytics);
