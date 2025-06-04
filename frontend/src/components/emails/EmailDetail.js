@@ -31,7 +31,9 @@ import {
   NotificationsActive as FollowUpIcon,
   Schedule as ScheduleIcon,
   Warning as WarningIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  MoreVert as MoreVertIcon
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -238,83 +240,150 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
           </Box>
         </Stack>
         
-        {/* Status indicators */}
-        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+        {/* Status indicators - Compact badges */}
+        <Stack direction="row" spacing={0.5} sx={{ mb: 1 }}>
           {!email.isRead && (
-            <Chip label="Unread" size="small" color="info" variant="outlined" />
+            <Box 
+              sx={{ 
+                width: 8, 
+                height: 8, 
+                borderRadius: '50%', 
+                bgcolor: 'primary.main',
+                alignSelf: 'center',
+                mr: 1
+              }} 
+              title="Unread"
+            />
           )}
           {email.hasAttachments && (
             <Chip 
-              icon={<AttachmentIcon />} 
-              label="Has Attachments" 
+              icon={<AttachmentIcon sx={{ fontSize: 14 }} />} 
+              label="Files" 
               size="small" 
-              variant="outlined" 
+              sx={{
+                height: 20,
+                fontSize: '0.75rem',
+                bgcolor: 'grey.100',
+                color: 'grey.700',
+                border: 'none',
+                '& .MuiChip-icon': {
+                  marginLeft: '4px',
+                  marginRight: '-2px'
+                }
+              }}
             />
           )}
           {email.taskExtracted && (
             <Chip 
-              icon={<TaskIcon />} 
+              icon={<CheckCircleOutlineIcon sx={{ fontSize: 14 }} />} 
               label="Tasks Extracted" 
               size="small" 
-              color="primary" 
-              variant="outlined" 
+              sx={{
+                height: 20,
+                fontSize: '0.75rem',
+                bgcolor: 'success.50',
+                color: 'success.700',
+                border: 'none',
+                '& .MuiChip-icon': {
+                  color: 'success.600',
+                  marginLeft: '4px',
+                  marginRight: '-2px'
+                }
+              }}
               title="This email has tasks extracted that are in your task list"
             />
           )}
           {email.needsFollowUp && (
             <Chip 
-              icon={<FollowUpIcon />} 
-              label="Needs Follow-up" 
+              icon={<ScheduleIcon sx={{ fontSize: 14 }} />} 
+              label="Follow-up" 
               size="small" 
-              color="warning" 
-              variant="outlined" 
+              sx={{
+                height: 20,
+                fontSize: '0.75rem',
+                bgcolor: 'warning.50',
+                color: 'warning.700',
+                border: 'none',
+                '& .MuiChip-icon': {
+                  color: 'warning.600',
+                  marginLeft: '4px',
+                  marginRight: '-2px'
+                }
+              }}
               title="This email requires a follow-up response"
-            />
-          )}
-          {email.taskExtracted && email.needsFollowUp && (
-            <Chip 
-              icon={<InfoIcon />} 
-              label="Multiple Actions" 
-              size="small" 
-              color="success" 
-              variant="outlined" 
-              title="This email requires both tasks and follow-up"
             />
           )}
         </Stack>
       </Box>
       
-      {/* Action buttons */}
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-        <Stack direction="row" spacing={2}>
+      {/* Action buttons - Compact Style */}
+      <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
+        <Stack direction="row" spacing={1} alignItems="center">
           <Button
-            variant="contained"
-            color="primary"
-            startIcon={<TaskIcon />}
+            size="small"
+            variant={email.taskExtracted ? "outlined" : "contained"}
+            color={email.taskExtracted ? "success" : "primary"}
+            startIcon={email.taskExtracted ? <CheckCircleOutlineIcon fontSize="small" /> : <TaskIcon fontSize="small" />}
             onClick={handleExtractTasks}
-            disabled={isExtracting || email.taskExtracted}
-            title="Extract actionable tasks from this email content and add them to your task list"
+            disabled={isExtracting}
+            sx={{
+              px: 2,
+              py: 0.5,
+              fontSize: '0.813rem',
+              textTransform: 'none',
+              fontWeight: 500,
+              ...(email.taskExtracted && {
+                bgcolor: 'success.50',
+                borderColor: 'success.main',
+                color: 'success.dark',
+                '&:hover': {
+                  bgcolor: 'success.100',
+                  borderColor: 'success.dark'
+                }
+              })
+            }}
           >
-            {isExtracting ? 'Extracting...' : 'Extract Tasks'}
+            {isExtracting ? 'Extracting...' : email.taskExtracted ? 'Tasks Extracted' : 'Extract Tasks'}
           </Button>
+          
           <Button
-            variant="contained"
+            size="small"
+            variant="outlined"
             color="warning"
-            startIcon={<FollowUpIcon />}
+            startIcon={<FollowUpIcon fontSize="small" />}
             onClick={handleDetectFollowUp}
             disabled={isDetectingFollowUp || email.needsFollowUp}
-            title="Analyze if this email requires a follow-up response"
+            sx={{
+              px: 2,
+              py: 0.5,
+              fontSize: '0.813rem',
+              textTransform: 'none',
+              fontWeight: 500,
+              bgcolor: 'warning.50',
+              borderColor: 'warning.main',
+              color: 'warning.dark',
+              '&:hover': {
+                bgcolor: 'warning.100',
+                borderColor: 'warning.dark'
+              }
+            }}
           >
             {isDetectingFollowUp ? 'Analyzing...' : 'Detect Follow-up'}
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<FollowUpIcon />}
+          
+          {/* More actions menu */}
+          <IconButton 
+            size="small" 
+            sx={{ 
+              ml: 'auto',
+              color: 'text.secondary',
+              '&:hover': { bgcolor: 'action.hover' }
+            }}
             onClick={handleCreateFollowUp}
-            title="Manually create a follow-up reminder for this email"
+            title="More actions"
           >
-            Create Follow-up
-          </Button>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
         </Stack>
       </Box>
       

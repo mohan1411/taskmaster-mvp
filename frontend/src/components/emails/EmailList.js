@@ -26,8 +26,11 @@ import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
-  ExtractOutlined as ExtractIcon,
-  NotificationsOutlined as FollowUpIcon
+  Task as TaskIcon,
+  NotificationsActive as FollowUpIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  Schedule as ScheduleIcon,
+  AttachFile as AttachmentIcon
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 
@@ -189,8 +192,14 @@ const EmailList = ({
                   button
                   onClick={() => onSelectEmail && onSelectEmail(email)}
                   sx={{ 
-                    backgroundColor: !email.isRead ? 'rgba(25, 118, 210, 0.05)' : 'transparent',
-                    transition: 'background-color 0.2s'
+                    backgroundColor: !email.isRead ? 'rgba(25, 118, 210, 0.04)' : 'transparent',
+                    transition: 'all 0.2s',
+                    py: 1.5,
+                    px: 2,
+                    '&:hover': {
+                      backgroundColor: !email.isRead ? 'rgba(25, 118, 210, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                    },
+                    position: 'relative'
                   }}
                 >
                   <ListItemAvatar>
@@ -253,41 +262,138 @@ const EmailList = ({
                           {email.snippet || 'No preview available'}
                         </Typography>
                         
-                        {/* Email indicators */}
-                        <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+                        {/* Email indicators - Compact badges */}
+                        <Box sx={{ mt: 1, display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
                           {email.taskExtracted && (
                             <Chip 
-                              label="Tasks Extracted" 
+                              icon={<CheckCircleOutlineIcon sx={{ fontSize: 14 }} />}
+                              label="Tasks" 
                               size="small" 
-                              color="primary"
-                              variant="outlined"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.75rem',
+                                bgcolor: 'success.50',
+                                color: 'success.700',
+                                border: 'none',
+                                '& .MuiChip-icon': {
+                                  color: 'success.600',
+                                  marginLeft: '4px',
+                                  marginRight: '-2px'
+                                }
+                              }}
                             />
                           )}
                           {email.needsFollowUp === true && (
                             <Chip 
-                              icon={<FollowUpIcon />}
-                              label="Needs Follow-up" 
+                              icon={<ScheduleIcon sx={{ fontSize: 14 }} />}
+                              label="Follow-up" 
                               size="small" 
-                              color="warning"
-                              variant="outlined"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.75rem',
+                                bgcolor: 'warning.50',
+                                color: 'warning.700',
+                                border: 'none',
+                                '& .MuiChip-icon': {
+                                  color: 'warning.600',
+                                  marginLeft: '4px',
+                                  marginRight: '-2px'
+                                }
+                              }}
                             />
                           )}
                           {email.hasAttachments && (
                             <Chip 
-                              label="Attachment" 
+                              icon={<AttachmentIcon sx={{ fontSize: 14 }} />}
+                              label="Files" 
                               size="small" 
-                              variant="outlined"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.75rem',
+                                bgcolor: 'grey.100',
+                                color: 'grey.700',
+                                border: 'none',
+                                '& .MuiChip-icon': {
+                                  marginLeft: '4px',
+                                  marginRight: '-2px'
+                                }
+                              }}
                             />
                           )}
                           {!email.isRead && (
-                            <Chip 
-                              icon={<UnreadIcon />}
-                              label="Unread" 
-                              size="small" 
-                              color="info"
-                              variant="outlined"
+                            <Box 
+                              sx={{ 
+                                width: 8, 
+                                height: 8, 
+                                borderRadius: '50%', 
+                                bgcolor: 'primary.main',
+                                flexShrink: 0
+                              }} 
+                              title="Unread"
                             />
                           )}
+                        </Box>
+                        
+                        {/* Quick actions - only show on hover */}
+                        <Box 
+                          className="email-actions"
+                          sx={{ 
+                            mt: 1, 
+                            display: 'flex', 
+                            gap: 0.5,
+                            opacity: 0,
+                            transition: 'opacity 0.2s',
+                            '.MuiListItem-root:hover &': {
+                              opacity: 1
+                            }
+                          }}
+                        >
+                          {!email.taskExtracted && (
+                            <Button
+                              size="small"
+                              variant="text"
+                              startIcon={<TaskIcon sx={{ fontSize: 16 }} />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onExtractTasks(email);
+                              }}
+                              sx={{
+                                fontSize: '0.75rem',
+                                textTransform: 'none',
+                                px: 1.5,
+                                py: 0.25,
+                                minWidth: 'auto',
+                                color: 'primary.main',
+                                '&:hover': {
+                                  bgcolor: 'primary.50'
+                                }
+                              }}
+                            >
+                              Extract Tasks
+                            </Button>
+                          )}
+                          <Button
+                            size="small"
+                            variant="text"
+                            startIcon={<FollowUpIcon sx={{ fontSize: 16 }} />}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDetectFollowUp(email);
+                            }}
+                            sx={{
+                              fontSize: '0.75rem',
+                              textTransform: 'none',
+                              px: 1.5,
+                              py: 0.25,
+                              minWidth: 'auto',
+                              color: 'warning.main',
+                              '&:hover': {
+                                bgcolor: 'warning.50'
+                              }
+                            }}
+                          >
+                            Follow-up
+                          </Button>
                         </Box>
                       </>
                     }
@@ -297,9 +403,10 @@ const EmailList = ({
                     edge="end"
                     aria-label="email actions"
                     onClick={(e) => handleOpenMenu(e, email)}
-                    sx={{ mt: 1 }}
+                    sx={{ mt: 1, ml: 'auto', flexShrink: 0 }}
+                    size="small"
                   >
-                    <MoreVertIcon />
+                    <MoreVertIcon fontSize="small" />
                   </IconButton>
                 </ListItem>
                 {index < filteredEmails.length - 1 && <Divider variant="inset" component="li" />}
@@ -316,7 +423,7 @@ const EmailList = ({
         onClose={handleCloseMenu}
       >
         <MenuItem onClick={handleExtractTasks}>
-          <ExtractIcon fontSize="small" sx={{ mr: 1 }} />
+          <TaskIcon fontSize="small" sx={{ mr: 1 }} />
           Extract Tasks
         </MenuItem>
         <MenuItem onClick={handleDetectFollowUp}>

@@ -7,21 +7,18 @@ import {
   Button, 
   CircularProgress, 
   Alert,
-  Divider,
   Card,
   CardContent,
   Grid,
-  Chip,
   Fab
 } from '@mui/material';
 import { 
   Email as EmailIcon,
-  Sync as SyncIcon,
-  Refresh as RefreshIcon,
-  TaskAlt as TaskAltIcon,
-  ReplyAll as FollowUpIcon
+  Sync as SyncIcon
 } from '@mui/icons-material';
 import GmailConnect from '../components/emails/GmailConnect';
+import EmailList from '../components/emails/EmailList';
+import EmailDetail from '../components/emails/EmailDetail';
 import emailService from '../services/emailService';
 import '../styles/GlobalPages.css';
 
@@ -31,7 +28,7 @@ const EmailsPage = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState(null);
   const [emails, setEmails] = useState([]);
-  const [processingEmails, setProcessingEmails] = useState(new Set());
+  const [selectedEmail, setSelectedEmail] = useState(null);
   const [emailStats, setEmailStats] = useState({
     total: 0,
     unread: 0,
@@ -113,12 +110,12 @@ const EmailsPage = () => {
     }
   };
 
-  const extractTasks = async (emailId) => {
+  const handleExtractTasks = async (email) => {
     try {
-      setProcessingEmails(prev => new Set(prev).add(emailId));
-      console.log('Extracting tasks for email:', emailId);
+      setError(null);
+      console.log('Extracting tasks for email:', email._id);
       
-      const result = await emailService.extractTasksFromEmail(emailId);
+      const result = await emailService.extractTasksFromEmail(email._id);
       console.log('Extract tasks result:', result);
       
       // Show success message
@@ -133,21 +130,15 @@ const EmailsPage = () => {
     } catch (err) {
       console.error('Error extracting tasks:', err);
       setError(`❌ Failed to extract tasks: ${err.response?.data?.message || err.message}`);
-    } finally {
-      setProcessingEmails(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(emailId);
-        return newSet;
-      });
     }
   };
 
-  const detectFollowUp = async (emailId) => {
+  const handleDetectFollowUp = async (email) => {
     try {
-      setProcessingEmails(prev => new Set(prev).add(emailId));
-      console.log('Detecting follow-up for email:', emailId);
+      setError(null);
+      console.log('Detecting follow-up for email:', email._id);
       
-      const result = await emailService.detectFollowUp(emailId);
+      const result = await emailService.detectFollowUp(email._id);
       console.log('Detect follow-up result:', result);
       
       // Show result message
@@ -162,27 +153,19 @@ const EmailsPage = () => {
     } catch (err) {
       console.error('Error detecting follow-up:', err);
       setError(`❌ Failed to detect follow-up: ${err.response?.data?.message || err.message}`);
-    } finally {
-      setProcessingEmails(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(emailId);
-        return newSet;
-      });
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = (now - date) / (1000 * 60 * 60);
-    
-    if (diffInHours < 24) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (diffInHours < 24 * 7) {
-      return date.toLocaleDateString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
-    } else {
-      return date.toLocaleDateString();
-    }
+  const handleSelectEmail = (email) => {
+    setSelectedEmail(email);
+  };
+
+  const handleCloseEmailDetail = () => {
+    setSelectedEmail(null);
+  };
+
+  const handleRefresh = () => {
+    loadEmails();
   };
 
   return (
@@ -293,156 +276,30 @@ const EmailsPage = () => {
                   </Grid>
                 </Grid>
 
-                {/* Email List */}
-                {emails.length === 0 ? (
-                  <Paper sx={{ p: 3, textAlign: 'center' }}>
-                    <EmailIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="h6" gutterBottom>
-                      No emails found
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                      Click "Sync Emails" to fetch your recent emails from Gmail.
-                    </Typography>
-                    <Button 
-                      variant="contained" 
-                      onClick={handleSync} 
-                      disabled={isSyncing}
-                      startIcon={<SyncIcon />}
-                    >
-                      {isSyncing ? 'Syncing...' : 'Sync Now'}
-                    </Button>
-                  </Paper>
-                ) : (
-                  <Paper sx={{ p: 0 }}>
-                    <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="h6">
-                        Recent Emails ({emails.length})
-                      </Typography>
-                      <Button 
-                        variant="outlined" 
-                        size="small"
-                        onClick={loadEmails}
-                        startIcon={<RefreshIcon />}
-                      >
-                        Refresh
-                      </Button>
-                    </Box>
-                    
-                    {emails.map((email, index) => (
-                      <Paper key={email._id} elevation={1} sx={{ m: 2, p: 3, border: '1px solid #e0e0e0' }}>
-                        {/* Email Content */}
-                        <Box sx={{ mb: 3 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              {!email.isRead && (
-                                <Box
-                                  sx={{
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: '50%',
-                                    bgcolor: 'primary.main',
-                                    mr: 1
-                                  }}
-                                />
-                              )}
-                              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                                {email.sender.name || email.sender.email}
-                              </Typography>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary">
-                              {formatDate(email.receivedAt)}
-                            </Typography>
-                          </Box>
-                          
-                          <Typography variant="h6" fontWeight={email.isRead ? 'normal' : 'bold'} sx={{ mb: 1 }}>
-                            {email.subject}
-                          </Typography>
-                          
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            {email.snippet}
-                          </Typography>
-                        </Box>
-
-                        {/* Status Chips */}
-                        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                          {email.taskExtracted && (
-                            <Chip 
-                              label="✅ Tasks Extracted" 
-                              color="success" 
-                              size="small"
-                              icon={<TaskAltIcon />}
-                            />
-                          )}
-                          {email.needsFollowUp && (
-                            <Chip 
-                              label="📅 Follow-up Needed" 
-                              color="warning" 
-                              size="small"
-                              icon={<FollowUpIcon />}
-                            />
-                          )}
-                        </Box>
-
-                        {/* Action Buttons - Large and Prominent */}
-                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            startIcon={
-                              processingEmails.has(email._id) ? (
-                                <CircularProgress size={20} color="inherit" />
-                              ) : (
-                                <TaskAltIcon />
-                              )
-                            }
-                            onClick={() => extractTasks(email._id)}
-                            disabled={processingEmails.has(email._id)}
-                            sx={{ 
-                              minWidth: 180,
-                              py: 1.5,
-                              fontSize: '1rem',
-                              backgroundColor: email.taskExtracted ? 'success.main' : 'primary.main',
-                              '&:hover': {
-                                backgroundColor: email.taskExtracted ? 'success.dark' : 'primary.dark'
-                              }
-                            }}
-                          >
-                            {processingEmails.has(email._id) ? 'Processing...' : 
-                             email.taskExtracted ? 'Tasks Extracted ✅' : 'Extract Tasks'}
-                          </Button>
-                          
-                          <Button
-                            variant="contained"
-                            color="warning"
-                            size="large"
-                            startIcon={
-                              processingEmails.has(email._id) ? (
-                                <CircularProgress size={20} color="inherit" />
-                              ) : (
-                                <FollowUpIcon />
-                              )
-                            }
-                            onClick={() => detectFollowUp(email._id)}
-                            disabled={processingEmails.has(email._id)}
-                            sx={{ 
-                              minWidth: 180,
-                              py: 1.5,
-                              fontSize: '1rem',
-                              backgroundColor: email.needsFollowUp ? 'success.main' : 'warning.main',
-                              '&:hover': {
-                                backgroundColor: email.needsFollowUp ? 'success.dark' : 'warning.dark'
-                              }
-                            }}
-                          >
-                            {processingEmails.has(email._id) ? 'Processing...' : 
-                             email.needsFollowUp ? 'Follow-up Set ✅' : 'Detect Follow-up'}
-                          </Button>
-                        </Box>
-                      </Paper>
-                    ))}
-                  </Paper>
-                )}
+                {/* Use EmailList component for displaying emails */}
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={selectedEmail ? 6 : 12}>
+                    <EmailList
+                      emails={emails}
+                      loading={isLoading}
+                      error={null}
+                      onRefresh={handleRefresh}
+                      onSelectEmail={handleSelectEmail}
+                      onExtractTasks={handleExtractTasks}
+                      onDetectFollowUp={handleDetectFollowUp}
+                    />
+                  </Grid>
+                  
+                  {selectedEmail && (
+                    <Grid item xs={12} md={6}>
+                      <EmailDetail
+                        email={selectedEmail}
+                        onClose={handleCloseEmailDetail}
+                        onRefresh={handleRefresh}
+                      />
+                    </Grid>
+                  )}
+                </Grid>
               </>
             )}
           </>
