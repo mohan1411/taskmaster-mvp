@@ -1,19 +1,19 @@
-/* Updated Global page layout styles for consistent design across all pages */
+/* Compact Global Design System */
 
-/* Base page container - applies to all main content pages */
+/* Base page container */
 .page-container {
   position: relative !important;
-  min-height: calc(100vh - 64px) !important; /* Account for app bar */
-  margin-left: 240px !important; /* After sidebar */
-  margin-top: 64px !important; /* Below app bar */
-  padding: 24px 32px !important;
+  min-height: calc(100vh - 64px) !important;
+  margin-left: 240px !important;
+  margin-top: 64px !important;
+  padding: 20px 24px !important; /* Reduced from 24px 32px */
   box-sizing: border-box !important;
   overflow-y: auto !important;
   background-color: #f5f5f5 !important;
   width: calc(100vw - 240px) !important;
 }
 
-/* Content wrapper with max-width for better readability */
+/* Content wrapper */
 .page-content {
   max-width: 1200px !important;
   margin: 0 auto !important;
@@ -21,41 +21,65 @@
   min-height: 100% !important;
 }
 
-/* Typography adjustments for better proportions */
+/* Compact Typography Scale */
 .page-container h1 {
-  font-size: 2rem !important;
+  font-size: 1.75rem !important; /* Reduced from 2rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
 }
 
 .page-container h2 {
-  font-size: 1.75rem !important;
+  font-size: 1.5rem !important; /* Reduced from 1.75rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
 }
 
 .page-container h3 {
-  font-size: 1.5rem !important;
+  font-size: 1.25rem !important; /* Reduced from 1.5rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
 }
 
 .page-container h4 {
-  font-size: 1.75rem !important; /* Slightly reduced from 2rem */
+  font-size: 1.5rem !important; /* Reduced from 1.75rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
 }
 
 .page-container h5 {
-  font-size: 1.125rem !important;
+  font-size: 1rem !important; /* Reduced from 1.125rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
 }
 
 .page-container h6 {
-  font-size: 1rem !important;
+  font-size: 0.875rem !important; /* Reduced from 1rem */
   font-weight: 500 !important;
-  margin-bottom: 0.75rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Compact spacing for Material-UI components */
+.page-container .MuiPaper-root {
+  /* Default compact spacing for cards */
+}
+
+.page-container .MuiCard-root .MuiCardContent-root {
+  padding: 16px !important; /* Reduced from 24px */
+}
+
+.page-container .MuiCard-root .MuiCardContent-root:last-child {
+  padding-bottom: 16px !important;
+}
+
+/* Compact lists */
+.page-container .MuiList-root.MuiList-dense .MuiListItem-root {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* Compact buttons */
+.page-container .MuiButton-root {
+  text-transform: none !important;
 }
 
 /* Grid layouts for consistent card displays */
@@ -136,7 +160,7 @@
     margin-top: 64px !important;
     width: calc(100vw - 240px) !important;
     min-height: calc(100vh - 64px) !important;
-    padding: 24px 32px !important;
+    padding: 20px 24px !important;
     box-sizing: border-box !important;
     overflow-y: auto !important;
     background-color: #f5f5f5 !important;

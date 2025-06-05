@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardActions,
-  CardHeader,
   Divider,
   CircularProgress,
   Alert,
@@ -19,7 +18,9 @@ import {
   ListItemText,
   ListItemIcon,
   Chip,
-  Stack
+  Stack,
+  IconButton,
+  Collapse
 } from '@mui/material';
 import {
   CheckCircleOutline,
@@ -28,12 +29,14 @@ import {
   Email as EmailIcon,
   ArrowForward,
   NotificationsActive as NotificationIcon,
-  TaskAlt as TaskIcon
+  TaskAlt as TaskIcon,
+  TrendingUp as TrendingUpIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import FollowUpWidget from '../components/followups/FollowUpWidget';
-import './Dashboard.css';
 import '../styles/GlobalPages.css';
 
 // Task priority colors
@@ -50,6 +53,11 @@ const DashboardPage = () => {
   
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedSections, setExpandedSections] = useState({
+    summary: true,
+    dueTasks: true,
+    recentTasks: true
+  });
   
   // Real stats from API calls
   const [stats, setStats] = useState({
@@ -64,7 +72,15 @@ const DashboardPage = () => {
     dueTasks: []
   });
   
-  // Load dashboard data - fetch real statistics from API
+  // Toggle section expansion
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+  
+  // Load dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -80,21 +96,15 @@ const DashboardPage = () => {
         let overdueTasksCount = 0;
         let tasksResponse = null;
         try {
-          // Get all active tasks - remove limit to get actual count
           tasksResponse = await api.get('/api/tasks', {
             params: {
               status: 'pending,in-progress'
-              // Removed limit to get all tasks for accurate counting
             }
           });
-          
-          console.log('Tasks API Response:', tasksResponse.data);
           
           if (tasksResponse.data && tasksResponse.data.tasks) {
             const allTasks = tasksResponse.data.tasks;
             pendingTasksCount = allTasks.length;
-            
-            console.log(`Found ${allTasks.length} total active tasks`);
             
             // Count overdue tasks
             overdueTasksCount = allTasks.filter(task => {
@@ -102,8 +112,6 @@ const DashboardPage = () => {
               const dueDate = new Date(task.dueDate);
               return dueDate < today;
             }).length;
-            
-            console.log(`Found ${overdueTasksCount} overdue tasks`);
             
             // Get today's date for filtering due today tasks
             const tomorrow = new Date(today);
@@ -116,8 +124,6 @@ const DashboardPage = () => {
               return dueDate >= today && dueDate < tomorrow;
             });
             
-            console.log(`Found ${dueTasks.length} tasks due today`);
-            
             // Update task data
             setTaskData({
               recentTasks: allTasks.slice(0, 5),
@@ -128,23 +134,16 @@ const DashboardPage = () => {
           console.error('Error fetching task data:', taskErr);
         }
         
-        // Get follow-ups count - try both with and without status filter for debugging
+        // Get follow-ups count
         let followUpCount = 0;
         try {
-          // First, try to get ALL follow-ups to see what exists
           const allFollowUpsResponse = await api.get('/api/followups');
-          console.log('ALL Follow-ups API Response:', allFollowUpsResponse.data);
           
           if (allFollowUpsResponse.data && allFollowUpsResponse.data.followups) {
-            console.log(`Total follow-ups in database: ${allFollowUpsResponse.data.followups.length}`);
-            console.log('Follow-up statuses:', allFollowUpsResponse.data.followups.map(f => f.status));
-            
-            // Count only active follow-ups (not completed or ignored)
             const activeFollowUps = allFollowUpsResponse.data.followups.filter(f => 
               f.status !== 'completed' && f.status !== 'ignored'
             );
             followUpCount = activeFollowUps.length;
-            console.log(`Found ${followUpCount} active follow-ups (excluding completed/ignored)`);
           }
         } catch (followUpErr) {
           console.error('Error fetching follow-up data:', followUpErr);
@@ -159,27 +158,10 @@ const DashboardPage = () => {
           }
         } catch (emailErr) {
           console.log('Email stats not available:', emailErr.message);
-          // This is optional, so don't show as error
         }
         
         // Update stats with real data
         setStats({
-          pendingTasks: pendingTasksCount,
-          overdueCount: overdueTasksCount,
-          followUpCount: followUpCount,
-          unreadEmailCount: unreadEmailCount
-        });
-        
-        // Debug log to check what we're actually setting
-        console.log('🔍 Setting Stats:', {
-          pendingTasksCount,
-          overdueTasksCount,
-          followUpCount,
-          unreadEmailCount,
-          totalTasksReceived: tasksResponse?.data?.tasks?.length || 0
-        });
-        
-        console.log('🔍 Stats state after setting:', {
           pendingTasks: pendingTasksCount,
           overdueCount: overdueTasksCount,
           followUpCount: followUpCount,
@@ -197,281 +179,361 @@ const DashboardPage = () => {
     fetchDashboardData();
   }, []);
   
-  // Stat card renderer - exact copy of what should work
+  // Compact stat card component
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
       sx={{ 
-        height: '100%',
+        height: 80,
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'transform 0.2s',
-        '&:hover': onClick ? { transform: 'translateY(-4px)', boxShadow: 3 } : {}
+        transition: 'all 0.2s',
+        '&:hover': onClick ? { 
+          transform: 'translateY(-2px)', 
+          boxShadow: 2,
+          bgcolor: 'action.hover' 
+        } : {}
       }}
       onClick={onClick}
     >
-      <CardContent sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          {React.cloneElement(icon, { color: color || 'primary', fontSize: 'large' })}
-          <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
-            {title}
-          </Typography>
+      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: 48,
+            height: 48,
+            borderRadius: 1,
+            bgcolor: `${color}.50`,
+            mr: 2
+          }}>
+            {React.cloneElement(icon, { 
+              sx: { fontSize: 24, color: `${color}.main` } 
+            })}
+          </Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="h3" sx={{ fontSize: '1.75rem', fontWeight: 600, lineHeight: 1 }}>
+              {value}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {title}
+            </Typography>
+          </Box>
         </Box>
-        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-          {value}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-  
-  // Empty state card component
-  const EmptyStateCard = ({ title, icon, message, buttonText, onClick }) => (
-    <Card sx={{ height: '100%' }}>
-      <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
-        {React.cloneElement(icon, { sx: { fontSize: 64, color: 'text.secondary', mb: 2 } })}
-        <Typography variant="h6" gutterBottom>{title}</Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
-          {message}
-        </Typography>
-        <Button variant="outlined" onClick={onClick}>
-          {buttonText}
-        </Button>
       </CardContent>
     </Card>
   );
   
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <CircularProgress />
+      </Box>
     );
   }
   
   return (
-    <div className="dashboard-page">
-      {/* Welcome section */}
-      <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Welcome to FizzTask{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
-        </Typography>
-        <Typography variant="body1" color="text.secondary" gutterBottom>
-          Here's your productivity overview for today.
-        </Typography>
+    <div className="page-container">
+      <div className="page-content">
+        {/* Compact Header */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h4" sx={{ fontSize: '1.5rem', fontWeight: 500, mb: 0.5 }}>
+            Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </Typography>
+        </Box>
         
+        {/* Alerts */}
         {stats.overdueCount > 0 && (
-          <Alert severity="warning" sx={{ mt: 2 }}>
-            You have {stats.overdueCount} overdue tasks that need attention.
+          <Alert 
+            severity="warning" 
+            sx={{ mb: 2 }}
+            action={
+              <Button size="small" onClick={() => navigate('/tasks')}>
+                View Tasks
+              </Button>
+            }
+          >
+            You have <strong>{stats.overdueCount}</strong> overdue tasks that need attention.
           </Alert>
         )}
         
         {error && (
-          <Alert severity="info" sx={{ mt: 2 }}>
+          <Alert severity="info" sx={{ mb: 2 }} onClose={() => setError(null)}>
             {error}
           </Alert>
         )}
-      </Paper>
-      
-      {/* Stats section */}
-      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-        Stats Overview
-      </Typography>
-      <div className="dashboard-stats-grid">
-        <div className="dashboard-stat-card" onClick={() => navigate('/tasks')}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <CheckCircleOutline color="primary" fontSize="large" />
-            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
-              Active Tasks
-            </Typography>
-          </Box>
-          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-            {stats.pendingTasks}
-          </Typography>
-        </div>
         
-        <div className="dashboard-stat-card" onClick={() => navigate('/tasks')}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <ErrorIcon color="error" fontSize="large" />
-            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
-              Overdue Tasks
-            </Typography>
-          </Box>
-          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-            {stats.overdueCount}
-          </Typography>
-        </div>
+        {/* Compact Stats Grid */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={6} sm={3}>
+            <StatCard
+              icon={<CheckCircleOutline />}
+              title="Active Tasks"
+              value={stats.pendingTasks}
+              color="primary"
+              onClick={() => navigate('/tasks')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <StatCard
+              icon={<ErrorIcon />}
+              title="Overdue"
+              value={stats.overdueCount}
+              color="error"
+              onClick={() => navigate('/tasks')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <StatCard
+              icon={<NotificationIcon />}
+              title="Follow-ups"
+              value={stats.followUpCount}
+              color="warning"
+              onClick={() => navigate('/followups')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <StatCard
+              icon={<EmailIcon />}
+              title="Unread"
+              value={stats.unreadEmailCount}
+              color="info"
+              onClick={() => navigate('/emails')}
+            />
+          </Grid>
+        </Grid>
         
-        <div className="dashboard-stat-card" onClick={() => navigate('/followups')}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <NotificationIcon color="secondary" fontSize="large" />
-            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
-              Follow-ups
-            </Typography>
-          </Box>
-          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-            {stats.followUpCount}
-          </Typography>
-        </div>
-        
-        <div className="dashboard-stat-card" onClick={() => navigate('/emails')}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <EmailIcon color="info" fontSize="large" />
-            <Typography sx={{ ml: 1 }} color="text.secondary" gutterBottom noWrap>
-              Unread Emails
-            </Typography>
-          </Box>
-          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-            {stats.unreadEmailCount}
-          </Typography>
-        </div>
-      </div>
-      
-      {/* Two column layout */}
-      <div className="dashboard-grid-container">
-        {/* Due Today section */}
-        <div>
-          {taskData.dueTasks && taskData.dueTasks.length > 0 ? (
-            <Card sx={{ height: '100%', minHeight: '400px' }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom display="flex" alignItems="center">
-                  <AlarmIcon color="warning" sx={{ mr: 1 }} />
-                  Due Today
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                
-                <List>
-                  {taskData.dueTasks.map((task) => (
-                    <ListItem key={task._id} alignItems="flex-start">
-                      <ListItemIcon>
-                        <CheckCircleOutline color="action" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={task.title}
-                        secondary={
-                          <React.Fragment>
-                            <Typography variant="body2" color="text.secondary" component="span">
-                              {task.description?.substring(0, 60) || 'No description'}
-                              {task.description?.length > 60 ? '...' : ''}
+        {/* Two column layout for main content */}
+        <Grid container spacing={3}>
+          {/* Due Today section - Compact */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ height: '100%' }}>
+              <Box 
+                sx={{ 
+                  p: 2, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: 'action.hover' }
+                }}
+                onClick={() => toggleSection('dueTasks')}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <AlarmIcon color="warning" sx={{ mr: 1, fontSize: 20 }} />
+                  <Typography variant="subtitle1" fontWeight={500}>
+                    Due Today
+                  </Typography>
+                  <Chip 
+                    label={taskData.dueTasks.length} 
+                    size="small" 
+                    sx={{ ml: 1, height: 20 }}
+                  />
+                </Box>
+                <IconButton size="small">
+                  {expandedSections.dueTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              
+              <Divider />
+              
+              <Collapse in={expandedSections.dueTasks}>
+                {taskData.dueTasks.length > 0 ? (
+                  <List dense sx={{ py: 0 }}>
+                    {taskData.dueTasks.map((task) => (
+                      <ListItem 
+                        key={task._id} 
+                        button
+                        onClick={() => navigate('/tasks')}
+                        sx={{ py: 1.5, px: 2 }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <CheckCircleOutline fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2" noWrap>
+                              {task.title}
                             </Typography>
-                            <Box sx={{ mt: 1 }}>
+                          }
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                               <Chip 
                                 size="small" 
                                 label={task.priority} 
-                                color={priorityColors[task.priority] || 'default'} 
-                                sx={{ mr: 1 }}
+                                color={priorityColors[task.priority]} 
+                                sx={{ height: 18, fontSize: '0.7rem' }}
                               />
                               {task.dueDate && (
-                                <Chip 
-                                  size="small" 
-                                  label={new Date(task.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
-                                  variant="outlined" 
-                                />
+                                <Typography variant="caption" color="text.secondary">
+                                  {new Date(task.dueDate).toLocaleTimeString([], { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </Typography>
                               )}
                             </Box>
-                          </React.Fragment>
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'flex-end' }}>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No tasks due today
+                    </Typography>
+                    <Button 
+                      size="small" 
+                      onClick={() => navigate('/tasks')}
+                      sx={{ mt: 1 }}
+                    >
+                      View All Tasks
+                    </Button>
+                  </Box>
+                )}
+              </Collapse>
+              
+              {taskData.dueTasks.length > 0 && expandedSections.dueTasks && (
+                <>
+                  <Divider />
+                  <Box sx={{ p: 1, textAlign: 'center' }}>
+                    <Button 
+                      size="small" 
+                      endIcon={<ArrowForward fontSize="small" />}
+                      onClick={() => navigate('/tasks')}
+                    >
+                      View All Tasks
+                    </Button>
+                  </Box>
+                </>
+              )}
+            </Paper>
+          </Grid>
+          
+          {/* Follow-ups section */}
+          <Grid item xs={12} md={6}>
+            <FollowUpWidget />
+          </Grid>
+        </Grid>
+        
+        {/* Recent Tasks - Compact List View */}
+        <Paper sx={{ mt: 3 }}>
+          <Box 
+            sx={{ 
+              p: 2, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'action.hover' }
+            }}
+            onClick={() => toggleSection('recentTasks')}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TrendingUpIcon color="primary" sx={{ mr: 1, fontSize: 20 }} />
+              <Typography variant="subtitle1" fontWeight={500}>
+                Recent Activity
+              </Typography>
+            </Box>
+            <IconButton size="small">
+              {expandedSections.recentTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          </Box>
+          
+          <Divider />
+          
+          <Collapse in={expandedSections.recentTasks}>
+            {taskData.recentTasks.length > 0 ? (
+              <List dense sx={{ py: 0 }}>
+                {taskData.recentTasks.map((task) => (
+                  <ListItem 
+                    key={task._id}
+                    button
+                    onClick={() => navigate('/tasks')}
+                    sx={{ 
+                      py: 1.5, 
+                      px: 2,
+                      '&:hover': {
+                        bgcolor: 'action.hover'
+                      }
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Typography variant="body2" noWrap sx={{ mr: 2 }}>
+                            {task.title}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            <Chip 
+                              size="small" 
+                              label={task.status.replace('-', ' ')}
+                              color={task.status === 'in-progress' ? 'primary' : 'default'} 
+                              sx={{ height: 18, fontSize: '0.7rem' }}
+                            />
+                            <Chip 
+                              size="small" 
+                              label={task.priority} 
+                              color={priorityColors[task.priority]} 
+                              sx={{ height: 18, fontSize: '0.7rem' }}
+                            />
+                          </Box>
+                        </Box>
+                      }
+                      secondary={
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          {task.description || 'No description'}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <TaskIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  No recent tasks
+                </Typography>
+                <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 2 }}>
+                  <Button 
+                    variant="contained" 
+                    size="small"
+                    onClick={() => navigate('/emails')}
+                  >
+                    Check Emails
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    size="small"
+                    onClick={() => navigate('/tasks')}
+                  >
+                    Create Task
+                  </Button>
+                </Stack>
+              </Box>
+            )}
+          </Collapse>
+          
+          {taskData.recentTasks.length > 0 && expandedSections.recentTasks && (
+            <>
+              <Divider />
+              <Box sx={{ p: 1, textAlign: 'center' }}>
                 <Button 
                   size="small" 
-                  endIcon={<ArrowForward />}
+                  endIcon={<ArrowForward fontSize="small" />}
                   onClick={() => navigate('/tasks')}
                 >
                   View All Tasks
                 </Button>
-              </CardActions>
-            </Card>
-          ) : (
-            <EmptyStateCard
-              title="No Tasks Due Today"
-              icon={<AlarmIcon />}
-              message="You don't have any tasks due today. You can check your task list for other pending and overdue tasks."
-              buttonText="View All Tasks"
-              onClick={() => navigate('/tasks')}
-            />
+              </Box>
+            </>
           )}
-        </div>
-        
-        {/* Follow-ups section */}
-        <div>
-          <FollowUpWidget />
-        </div>
+        </Paper>
       </div>
-      
-      {/* Recent tasks section - Force visibility */}
-      <Card sx={{ mb: 4, display: 'block !important', visibility: 'visible !important' }}>
-        <CardContent sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom display="flex" alignItems="center">
-            <CheckCircleOutline color="primary" sx={{ mr: 1 }} />
-            Recent Tasks
-          </Typography>
-          <Divider sx={{ mb: 3 }} />
-          
-          {taskData.recentTasks && taskData.recentTasks.length > 0 ? (
-            <Grid container spacing={2}>
-              {taskData.recentTasks.map((task) => (
-                <Grid item xs={12} sm={6} md={4} key={task._id}>
-                  <Card variant="outlined" sx={{ height: '100%' }}>
-                    <CardContent>
-                      <Typography variant="subtitle1" component="div" noWrap>
-                        {task.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {task.description?.substring(0, 100) || 'No description'}
-                        {task.description?.length > 100 ? '...' : ''}
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                        <Chip 
-                          size="small" 
-                          label={task.status}
-                          color={task.status === 'in-progress' ? 'primary' : 'default'} 
-                          sx={{ mr: 1 }}
-                        />
-                        <Chip 
-                          size="small" 
-                          label={task.priority} 
-                          color={priorityColors[task.priority] || 'default'} 
-                        />
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <TaskIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>No Recent Tasks</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
-                Your recent tasks will appear here once you start creating or extracting tasks from emails.
-              </Typography>
-              <Stack direction="row" spacing={2} justifyContent="center">
-                <Button variant="contained" onClick={() => navigate('/emails')}>
-                  Go to Emails
-                </Button>
-                <Button variant="outlined" onClick={() => navigate('/tasks')}>
-                  Create Task Manually
-                </Button>
-              </Stack>
-            </Box>
-          )}
-        </CardContent>
-        {taskData.recentTasks && taskData.recentTasks.length > 0 && (
-          <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
-            <Button 
-              size="small" 
-              endIcon={<ArrowForward />}
-              onClick={() => navigate('/tasks')}
-            >
-              View All Tasks
-            </Button>
-          </CardActions>
-        )}
-      </Card>
     </div>
   );
 };

@@ -1,0 +1,366 @@
+/* Compact Global Design System - Enhanced */
+
+/* Root variables for consistent theming */
+:root {
+  --compact-spacing-xs: 4px;
+  --compact-spacing-sm: 8px;
+  --compact-spacing-md: 12px;
+  --compact-spacing-lg: 16px;
+  --compact-spacing-xl: 20px;
+  --compact-spacing-xxl: 24px;
+  
+  --compact-font-xs: 0.625rem;  /* 10px */
+  --compact-font-sm: 0.688rem;  /* 11px */
+  --compact-font-md: 0.75rem;   /* 12px */
+  --compact-font-base: 0.813rem; /* 13px */
+  --compact-font-lg: 0.875rem;  /* 14px */
+  --compact-font-xl: 1rem;      /* 16px */
+  --compact-font-2xl: 1.125rem; /* 18px */
+  --compact-font-3xl: 1.25rem;  /* 20px */
+  --compact-font-4xl: 1.5rem;   /* 24px */
+  --compact-font-5xl: 1.75rem;  /* 28px */
+}
+
+/* Base page container - Compact */
+.page-container {
+  position: relative !important;
+  min-height: calc(100vh - 64px) !important;
+  margin-left: 240px !important;
+  margin-top: 64px !important;
+  padding: 16px 20px !important; /* Further reduced */
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  background-color: #f8f9fa !important;
+  width: calc(100vw - 240px) !important;
+}
+
+/* Content wrapper */
+.page-content {
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  min-height: 100% !important;
+}
+
+/* Compact Typography Scale - Refined */
+.page-container h1,
+.MuiTypography-h1 {
+  font-size: var(--compact-font-5xl) !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.page-container h2,
+.MuiTypography-h2 {
+  font-size: var(--compact-font-4xl) !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.page-container h3,
+.MuiTypography-h3 {
+  font-size: var(--compact-font-3xl) !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.page-container h4,
+.MuiTypography-h4 {
+  font-size: var(--compact-font-2xl) !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.page-container h5,
+.MuiTypography-h5 {
+  font-size: var(--compact-font-xl) !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.page-container h6,
+.MuiTypography-h6 {
+  font-size: var(--compact-font-lg) !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Body text */
+.MuiTypography-body1 {
+  font-size: var(--compact-font-lg) !important;
+  line-height: 1.5 !important;
+}
+
+.MuiTypography-body2 {
+  font-size: var(--compact-font-base) !important;
+  line-height: 1.5 !important;
+}
+
+.MuiTypography-caption {
+  font-size: var(--compact-font-md) !important;
+  line-height: 1.4 !important;
+}
+
+/* Compact spacing for Material-UI components */
+.page-container .MuiPaper-root {
+  border-radius: 8px !important;
+}
+
+/* Compact Cards */
+.page-container .MuiCard-root {
+  border-radius: 8px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.page-container .MuiCard-root .MuiCardContent-root {
+  padding: var(--compact-spacing-lg) !important;
+}
+
+.page-container .MuiCard-root .MuiCardContent-root:last-child {
+  padding-bottom: var(--compact-spacing-lg) !important;
+}
+
+/* Ultra-compact stat cards */
+.compact-stat-card {
+  height: 72px !important;
+}
+
+.compact-stat-card .MuiCardContent-root {
+  padding: var(--compact-spacing-md) !important;
+}
+
+.compact-stat-card .MuiCardContent-root:last-child {
+  padding-bottom: var(--compact-spacing-md) !important;
+}
+
+/* Compact lists */
+.page-container .MuiList-root {
+  padding: 0 !important;
+}
+
+.page-container .MuiList-root.MuiList-dense .MuiListItem-root {
+  padding-top: var(--compact-spacing-sm) !important;
+  padding-bottom: var(--compact-spacing-sm) !important;
+  padding-left: var(--compact-spacing-md) !important;
+  padding-right: var(--compact-spacing-md) !important;
+  min-height: 40px !important;
+}
+
+.page-container .MuiListItemIcon-root {
+  min-width: 32px !important;
+}
+
+.page-container .MuiListItemText-root {
+  margin: 0 !important;
+}
+
+/* Compact buttons */
+.page-container .MuiButton-root {
+  text-transform: none !important;
+  font-weight: 500 !important;
+}
+
+.page-container .MuiButton-sizeSmall {
+  height: 28px !important;
+  padding: 4px 12px !important;
+  font-size: var(--compact-font-md) !important;
+}
+
+.page-container .MuiButton-sizeMedium {
+  height: 32px !important;
+  padding: 6px 16px !important;
+  font-size: var(--compact-font-base) !important;
+}
+
+/* Compact chips */
+.page-container .MuiChip-sizeSmall {
+  height: 20px !important;
+  font-size: var(--compact-font-sm) !important;
+}
+
+.page-container .MuiChip-sizeSmall .MuiChip-label {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.page-container .MuiChip-sizeMedium {
+  height: 24px !important;
+  font-size: var(--compact-font-md) !important;
+}
+
+/* Compact icon buttons */
+.page-container .MuiIconButton-sizeSmall {
+  padding: 4px !important;
+}
+
+.page-container .MuiIconButton-sizeMedium {
+  padding: 8px !important;
+}
+
+/* Section headers */
+.compact-section-header {
+  padding: var(--compact-spacing-md) var(--compact-spacing-lg) !important;
+  background-color: #f5f5f5 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+}
+
+.compact-section-header:hover {
+  background-color: #eeeeee !important;
+}
+
+/* Grid layouts for consistent card displays */
+.cards-grid {
+  display: grid !important;
+  gap: var(--compact-spacing-lg) !important;
+  margin-bottom: var(--compact-spacing-xl) !important;
+}
+
+/* Compact table */
+.page-container .MuiTable-root {
+  min-width: auto !important;
+}
+
+.page-container .MuiTableCell-root {
+  padding: var(--compact-spacing-sm) var(--compact-spacing-md) !important;
+}
+
+.page-container .MuiTableCell-head {
+  font-weight: 600 !important;
+  font-size: var(--compact-font-base) !important;
+  height: 40px !important;
+}
+
+.page-container .MuiTableRow-root {
+  height: 44px !important;
+}
+
+/* Hover effects */
+.hover-actions {
+  opacity: 0 !important;
+  transition: opacity 0.2s ease-in-out !important;
+}
+
+.MuiListItem-root:hover .hover-actions,
+.MuiTableRow-root:hover .hover-actions,
+.card-item:hover .hover-actions {
+  opacity: 1 !important;
+}
+
+/* Form elements */
+.page-container .MuiTextField-root {
+  margin-bottom: var(--compact-spacing-lg) !important;
+}
+
+.page-container .MuiInputBase-input {
+  font-size: var(--compact-font-lg) !important;
+  padding: var(--compact-spacing-sm) var(--compact-spacing-md) !important;
+}
+
+.page-container .MuiInputLabel-root {
+  font-size: var(--compact-font-lg) !important;
+}
+
+.page-container .MuiFormHelperText-root {
+  font-size: var(--compact-font-md) !important;
+  margin-top: 4px !important;
+}
+
+/* Dialog improvements */
+.page-container .MuiDialog-paper {
+  border-radius: 8px !important;
+}
+
+.page-container .MuiDialogTitle-root {
+  padding: var(--compact-spacing-lg) !important;
+  font-size: var(--compact-font-2xl) !important;
+}
+
+.page-container .MuiDialogContent-root {
+  padding: 0 var(--compact-spacing-lg) var(--compact-spacing-lg) !important;
+}
+
+.page-container .MuiDialogActions-root {
+  padding: var(--compact-spacing-md) var(--compact-spacing-lg) !important;
+}
+
+/* Mobile responsiveness - even more compact */
+@media (max-width: 900px) {
+  .page-container {
+    margin-left: 0 !important;
+    width: 100vw !important;
+    margin-top: 56px !important;
+    padding: var(--compact-spacing-md) !important;
+  }
+  
+  :root {
+    --compact-font-5xl: 1.5rem;
+    --compact-font-4xl: 1.25rem;
+    --compact-font-3xl: 1.125rem;
+    --compact-font-2xl: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-container {
+    padding: var(--compact-spacing-sm) !important;
+  }
+  
+  .page-container .MuiCard-root .MuiCardContent-root {
+    padding: var(--compact-spacing-md) !important;
+  }
+}
+
+/* Utility classes */
+.compact-mb-1 { margin-bottom: var(--compact-spacing-xs) !important; }
+.compact-mb-2 { margin-bottom: var(--compact-spacing-sm) !important; }
+.compact-mb-3 { margin-bottom: var(--compact-spacing-md) !important; }
+.compact-mb-4 { margin-bottom: var(--compact-spacing-lg) !important; }
+.compact-mb-5 { margin-bottom: var(--compact-spacing-xl) !important; }
+
+.compact-mt-1 { margin-top: var(--compact-spacing-xs) !important; }
+.compact-mt-2 { margin-top: var(--compact-spacing-sm) !important; }
+.compact-mt-3 { margin-top: var(--compact-spacing-md) !important; }
+.compact-mt-4 { margin-top: var(--compact-spacing-lg) !important; }
+.compact-mt-5 { margin-top: var(--compact-spacing-xl) !important; }
+
+.compact-p-1 { padding: var(--compact-spacing-xs) !important; }
+.compact-p-2 { padding: var(--compact-spacing-sm) !important; }
+.compact-p-3 { padding: var(--compact-spacing-md) !important; }
+.compact-p-4 { padding: var(--compact-spacing-lg) !important; }
+.compact-p-5 { padding: var(--compact-spacing-xl) !important; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fix for layout issues */
+.page-container .MuiContainer-root {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.page-container .MuiBox-root {
+  max-width: none !important;
+}
+
+/* Ensure content is visible */
+.page-content {
+  overflow: visible !important;
+  min-height: auto !important;
+  padding-bottom: 40px !important;
+}
