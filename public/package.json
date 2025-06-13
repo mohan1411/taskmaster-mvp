@@ -1,0 +1,9 @@
+{
+  "name": "fizztask-landing",
+  "version": "1.0.0",
+  "description": "FizzTask Landing Page",
+  "scripts": {
+    "start": "echo 'This is a static site - no build required'"
+  },
+  "private": true
+}
