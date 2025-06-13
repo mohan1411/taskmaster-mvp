@@ -11,6 +11,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 backend/.env
+backend/.env.backup
 frontend/.env.local
 
 # Build outputs
@@ -27,8 +28,12 @@ pids
 # Coverage directory used by tools like istanbul
 coverage/
 
-# Uploads
+# Uploads and temporary files
 backend/uploads/
+uploads/
+temp/
+tmp/
+temp-tools/
 
 # Logs
 logs
@@ -50,6 +55,71 @@ logs
 ehthumbs.db
 Thumbs.db
 
-# Temporary files
-temp/
-tmp/
+# Development and debugging batch files
+*.bat
+!start-taskmaster.bat
+!stop-taskmaster.bat
+!setup.bat
+
+# Development scripts
+*-fix.js
+*-debug.js
+*-test.js
+check-*.js
+debug-*.js
+fix-*.js
+test-*.js
+create-*.js
+populate-*.js
+delete-*.js
+verify-*.js
+
+# HTML test files
+*-debug.html
+*-test.html
+test-*.html
+debug-*.html
+api-debug.html
+auth-debug.html
+
+# Documentation drafts and notes
+*-GUIDE.md
+*-NOTES.md
+*-TODO.md
+*-FIX.md
+*-SOLUTION.md
+*-TROUBLESHOOTING.md
+LOGIN-*.md
+README-*.md
+!README.md
+
+# Demo and sample data
+demo-data/
+demo_samples/
+demo-*.txt
+demo-*.md
+
+# PDF test files
+*.pdf
+
+# Direct test files
+direct-test.txt
+test-config.txt
+
+# Image folders (except public/images)
+images/
+!public/images/
+
+# PowerShell scripts
+*.ps1
+
+# Temporary console files
+console.log*
+
+# Any file with ERROR, DEBUG, TEST in name
+*ERROR*
+*DEBUG*
+*TEST*
+!package-lock.json
+!frontend/package-lock.json
+!backend/package-lock.json
