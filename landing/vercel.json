@@ -1,5 +1,21 @@
 {
   "version": 2,
   "name": "fizztask-landing",
-  "outputDirectory": "."
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "images/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "rewrites": []
 }
