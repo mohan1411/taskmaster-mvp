@@ -1,21 +1,7 @@
 {
   "version": 2,
   "name": "fizztask-landing",
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "images/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
-  "rewrites": []
+  "buildCommand": false,
+  "outputDirectory": ".",
+  "framework": null
 }
