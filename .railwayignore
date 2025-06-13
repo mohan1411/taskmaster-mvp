@@ -1,0 +1,39 @@
+# Ignore landing page files
+landing/
+landing/*
+
+# Ignore development files
+*.log
+.env.local
+.DS_Store
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore test files
+*.test.js
+*.spec.js
+__tests__/
+coverage/
+
+# Ignore documentation
+*.md
+docs/
+documentation/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore deployment files for other platforms
+vercel.json
+netlify.toml
+.vercel/
+.netlify/
