@@ -106,9 +106,10 @@ demo-*.md
 direct-test.txt
 test-config.txt
 
-# Image folders (except public/images)
+# Image folders (except public/images and landing/images)
 images/
 !public/images/
+!landing/images/
 
 # PowerShell scripts
 *.ps1
