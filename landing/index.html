@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FizzTask - Turn Emails into Tasks Automatically with AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Navigation */
+        nav {
+            background: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            margin-top: 60px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-button {
+            background: #4CAF50;
+            color: white;
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            margin: 0.5rem;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .secondary-button {
+            background: transparent;
+            border: 2px solid white;
+        }
+        
+        /* Video Section */
+        .video-section {
+            padding: 4rem 2rem;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        
+        .video-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        
+        .video-placeholder {
+            background: #333;
+            height: 500px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 2rem;
+            transition: all 0.3s;
+        }
+        
+        .video-placeholder:hover .play-button {
+            transform: scale(1.1);
+        }
+        
+        /* Problem Section */
+        .problem-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .problem-card {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .problem-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Solution Section */
+        .solution-section {
+            background: #f8f9fa;
+            padding: 4rem 2rem;
+        }
+        
+        .solution-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .feature-list {
+            list-style: none;
+            font-size: 1.2rem;
+        }
+        
+        .feature-list li {
+            padding: 1rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .check-icon {
+            color: #4CAF50;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Why Section */
+        .why-section {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .step-number {
+            background: #4CAF50;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+        
+        /* FAQ */
+        .faq-section {
+            background: #f8f9fa;
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .faq-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Footer CTA */
+        .footer-cta {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .solution-container { grid-template-columns: 1fr; }
+            .video-placeholder { height: 300px; }
+        }
+        
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mt-3 { margin-top: 3rem; }
+        .mb-3 { margin-bottom: 3rem; }
+        h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">📋 FizzTask</div>
+            <div>
+                <a href="https://fizztask.com" class="cta-button" style="padding: 0.8rem 2rem; font-size: 1rem;">Login to App</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Your Emails Have Hidden Tasks.<br>AI Finds Them in Seconds.</h1>
+        <p class="subtitle">Stop spending 3 hours daily converting emails to tasks manually.<br>Let FizzTask's AI do it automatically.</p>
+        
+        <div>
+            <a href="https://fizztask.com" class="cta-button">Start Using FizzTask</a>
+            <a href="#demo" class="cta-button secondary-button">Watch Demo Video</a>
+        </div>
+        
+        <p style="margin-top: 2rem; opacity: 0.8;">
+            ⚡ AI-Powered Automation · 🚀 Save 3+ Hours Daily · 💚 Built for Professionals
+        </p>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section" id="demo">
+        <h2>See FizzTask in Action</h2>
+        <p style="font-size: 1.3rem; margin-bottom: 2rem;">Watch how we turn email chaos into organized productivity</p>
+        
+        <div class="video-container">
+            <!-- Loom Video Embed -->
+            <div style="position: relative; padding-bottom: 53.125%; height: 0;">
+                <iframe src="https://www.loom.com/embed/0a7ba130e8314b0dbc37eec3f7f95705?sid=bedd003f-0dfb-49ef-a530-24fe05aca270" 
+                        frameborder="0" 
+                        webkitallowfullscreen 
+                        mozallowfullscreen 
+                        allowfullscreen 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px;">
+                </iframe>
+            </div>
+            
+            <p style="margin-top: 1rem; color: #666;">
+                🎥 9-minute demo showing real email-to-task extraction with AI
+            </p>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section">
+        <h2 class="text-center">The Hidden Cost of Email Management</h2>
+        
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="problem-icon">📧</div>
+                <h3>121 Emails Per Day</h3>
+                <p>Average professional receives 121 emails daily, each potentially containing multiple tasks</p>
+            </div>
+            
+            <div class="problem-card">
+                <div class="problem-icon">⏰</div>
+                <h3>3.1 Hours Wasted</h3>
+                <p>Time spent reading emails and manually creating tasks that could be automated</p>
+            </div>
+            
+            <div class="problem-card">
+                <div class="problem-icon">😰</div>
+                <h3>23% Tasks Missed</h3>
+                <p>Important deadlines buried in email threads are often overlooked</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution-section">
+        <div class="solution-container">
+            <div>
+                <h2>The Only Solution That Bridges Email & Tasks</h2>
+                <p style="font-size: 1.3rem; margin-bottom: 2rem; opacity: 0.9;">Unlike email clients that just organize inbox or task tools that require manual input, FizzTask automatically extracts tasks from your emails.</p>
+                <ul class="feature-list">
+                    <li><span class="check-icon">✅</span> Connects with Gmail in 30 seconds</li>
+                    <li><span class="check-icon">✅</span> AI reads every email for actionable items</li>
+                    <li><span class="check-icon">✅</span> Extracts tasks from PDFs, Word docs, Excel files</li>
+                    <li><span class="check-icon">✅</span> Creates tasks with priorities and deadlines</li>
+                    <li><span class="check-icon">✅</span> 95% accuracy with GPT-4 technology</li>
+                    <li><span class="check-icon">✅</span> Saves 3+ hours daily per user</li>
+                </ul>
+                <a href="#contact" class="cta-button" style="margin-top: 2rem;">Get Early Access</a>
+            </div>
+            
+            <div style="background: #f0f0f0; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <!-- Dashboard Screenshot Placeholder -->
+                <img src="images/fizztask-dashboard.png" alt="FizzTask Dashboard" style="width: 100%; height: auto; display: block;">
+                <!--<div style="padding: 2rem; text-align: center; background: white;">
+                    <h3 style="color: #666; margin-bottom: 1rem;">FizzTask Dashboard Screenshot</h3>
+                    <p style="color: #999; margin-bottom: 2rem;">Shows: 20 Active Tasks, 3 Overdue, 7 Unread Emails, 2 Follow-ups</p>
+                    <div style="background: #f8f9fa; padding: 2rem; border-radius: 10px;">
+                        <p style="color: #666; margin: 0;">To add your dashboard screenshot:</p>
+                        <ol style="text-align: left; color: #666; margin: 1rem 0 0 2rem;">
+                            <li>Save your dashboard screenshot as an image file</li>
+                            <li>Upload it to your project folder</li>
+                            <li>Replace this placeholder with:<br>
+                                <code style="background: #e9ecef; padding: 0.5rem; display: block; margin-top: 0.5rem; border-radius: 5px;">
+                                    &lt;img src="dashboard-screenshot.png" alt="FizzTask Dashboard" style="width: 100%; height: auto; display: block; border-radius: 10px;"&gt;
+                                </code>
+                            </li>
+                        </ol>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </section>
+
+    <!-- Why FizzTask Section -->
+    <section class="why-section" style="padding: 4rem 2rem; background: #fff;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h2 class="text-center">Why FizzTask is Different</h2>
+            <p class="text-center" style="font-size: 1.3rem; margin-bottom: 3rem; opacity: 0.8;">We built the solution that others missed</p>
+            
+            <div class="problem-grid">
+                <div class="problem-card" style="background: #f8f9fa; border-radius: 15px; padding: 2.5rem;">
+                    <div class="problem-icon">📧</div>
+                    <h3>Not Just Another Email Client</h3>
+                    <p>While email apps help you read faster, they don't extract tasks. FizzTask finds every action item automatically.</p>
+                </div>
+                
+                <div class="problem-card" style="background: #f8f9fa; border-radius: 15px; padding: 2.5rem;">
+                    <div class="problem-icon">📋</div>
+                    <h3>Not Just Another Task Manager</h3>
+                    <p>Task apps require manual input. FizzTask creates tasks from emails without you lifting a finger.</p>
+                </div>
+                
+                <div class="problem-card" style="background: #f8f9fa; border-radius: 15px; padding: 2.5rem;">
+                    <div class="problem-icon">🤖</div>
+                    <h3>Not a Complex Automation</h3>
+                    <p>No complex setups or coding required. FizzTask works in 30 seconds with one-click Gmail connection.</p>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 3rem; border-radius: 20px; margin-top: 3rem; text-align: center;">
+                <h3 style="font-size: 2rem; margin-bottom: 1rem;">FizzTask: The Smart Bridge Between Email & Productivity</h3>
+                <p style="font-size: 1.3rem; opacity: 0.9;">The only AI-powered solution that automatically converts emails and attachments into organized, actionable tasks.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works" style="background: #f8f9fa;">
+        <h2 class="text-center">How FizzTask Works</h2>
+        <p class="text-center" style="font-size: 1.3rem; margin-bottom: 3rem;">From email chaos to organized tasks in 4 simple steps</p>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Connect Gmail</h3>
+                <p>Secure OAuth connection in 30 seconds. No passwords stored.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>AI Scans Emails</h3>
+                <p>Our AI reads emails and attachments to find hidden tasks.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Review & Approve</h3>
+                <p>See extracted tasks with confidence scores. Edit if needed.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Stay Organized</h3>
+                <p>All tasks in one dashboard with deadlines and priorities.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact" style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; text-align: center;">
+        <h2>Interested in FizzTask?</h2>
+        <p style="font-size: 1.3rem; margin: 2rem 0;">We're putting the finishing touches on FizzTask. Get early access and exclusive benefits.</p>
+        
+        <div style="background: #f8f9fa; padding: 3rem; border-radius: 20px; margin: 2rem 0;">
+            <h3>Contact Us for a Demo</h3>
+            <p style="font-size: 1.2rem; margin: 2rem 0;">
+                📧 Email: mohan.g1411@gmail.com<br>
+                📱 Phone: +91 98867 90146<br>
+                💬 WhatsApp: +91 98867 90146
+            </p>
+            
+            <p style="margin-top: 2rem; color: #666;">
+                We'll personally walk you through FizzTask and discuss how it can transform your team's productivity.
+            </p>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <h2 class="text-center">Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+            <h3>🤖 How accurate is the AI task extraction?</h3>
+            <p style="margin-top: 1rem; display: none;">FizzTask achieves 95% accuracy using OpenAI's GPT-4 technology. You can always review and edit before creating tasks.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h3>🔒 Is my email data secure?</h3>
+            <p style="margin-top: 1rem; display: none;">Absolutely. We use OAuth for Gmail connection (no password storage), encrypt all data, and never train AI on your emails.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h3>📱 Do you have mobile apps?</h3>
+            <p style="margin-top: 1rem; display: none;">Mobile apps are coming in August 2025. The web app is fully responsive and works great on mobile browsers.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h3>🏢 Can my whole team use FizzTask?</h3>
+            <p style="margin-top: 1rem; display: none;">Yes! We offer team plans with collaboration features. Contact us for details.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h3>⏱️ How much time will I really save?</h3>
+            <p style="margin-top: 1rem; display: none;">Our average user saves 3+ hours daily. With 100 emails, manual processing takes 60+ minutes vs 5 minutes with FizzTask.</p>
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="footer-cta">
+        <h2>Ready to Transform Your Email Workflow?</h2>
+        <p style="font-size: 1.5rem; margin: 2rem 0;">See how FizzTask can save you 3+ hours every day</p>
+        
+        <div>
+            <a href="#contact" class="cta-button">Request a Personal Demo</a>
+        </div>
+        
+        <p style="margin-top: 3rem; opacity: 0.8;">
+            Questions? Email us at mohan.g1411@gmail.com or call +91 98867 90146
+        </p>
+    </section>
+
+    <script>
+        // Simple FAQ toggle
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const answer = item.querySelector('p');
+                answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
