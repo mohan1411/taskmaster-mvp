@@ -6,10 +6,12 @@
   "scripts": {
     "start": "cd backend && node server.js",
     "build": "cd frontend && npm install && npm run build && cd .. && cp -r frontend/build/* backend/public/",
+    "build:frontend": "cd frontend && npm install && npm run build",
     "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "heroku-postbuild": "npm run build",
-    "railway-build": "npm run install:all && npm run build"
+    "railway-build": "npm run install:all && npm run build",
+    "vercel-build": "cd frontend && npm install && npm run build"
   },
   "engines": {
     "node": ">=14.x",
