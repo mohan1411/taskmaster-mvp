@@ -1,18 +1,34 @@
 {
   "name": "fizztask",
   "version": "1.0.0",
-  "description": "FizzTask - AI-powered task management with email integration",
+  "description": "FizzTask - AI-powered task management from emails",
   "main": "backend/server.js",
   "scripts": {
     "start": "cd backend && node server.js",
-    "dev": "cd backend && npm run dev",
-    "build": "cd frontend && npm run build",
-    "install-all": "cd backend && npm install && cd ../frontend && npm install"
+    "build": "cd frontend && npm install && npm run build && cd .. && cp -r frontend/build/* backend/public/",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "heroku-postbuild": "npm run build",
+    "railway-build": "npm run install:all && npm run build"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=14.x",
+    "npm": ">=6.x"
   },
-  "devDependencies": {
-    "cypress": "^14.3.3"
-  }
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohan1411/taskmaster-mvp.git"
+  },
+  "keywords": [
+    "fizztask",
+    "task-management",
+    "email",
+    "ai"
+  ],
+  "author": "FizzTask Team",
+  "license": "MIT"
 }

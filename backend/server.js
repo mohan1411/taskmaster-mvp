@@ -81,6 +81,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const testRoutes = require('./routes/testRoutes');
 const onboardingRoutes = require('./routes/onboardingRoutes');
 const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 
 // Define API routes
 app.use('/api/auth', userRoutes);
@@ -94,6 +95,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/unified-email', unifiedEmailRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -106,11 +108,32 @@ app.use((err, req, res, next) => {
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
+  // First try to serve from backend/public (Railway build)
+  const publicPath = path.join(__dirname, 'public');
+  const frontendBuildPath = path.join(__dirname, '../frontend/build');
   
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
-  });
+  // Check which directory exists and use it
+  const fs = require('fs');
+  if (fs.existsSync(publicPath) && fs.existsSync(path.join(publicPath, 'index.html'))) {
+    console.log('Serving static files from:', publicPath);
+    app.use(express.static(publicPath));
+    
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(publicPath, 'index.html'));
+    });
+  } else if (fs.existsSync(frontendBuildPath) && fs.existsSync(path.join(frontendBuildPath, 'index.html'))) {
+    console.log('Serving static files from:', frontendBuildPath);
+    app.use(express.static(frontendBuildPath));
+    
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(frontendBuildPath, 'index.html'));
+    });
+  } else {
+    console.error('No static files found to serve!');
+    app.get('*', (req, res) => {
+      res.status(404).send('Frontend build not found. Please build the React app.');
+    });
+  }
 }
 
 // Start the server
