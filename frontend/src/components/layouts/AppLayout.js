@@ -36,6 +36,9 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
     flexGrow: 1,
     padding: 0, // Remove default padding to let pages control their own layout
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
+    minHeight: '100vh',
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
