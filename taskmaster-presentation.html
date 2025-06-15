@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FizzTask - Transform Your Email Chaos into Organized Action</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Slide Backgrounds */
+        .slide-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            align-items: center;
+            text-align: center;
+        }
+        
+        .slide-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .slide-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .slide-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .slide-5 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .slide-6 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+        
+        .slide-7 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        
+        .slide-8 {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+        }
+        
+        .slide-9 {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+        
+        .slide-10 {
+            background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%);
+        }
+        
+        .slide-11 {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            color: #333;
+        }
+        
+        .slide-12 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .slide-13 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .slide-15 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            align-items: center;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: rgba(255,255,255,0.95);
+        }
+        
+        p {
+            font-size: 1.6rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+        }
+        
+        .subtitle {
+            font-size: 2.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .problem-list {
+            list-style: none;
+            font-size: 1.8rem;
+            line-height: 2.5;
+        }
+        
+        .problem-list li::before {
+            content: "❌";
+            margin-right: 15px;
+        }
+        
+        .solution-list {
+            list-style: none;
+            font-size: 1.8rem;
+            line-height: 2.5;
+        }
+        
+        .solution-list li::before {
+            content: "✅";
+            margin-right: 15px;
+        }
+        
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .benefit-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .benefit-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .competitor-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .competitor-table th,
+        .competitor-table td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .competitor-table th {
+            background: rgba(255,255,255,0.15);
+            font-weight: 600;
+        }
+        
+        .competitor-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .screenshot-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        
+        .screenshot-header {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .pricing-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: scale(1.05);
+            border-color: #4CAF50;
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+            margin-top: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 40px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -35px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #4CAF50;
+            border: 3px solid #fff;
+        }
+        
+        .highlight {
+            background: rgba(255,255,255,0.2);
+            padding: 3px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            h2 { font-size: 2rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .benefit-grid { grid-template-columns: 1fr; }
+            .pricing-container { grid-template-columns: 1fr; }
+            .slide { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-1 active" data-slide="1">
+            <div class="logo">📋</div>
+            <h1>FizzTask</h1>
+            <p class="subtitle">Transform Your Email Chaos into Organized Action</p>
+            <p style="font-size: 1.3rem; opacity: 0.8;">AI-Powered Task Management for Modern Professionals</p>
+            <div class="slide-number">1 / 14</div>
+        </div>
+        
+        <!-- Slide 2: The Problem -->
+        <div class="slide slide-2" data-slide="2">
+            <h2>The Problem We're Solving</h2>
+            <ul class="problem-list">
+                <li>Professionals receive 121+ emails daily</li>
+                <li>Important tasks get buried in inbox chaos</li>
+                <li>Manual task creation takes 3+ hours daily</li>
+                <li>23% of critical deadlines are missed</li>
+                <li>No intelligent connection between emails and tasks</li>
+            </ul>
+            <p style="margin-top: 40px; font-size: 1.8rem;">
+                <span class="highlight">Result: Decreased productivity & increased stress</span>
+            </p>
+            <div class="slide-number">2 / 14</div>
+        </div>
+        
+        <!-- Slide 3: The Solution -->
+        <div class="slide slide-3" data-slide="3">
+            <h2>FizzTask: Your AI Task Assistant</h2>
+            <p style="font-size: 1.8rem; margin-bottom: 40px;">
+                Automatically extracts tasks from emails & attachments using advanced AI
+            </p>
+            <ul class="solution-list">
+                <li>Gmail integration with one-click setup</li>
+                <li>AI-powered task extraction from emails</li>
+                <li>Process PDFs, Word docs, Excel files automatically</li>
+                <li>Smart priority and deadline detection</li>
+                <li>Never miss a follow-up or deadline again</li>
+            </ul>
+            <div class="slide-number">3 / 14</div>
+        </div>
+        
+        <!-- Slide 4: Key Features -->
+        <div class="slide slide-4" data-slide="4">
+            <h2>Powerful Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <h3>Email Intelligence</h3>
+                    <p>AI scans emails to identify action items, deadlines, and follow-ups automatically</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📄</div>
+                    <h3>Document Processing</h3>
+                    <p>Extract tasks from PDFs, Word docs, Excel sheets with 95% accuracy</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Smart Prioritization</h3>
+                    <p>AI suggests priority levels based on content, sender importance, and deadlines</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Intelligent Reminders</h3>
+                    <p>Context-aware notifications ensure nothing falls through the cracks</p>
+                </div>
+            </div>
+            <div class="slide-number">4 / 14</div>
+        </div>
+        
+        <!-- Slide 5: How It Works -->
+        <div class="slide slide-5" data-slide="5">
+            <h2>How FizzTask Works</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>Step 1: Connect Gmail</h3>
+                    <p>One-click OAuth integration - takes 30 seconds</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Step 2: AI Processes Emails</h3>
+                    <p>Our AI scans emails and attachments for actionable items</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Step 3: Review & Create Tasks</h3>
+                    <p>Approve AI suggestions with confidence scores</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Step 4: Stay Organized</h3>
+                    <p>Dashboard shows all tasks, deadlines, and follow-ups</p>
+                </div>
+            </div>
+            <div class="slide-number">5 / 14</div>
+        </div>
+        
+        <!-- Slide 6: Live Demo Screenshots -->
+        <div class="slide slide-6" data-slide="6">
+            <h2>FizzTask vs Traditional Methods</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px;">
+                <div style="background: rgba(255,100,100,0.1); padding: 40px; border-radius: 20px; border: 2px solid rgba(255,100,100,0.3);">
+                    <h3 style="color: #ff6464;">❌ Without FizzTask</h3>
+                    <ul style="list-style: none; font-size: 1.4rem; line-height: 2.5;">
+                        <li>📧 Read 100+ emails daily</li>
+                        <li>📝 Manually create each task</li>
+                        <li>📎 Open attachments, scan for tasks</li>
+                        <li>⏰ 3-4 hours daily on task management</li>
+                        <li>😰 High chance of missing deadlines</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(100,255,100,0.1); padding: 40px; border-radius: 20px; border: 2px solid rgba(100,255,100,0.3);">
+                    <h3 style="color: #64ff64;">✅ With FizzTask</h3>
+                    <ul style="list-style: none; font-size: 1.4rem; line-height: 2.5;">
+                        <li>🤖 AI reads emails for you</li>
+                        <li>⚡ Tasks created automatically</li>
+                        <li>📄 Documents processed instantly</li>
+                        <li>⏱️ 10 minutes to review & organize</li>
+                        <li>🎯 Never miss a deadline again</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 40px; font-size: 1.8rem;">
+                <span class="highlight">Transform 3 hours of work into 10 minutes of review</span>
+            </p>
+            <div class="slide-number">6 / 14</div>
+        </div>
+        
+        <!-- Slide 7: Benefits -->
+        <div class="slide slide-7" data-slide="7">
+            <h2>Measurable Benefits</h2>
+            <div class="benefit-grid">
+                <div class="benefit-card">
+                    <div class="benefit-number">75%</div>
+                    <p>Reduction in task creation time</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">0%</div>
+                    <p>Missed deadlines with AI reminders</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">3hrs</div>
+                    <p>Saved daily per user</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">95%</div>
+                    <p>Task extraction accuracy</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">40%</div>
+                    <p>Increase in productivity</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">100%</div>
+                    <p>Email coverage</p>
+                </div>
+            </div>
+            <div class="slide-number">7 / 14</div>
+        </div>
+        
+        <!-- Slide 8: Competitive Analysis -->
+        <div class="slide slide-8" data-slide="8">
+            <h2>Competitive Positioning</h2>
+            <div style="margin-top: 30px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+                    <h3 style="color: #64b5f6; margin-bottom: 15px;">📧 Email-First Tools (Superhuman, Hey, Shortwave)</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 1.3rem;">
+                        <div>✅ Great for: Reading emails faster</div>
+                        <div>❌ Missing: Task extraction, document AI</div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+                    <h3 style="color: #81c784; margin-bottom: 15px;">📋 Task-First Tools (Motion, Asana, Notion)</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 1.3rem;">
+                        <div>✅ Great for: Managing tasks</div>
+                        <div>❌ Missing: Email intelligence, auto-capture</div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+                    <h3 style="color: #ffb74d; margin-bottom: 15px;">🔧 DIY Solutions (Zapier + GPT)</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 1.3rem;">
+                        <div>✅ Great for: Tech-savvy users</div>
+                        <div>❌ Missing: Ready solution, support, unified UI</div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 25px; border-radius: 15px;">
+                    <h3 style="color: white; margin-bottom: 15px;">🚀 FizzTask - The Smart Bridge</h3>
+                    <div style="font-size: 1.4rem; line-height: 2;">
+                        ✅ Automatic email → task conversion<br>
+                        ✅ AI document processing (PDFs, Word, Excel)<br>
+                        ✅ Zero setup - works in 30 seconds<br>
+                        ✅ ₹999/month all-inclusive
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 30px; font-size: 1.5rem;">
+                <span class="highlight">The ONLY solution that intelligently bridges emails and task management</span>
+            </p>
+        </div>
+        
+        <!-- Slide 9: Indian Market Competitors -->
+        <div class="slide slide-9" data-slide="9">
+            <h2>Market Landscape Analysis</h2>
+            <table class="competitor-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>FizzTask</th>
+                        <th>Superhuman</th>
+                        <th>Motion</th>
+                        <th>Mailparser</th>
+                        <th>Zapier+GPT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Gmail Integration</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>AI Task Extraction</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>✅ Basic</td>
+                        <td>✅ Manual</td>
+                    </tr>
+                    <tr>
+                        <td>Document Processing</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>Task Management UI</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>Zero Setup</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>Price (Monthly)</td>
+                        <td>₹999</td>
+                        <td>$30</td>
+                        <td>$19</td>
+                        <td>$30+</td>
+                        <td>$20+</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 30px; text-align: center; font-size: 1.5rem;">
+                <span class="highlight">FizzTask: The only all-in-one AI solution for email-to-task automation</span>
+            </p>
+        </div>
+        
+        <!-- Slide 10: Target Market -->
+        <div class="slide slide-10" data-slide="10">
+            <h2>Our Positioning Statement</h2>
+            <div style="text-align: center; margin-top: 60px;">
+                <p style="font-size: 2.5rem; line-height: 1.6; font-weight: 300;">
+                    "While others help you <span class="highlight">read emails faster</span><br>
+                    OR <span class="highlight">manage tasks better</span>,<br><br>
+                    
+                    FizzTask is the <strong>only solution</strong> that<br>
+                    intelligently bridges the gap —<br><br>
+                    
+                    <span style="font-size: 3rem; font-weight: 700; color: #4CAF50;">
+                        Automatically extracting tasks<br>
+                        from emails and documents<br>
+                    </span><br>
+                    
+                    so you never miss a deadline again."
+                </p>
+                
+                <div style="margin-top: 50px; font-size: 1.6rem;">
+                    <p>🎯 <strong>Target Users:</strong> Email-heavy professionals</p>
+                    <p>💡 <strong>Core Value:</strong> Zero manual work</p>
+                    <p>🚀 <strong>Key Differentiator:</strong> AI-powered automation</p>
+                </div>
+            </div>
+            <div class="slide-number">10 / 15</div>
+        </div>
+        
+        <!-- Slide 11: Target Market -->
+        <div class="slide slide-11" data-slide="11">
+            <h2>Market Opportunity</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🌍 Total Addressable Market (TAM)</h3>
+                    <ul style="list-style: none; font-size: 1.3rem; line-height: 2;">
+                        <li>📧 4.3B global email users</li>
+                        <li>💼 1.5B business professionals</li>
+                        <li>💰 <strong>$10B</strong> AI productivity tools by 2025</li>
+                        <li>📈 13.2% CAGR growth rate</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Serviceable Market (SAM)</h3>
+                    <ul style="list-style: none; font-size: 1.3rem; line-height: 2;">
+                        <li>📊 500M Gmail/Workspace users</li>
+                        <li>🏢 100-150M potential users</li>
+                        <li>💵 <strong>$2.5B</strong> annual opportunity</li>
+                        <li>🇮🇳 50M+ users in India alone</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 30px; border-radius: 20px; margin-top: 30px; text-align: center;">
+                <h3 style="margin-bottom: 20px;">🚀 FizzTask's 3-Year Target (SOM)</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; font-size: 1.3rem;">
+                    <div>
+                        <div style="font-size: 2.5rem; font-weight: 700;">250K</div>
+                        <div>Active Users</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; font-weight: 700;">₹42 Cr</div>
+                        <div>ARR ($5M)</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; font-weight: 700;">0.25%</div>
+                        <div>Market Share</div>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 20px; font-size: 1.4rem;">
+                <span class="highlight">Capturing just 0.25% of SAM = ₹42 Crore business</span>
+            </p>
+            <div class="slide-number">11 / 15</div>
+        </div>
+        
+        <!-- Slide 12: Pricing Strategy -->
+        <div class="slide slide-11" data-slide="11">
+            <h2>Pricing Plans</h2>
+            <div class="pricing-container">
+                <div class="pricing-card">
+                    <h3>Free</h3>
+                    <div class="price">₹0</div>
+                    <ul style="list-style: none; font-size: 1.2rem; line-height: 2;">
+                        <li>50 emails/month</li>
+                        <li>Basic task extraction</li>
+                        <li>Gmail integration</li>
+                        <li>Community support</li>
+                    </ul>
+                </div>
+                <div class="pricing-card" style="border-color: #4CAF50;">
+                    <h3>Professional</h3>
+                    <div class="price">₹999/mo</div>
+                    <ul style="list-style: none; font-size: 1.2rem; line-height: 2;">
+                        <li>Unlimited emails</li>
+                        <li>AI document processing</li>
+                        <li>Priority suggestions</li>
+                        <li>Email support</li>
+                        <li>API access</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <h3>Team</h3>
+                    <div class="price">₹799/user</div>
+                    <ul style="list-style: none; font-size: 1.2rem; line-height: 2;">
+                        <li>Everything in Pro</li>
+                        <li>Team collaboration</li>
+                        <li>Admin controls</li>
+                        <li>Phone support</li>
+                        <li>Custom integrations</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-number">12 / 15</div>
+        </div>
+        
+        <!-- Slide 12: Traction & Roadmap -->
+        <div class="slide slide-12" data-slide="12">
+            <h2>Current Status & Roadmap</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div>
+                    <h3>✅ Completed</h3>
+                    <ul class="solution-list" style="font-size: 1.4rem;">
+                        <li>Gmail integration</li>
+                        <li>AI task extraction</li>
+                        <li>Document processing</li>
+                        <li>Task management</li>
+                        <li>Follow-up tracking</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>🚀 Coming Soon</h3>
+                    <ul style="list-style: none; font-size: 1.4rem; line-height: 2.5;">
+                        <li>📅 Calendar sync (July 2025)</li>
+                        <li>📱 Mobile apps (August 2025)</li>
+                        <li>🔗 Slack integration (September 2025)</li>
+                        <li>🌐 Multi-language support (October 2025)</li>
+                        <li>🤝 Teams collaboration (November 2025)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-number">13 / 15</div>
+        </div>
+        
+        <!-- Slide 13: Technology & Cost Analysis -->
+        <div class="slide slide-13" data-slide="13">
+            <h2>AI Technology & Cost Efficiency</h2>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px;">🤖 Powered by OpenAI GPT-4o-mini</h3>
+                <p style="font-size: 1.4rem; line-height: 2;">
+                    • Latest model: <span class="highlight">gpt-4o-mini-2024-07-18</span><br>
+                    • Optimized for speed and accuracy<br>
+                    • 95% task extraction accuracy<br>
+                    • 200x more cost-effective than GPT-4
+                </p>
+            </div>
+            
+            <div style="background: rgba(100,255,100,0.1); padding: 30px; border-radius: 20px;">
+                <h3 style="margin-bottom: 20px;">💰 API Cost Analysis (100 Emails)</h3>
+                <table style="width: 100%; font-size: 1.3rem; background: transparent;">
+                    <tr>
+                        <td>Average email length:</td>
+                        <td style="text-align: right;"><strong>500 tokens</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Total tokens for 100 emails:</td>
+                        <td style="text-align: right;"><strong>50,000 tokens</strong></td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4o-mini cost:</td>
+                        <td style="text-align: right;"><strong>$0.0075</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Cost in INR:</td>
+                        <td style="text-align: right;"><strong>₹0.63</strong></td>
+                    </tr>
+                    <tr style="border-top: 2px solid rgba(255,255,255,0.3); padding-top: 10px;">
+                        <td><strong>Monthly cost (3000 emails):</strong></td>
+                        <td style="text-align: right;"><strong>₹19 only!</strong></td>
+                    </tr>
+                </table>
+                <p style="text-align: center; margin-top: 20px; font-size: 1.2rem;">
+                    <span class="highlight">User pays ₹999/month → 98% gross margin on AI costs</span>
+                </p>
+            </div>
+            <div class="slide-number">13 / 14</div>
+        </div>
+        
+        <!-- Slide 14: Call to Action -->
+        <div class="slide slide-14" data-slide="14">
+            <h2>Why Choose FizzTask?</h2>
+            <div style="text-align: center; margin-top: 50px;">
+                <p style="font-size: 2rem; line-height: 2;">
+                    ✨ <span class="highlight">Intelligent AI</span> that understands your emails<br>
+                    🎯 <span class="highlight">95% accuracy</span> in task extraction<br>
+                    ⏰ <span class="highlight">3 hours saved</span> daily per user<br>
+                    💰 <span class="highlight">ROI in 7 days</span> through productivity gains<br>
+                    🚀 <span class="highlight">One-click setup</span> with Gmail
+                </p>
+                <button style="
+                    background: #4CAF50;
+                    color: white;
+                    border: none;
+                    padding: 20px 60px;
+                    font-size: 1.8rem;
+                    border-radius: 50px;
+                    margin-top: 40px;
+                    cursor: pointer;
+                ">
+                    Start Free Trial Today
+                </button>
+            </div>
+            <div class="slide-number">14 / 15</div>
+        </div>
+        
+        <!-- Slide 15: Contact -->
+        <div class="slide slide-1" data-slide="15">
+            <div class="logo">📋</div>
+            <h1>Let's Transform Your Productivity</h1>
+            <div style="margin-top: 60px; text-align: center;">
+                <p style="font-size: 1.8rem; line-height: 2;">
+                    📧 hello@fizztask.com<br>
+                    🌐 www.fizztask.com<br>
+                    📱 +91 98765 43210<br>
+                </p>
+                <p style="margin-top: 40px; font-size: 1.5rem;">
+                    <em>"Where emails become action"</em>
+                </p>
+            </div>
+            <div class="slide-number">15 / 15</div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+            <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
+    
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 15;
+        
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            document.querySelector(`.slide[data-slide="${currentSlide}"]`).classList.add('active');
+        }
+        
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+        
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousSlide();
+            }
+            if (e.key === 'Home') {
+                e.preventDefault();
+                currentSlide = 1;
+                showSlide(currentSlide);
+            }
+            if (e.key === 'End') {
+                e.preventDefault();
+                currentSlide = totalSlides;
+                showSlide(currentSlide);
+            }
+        });
+        
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide();
+            if (touchEndX > touchStartX + 50) previousSlide();
+        }
+    </script>
+</body>
+</html>

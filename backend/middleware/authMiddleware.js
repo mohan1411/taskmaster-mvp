@@ -18,15 +18,29 @@ const protect = async (req, res, next) => {
       // Get user from the token (exclude password)
       req.user = await User.findById(decoded.id).select('-password -refreshToken');
 
+      // Check if user exists
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      // Check if user is active
+      if (req.user.status === 'suspended' || req.user.status === 'deleted') {
+        return res.status(401).json({ message: 'Account suspended or deleted' });
+      }
+
       next();
     } catch (error) {
-      console.error(error);
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ message: 'Not authorized, invalid token' });
+      }
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Not authorized, token expired' });
+      }
+      console.error('Auth middleware error:', error);
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FizzTask Demo Login</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .credentials {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .value {
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .copy-btn:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FizzTask Demo Login</h1>
+        
+        <div class="credentials">
+            <div class="label">Email</div>
+            <div class="value" id="email">newuser@example.com</div>
+            
+            <div class="label">Password</div>
+            <div class="value" id="password">demo123</div>
+        </div>
+        
+        <div class="warning">
+            ⚠️ Password is all lowercase - no capital letters!
+        </div>
+        
+        <button class="copy-btn" onclick="copyCredentials()">Copy Credentials</button>
+    </div>
+    
+    <script>
+        function copyCredentials() {
+            const text = 'Email: newuser@example.com\nPassword: demo123';
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Credentials copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

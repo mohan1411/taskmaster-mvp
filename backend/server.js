@@ -7,9 +7,10 @@ const path = require('path');
 const connectDB = require('./config/db');
 const config = require('./config/config');
 const { scheduleReminderJob } = require('./jobs/reminderJob');
+const { apiLimiter } = require('./middleware/rateLimitMiddleware');
 
-// Optional dependencies
-let helmet, morgan;
+// Security dependencies
+let helmet, morgan, mongoSanitize, xss, hpp;
 try {
   helmet = require('helmet');
   console.log('Helmet loaded successfully');
@@ -24,15 +25,41 @@ try {
   console.warn('Morgan not available, HTTP logging will be disabled');
 }
 
+try {
+  mongoSanitize = require('express-mongo-sanitize');
+  xss = require('xss');
+  hpp = require('hpp');
+  console.log('Security middleware loaded successfully');
+} catch (err) {
+  console.warn('Some security middleware not available');
+}
+
 // Initialize Express app
 const app = express();
 
 // Connect to MongoDB
 connectDB();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Apply rate limiting to all requests
+app.use(apiLimiter);
+
+// Body parser middleware with size limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Security middleware
+if (mongoSanitize) {
+  app.use(mongoSanitize({
+    replaceWith: '_',
+    onSanitize: ({ req, key }) => {
+      console.warn(`Blocked MongoDB operator in ${key}`);
+    }
+  }));
+}
+
+if (hpp) {
+  app.use(hpp());
+}
 
 // CORS configuration for fizztask.com
 const corsOptions = {
@@ -52,21 +79,41 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  maxAge: 86400 // 24 hours
 };
 
 app.use(cors(corsOptions));
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static files from uploads directory with security
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, path) => {
+    res.set('X-Content-Type-Options', 'nosniff');
+  }
+}));
 
-// Use helmet if available
+// Use helmet if available with custom configuration
 if (helmet) {
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https://api.openai.com"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    }
+  }));
 }
 
 // Use morgan if available
-if (morgan) {
+if (morgan && process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
