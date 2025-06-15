@@ -97,7 +97,7 @@ const ResetPasswordPage = () => {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, mb: 8 }}>
         <Paper sx={{ p: 4 }}>
-          <Typography component="h1" variant="h4" align="center" gutterBottom style={{ color: 'rgba(0, 0, 0, 0.87)' }}>
+          <Typography component="h1" variant="h4" align="center" gutterBottom>
             Reset Password
           </Typography>
           

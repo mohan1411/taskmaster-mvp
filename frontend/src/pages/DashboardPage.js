@@ -183,7 +183,6 @@ const DashboardPage = () => {
   // Compact stat card component
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
-      className="stat-card"
       sx={{ 
         height: 80,
         cursor: onClick ? 'pointer' : 'default',
@@ -198,32 +197,25 @@ const DashboardPage = () => {
     >
       <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              width: 48,
-              height: 48,
-              borderRadius: 1,
-              mr: 2,
-              backgroundColor: 
-                color === 'primary' ? 'rgba(33, 150, 243, 0.1)' :
-                color === 'error' ? 'rgba(244, 67, 54, 0.1)' :
-                color === 'warning' ? 'rgba(255, 152, 0, 0.1)' :
-                color === 'info' ? 'rgba(33, 150, 243, 0.1)' :
-                color === 'success' ? 'rgba(76, 175, 80, 0.1)' : 
-                'rgba(0, 0, 0, 0.1)'
-            }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: 48,
+            height: 48,
+            borderRadius: 1,
+            bgcolor: `${color}.50`,
+            mr: 2
+          }}>
             {React.cloneElement(icon, { 
               sx: { fontSize: 24, color: `${color}.main` } 
             })}
           </Box>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h3" sx={{ fontSize: '1.75rem', fontWeight: 600, lineHeight: 1, color: 'text.primary' }}>
+            <Typography variant="h3" sx={{ fontSize: '1.75rem', fontWeight: 600, lineHeight: 1 }}>
               {value}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            <Typography variant="caption" color="text.secondary">
               {title}
             </Typography>
           </Box>
@@ -245,10 +237,10 @@ const DashboardPage = () => {
       <div className="page-content">
         {/* Compact Header */}
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontSize: '1.5rem', fontWeight: 500, mb: 0.5, color: 'text.primary' }}>
+          <Typography variant="h4" sx={{ fontSize: '1.5rem', fontWeight: 500, mb: 0.5 }}>
             Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" color="text.secondary">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </Typography>
         </Box>

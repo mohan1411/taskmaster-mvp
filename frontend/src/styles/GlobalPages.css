@@ -9,14 +9,8 @@
   padding: 20px 24px !important; /* Reduced from 24px 32px */
   box-sizing: border-box !important;
   overflow-y: auto !important;
-  background-color: var(--background-default, #f5f5f5) !important;
+  background-color: #f5f5f5 !important;
   width: calc(100vw - 240px) !important;
-}
-
-/* Dark mode page container */
-[data-theme="dark"] .page-container {
-  background-color: #121212 !important;
-  color: #ffffff !important;
 }
 
 /* Content wrapper */
@@ -27,126 +21,54 @@
   min-height: 100% !important;
 }
 
-/* Compact Typography Scale with explicit colors */
-.page-container h1,
-.page-container .MuiTypography-h1 {
+/* Compact Typography Scale */
+.page-container h1 {
   font-size: 1.75rem !important; /* Reduced from 2rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
-  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-.page-container h2,
-.page-container .MuiTypography-h2 {
+.page-container h2 {
   font-size: 1.5rem !important; /* Reduced from 1.75rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
-  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-.page-container h3,
-.page-container .MuiTypography-h3 {
+.page-container h3 {
   font-size: 1.25rem !important; /* Reduced from 1.5rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
-  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-.page-container h4,
-.page-container .MuiTypography-h4 {
+.page-container h4 {
   font-size: 1.5rem !important; /* Reduced from 1.75rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
-  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-.page-container h5,
-.page-container .MuiTypography-h5 {
+.page-container h5 {
   font-size: 1rem !important; /* Reduced from 1.125rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
-  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-.page-container h6,
-.page-container .MuiTypography-h6 {
+.page-container h6 {
   font-size: 0.875rem !important; /* Reduced from 1rem */
   font-weight: 500 !important;
   margin-bottom: 0.5rem !important;
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-
-/* Ensure all Typography components have visible text */
-.page-container .MuiTypography-root {
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-
-.page-container .MuiTypography-body1,
-.page-container .MuiTypography-body2 {
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-
-.page-container .MuiTypography-caption,
-.page-container .MuiTypography-subtitle1,
-.page-container .MuiTypography-subtitle2 {
-  color: rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Dark mode support */
-[data-theme="dark"] .page-container h1,
-[data-theme="dark"] .page-container h2,
-[data-theme="dark"] .page-container h3,
-[data-theme="dark"] .page-container h4,
-[data-theme="dark"] .page-container h5,
-[data-theme="dark"] .page-container h6,
-[data-theme="dark"] .page-container .MuiTypography-h1,
-[data-theme="dark"] .page-container .MuiTypography-h2,
-[data-theme="dark"] .page-container .MuiTypography-h3,
-[data-theme="dark"] .page-container .MuiTypography-h4,
-[data-theme="dark"] .page-container .MuiTypography-h5,
-[data-theme="dark"] .page-container .MuiTypography-h6,
-[data-theme="dark"] .page-container .MuiTypography-root,
-[data-theme="dark"] .page-container .MuiTypography-body1,
-[data-theme="dark"] .page-container .MuiTypography-body2 {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .page-container .MuiTypography-caption,
-[data-theme="dark"] .page-container .MuiTypography-subtitle1,
-[data-theme="dark"] .page-container .MuiTypography-subtitle2 {
-  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Compact spacing for Material-UI components */
 .page-container .MuiPaper-root {
   /* Default compact spacing for cards */
-  background-color: #ffffff !important;
-}
-
-.page-container .MuiCard-root {
-  background-color: #ffffff !important;
 }
 
 .page-container .MuiCard-root .MuiCardContent-root {
   padding: 16px !important; /* Reduced from 24px */
-  color: rgba(0, 0, 0, 0.87) !important;
 }
 
 .page-container .MuiCard-root .MuiCardContent-root:last-child {
   padding-bottom: 16px !important;
-}
-
-/* Dark mode card backgrounds */
-[data-theme="dark"] .page-container .MuiPaper-root {
-  background-color: #1e1e1e !important;
-}
-
-[data-theme="dark"] .page-container .MuiCard-root {
-  background-color: #1e1e1e !important;
-}
-
-[data-theme="dark"] .page-container .MuiCard-root .MuiCardContent-root {
-  color: #ffffff !important;
 }
 
 /* Compact lists */
@@ -273,76 +195,3 @@
   max-width: none !important;
 }
 
-/* Stat card specific fixes */
-.stat-card {
-  background-color: #ffffff !important;
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-
-.stat-card .MuiTypography-h3 {
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-
-.stat-card .MuiTypography-caption {
-  color: rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Stat card icon backgrounds */
-.stat-icon-box {
-  opacity: 1 !important;
-}
-
-/* Primary color backgrounds */
-.stat-icon-box.primary {
-  background-color: #e3f2fd !important;
-}
-
-.stat-icon-box.error {
-  background-color: #ffebee !important;
-}
-
-.stat-icon-box.warning {
-  background-color: #fff3e0 !important;
-}
-
-.stat-icon-box.info {
-  background-color: #e3f2fd !important;
-}
-
-.stat-icon-box.success {
-  background-color: #e8f5e9 !important;
-}
-
-/* Dark mode stat cards */
-[data-theme="dark"] .stat-card {
-  background-color: #1e1e1e !important;
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .stat-card .MuiTypography-h3 {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .stat-card .MuiTypography-caption {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-[data-theme="dark"] .stat-icon-box.primary {
-  background-color: #0d47a1 !important;
-}
-
-[data-theme="dark"] .stat-icon-box.error {
-  background-color: #b71c1c !important;
-}
-
-[data-theme="dark"] .stat-icon-box.warning {
-  background-color: #e65100 !important;
-}
-
-[data-theme="dark"] .stat-icon-box.info {
-  background-color: #0d47a1 !important;
-}
-
-[data-theme="dark"] .stat-icon-box.success {
-  background-color: #1b5e20 !important;
-}

@@ -327,7 +327,7 @@ const TasksPage = () => {
       <div className="page-content">
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1" gutterBottom style={{ color: 'rgba(0, 0, 0, 0.87)' }}>
+          <Typography variant="h4" component="h1" gutterBottom>
             Tasks
           </Typography>
           <Button
