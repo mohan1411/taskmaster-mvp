@@ -2,13 +2,19 @@ import axios from 'axios';
 
 // Environment-based API URL configuration
 const getApiBaseUrl = () => {
-  // In development, use the environment variable or default to localhost
-  if (process.env.NODE_ENV === 'development') {
-    return process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  // Use environment variable if set, otherwise use defaults
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
   }
   
-  // In production, use the production URL
-  return 'https://taskmaster-mvp-production.up.railway.app';
+  // In development, default to localhost
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:5000';
+  }
+  
+  // In production, use a placeholder that should be replaced by env var
+  console.warn('REACT_APP_API_URL not set in production!');
+  return 'https://your-backend-url.com';
 };
 
 const API_BASE_URL = getApiBaseUrl();
