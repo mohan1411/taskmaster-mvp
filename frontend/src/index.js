@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CustomThemeProvider } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
+import './styles/theme-fixes.css';
 
 // Debug theme loading
 console.log('🎨 Environment:', process.env.NODE_ENV);

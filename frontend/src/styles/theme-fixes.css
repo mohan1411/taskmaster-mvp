@@ -1,0 +1,55 @@
+/* Theme-aware text color fixes */
+
+/* Ensure all typography elements use proper theme colors */
+.MuiTypography-root {
+  color: var(--mui-palette-text-primary);
+}
+
+.MuiTypography-h1,
+.MuiTypography-h2,
+.MuiTypography-h3,
+.MuiTypography-h4,
+.MuiTypography-h5,
+.MuiTypography-h6 {
+  color: var(--mui-palette-text-primary) !important;
+}
+
+.MuiTypography-body1,
+.MuiTypography-body2 {
+  color: var(--mui-palette-text-primary);
+}
+
+.MuiTypography-caption,
+.MuiTypography-overline {
+  color: var(--mui-palette-text-secondary);
+}
+
+/* Fix card backgrounds for better contrast */
+.MuiCard-root {
+  background-color: var(--mui-palette-background-paper);
+}
+
+/* Ensure stat card visibility */
+.MuiCardContent-root {
+  color: var(--mui-palette-text-primary);
+}
+
+/* Page container text color */
+.page-container {
+  color: var(--mui-palette-text-primary);
+}
+
+/* Fix for Material-UI theme variables */
+:root {
+  --mui-palette-text-primary: rgba(0, 0, 0, 0.87);
+  --mui-palette-text-secondary: rgba(0, 0, 0, 0.6);
+  --mui-palette-background-paper: #ffffff;
+  --mui-palette-background-default: #fafafa;
+}
+
+[data-theme="dark"] {
+  --mui-palette-text-primary: #ffffff;
+  --mui-palette-text-secondary: rgba(255, 255, 255, 0.7);
+  --mui-palette-background-paper: #1e1e1e;
+  --mui-palette-background-default: #121212;
+}

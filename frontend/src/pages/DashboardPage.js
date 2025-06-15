@@ -204,7 +204,7 @@ const DashboardPage = () => {
             width: 48,
             height: 48,
             borderRadius: 1,
-            bgcolor: `${color}.50`,
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? `${color}.900` : `${color}.100`,
             mr: 2
           }}>
             {React.cloneElement(icon, { 
@@ -212,10 +212,10 @@ const DashboardPage = () => {
             })}
           </Box>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h3" sx={{ fontSize: '1.75rem', fontWeight: 600, lineHeight: 1 }}>
+            <Typography variant="h3" sx={{ fontSize: '1.75rem', fontWeight: 600, lineHeight: 1, color: 'text.primary' }}>
               {value}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {title}
             </Typography>
           </Box>
@@ -237,10 +237,10 @@ const DashboardPage = () => {
       <div className="page-content">
         {/* Compact Header */}
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontSize: '1.5rem', fontWeight: 500, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontSize: '1.5rem', fontWeight: 500, mb: 0.5, color: 'text.primary' }}>
             Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </Typography>
         </Box>
