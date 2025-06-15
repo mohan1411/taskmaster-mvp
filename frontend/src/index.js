@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import { CustomThemeProvider } from './context/ThemeContext';
@@ -18,7 +17,6 @@ root.render(
     <ErrorBoundary>
       <BrowserRouter>
         <CustomThemeProvider>
-          <CssBaseline />
           <AuthProvider>
             <App />
           </AuthProvider>
