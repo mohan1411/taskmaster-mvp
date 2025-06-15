@@ -1,0 +1,441 @@
+const Document = require('../models/documentModel');
+const documentExtractor = require('./documentExtractor');
+const taskParser = require('./taskParser');
+const simpleTaskParser = require('./simpleTaskParser');
+const fileTypeDetector = require('../utils/fileTypeDetector');
+const fs = require('fs').promises;
+const path = require('path');
+
+class AttachmentProcessor {
+  constructor() {
+    this.processingQueue = new Map();
+    // Configuration: Set parser preference
+    // Options: 'openai-first', 'simple-only', 'openai-only'
+    this.parserMode = process.env.DOCUMENT_PARSER_MODE || 'simple-only';
+  }
+
+  /**
+   * Process a single document
+   */
+  async processDocument(documentId, filePath) {
+    // Prevent duplicate processing
+    if (this.processingQueue.has(documentId)) {
+      console.log(`Document ${documentId} already being processed`);
+      return;
+    }
+
+    this.processingQueue.set(documentId, true);
+
+    try {
+      // Get document from database
+      const document = await Document.findById(documentId);
+      if (!document) {
+        throw new Error('Document not found');
+      }
+
+      // Mark as processing
+      await document.markAsProcessing();
+
+      // Validate file
+      const validation = await fileTypeDetector.validateFile(filePath, document.mimeType);
+      if (!validation.valid) {
+        throw new Error(`File validation failed: ${validation.error}`);
+      }
+
+      // Get processor type
+      const processorType = fileTypeDetector.getProcessor(document.mimeType);
+      if (!processorType) {
+        throw new Error(`No processor available for ${document.mimeType}`);
+      }
+
+      // Extract text
+      console.log(`Extracting text from ${document.originalName}`);
+      const extractionResult = await documentExtractor.extractFromFile(
+        filePath, 
+        document.mimeType
+      );
+
+      // Detect document type
+      const documentType = await fileTypeDetector.detectDocumentType(extractionResult.text);
+
+      // Parse for tasks based on configuration
+      console.log(`Parsing tasks from ${document.originalName} using mode: ${this.parserMode}`);
+      let tasks = [];
+      
+      const parserContext = {
+        source: 'document',
+        documentName: document.originalName,
+        documentType: documentType,
+        emailContext: document.emailId ? await this.getEmailContext(document.emailId) : null,
+        structured: extractionResult.structured
+      };
+
+      // Choose parser based on configuration
+      switch (this.parserMode) {
+        case 'simple-only':
+          // Use simple parser only (no OpenAI)
+          // EMERGENCY INLINE PARSER - TEMPORARY FIX
+          console.log('Using emergency inline parser...');
+          const lines = extractionResult.text.split(/\r?\n/);
+          tasks = [];
+          
+          lines.forEach((line, index) => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.length < 5) return;
+            
+            let task = null;
+            
+            // Check for task patterns
+            if (trimmed.match(/TODO:/i)) {
+              task = { 
+                title: trimmed.replace(/TODO:\s*/i, '').trim(), 
+                priority: 'medium' 
+              };
+            } else if (trimmed.match(/\b(needs?|must|should|has|have)\s+(to\s+)?/i)) {
+              task = { 
+                title: trimmed, 
+                priority: 'high' 
+              };
+            } else if (trimmed.match(/^[-•*]\s+/)) {
+              task = { 
+                title: trimmed.replace(/^[-•*]\s+/, '').trim(), 
+                priority: 'medium' 
+              };
+            } else if (trimmed.match(/^\d+[.)]\s+/)) {
+              task = { 
+                title: trimmed.replace(/^\d+[.)]\s+/, '').trim(), 
+                priority: 'medium' 
+              };
+            } else if (trimmed.match(/^(Action|Task):\s*/i)) {
+              task = { 
+                title: trimmed.replace(/^(Action|Task):\s*/i, '').trim(), 
+                priority: 'high' 
+              };
+            } else if (trimmed.match(/URGENT/i)) {
+              task = { 
+                title: trimmed.replace(/URGENT:\s*/i, '').trim(), 
+                priority: 'urgent' 
+              };
+            }
+            
+            if (task && task.title.length > 3) {
+              tasks.push({
+                ...task,
+                description: trimmed,
+                confidence: 75,
+                lineNumber: index + 1,
+                sourceText: trimmed
+              });
+              console.log('Found task:', task.title);
+            }
+          });
+          
+          console.log('Inline parser found', tasks.length, 'tasks');
+          // END EMERGENCY PARSER
+          break;
+          
+        case 'openai-only':
+          // Use OpenAI only (will fail if not configured)
+          tasks = await taskParser.parseDocument(extractionResult.text, parserContext);
+          console.log(`OpenAI parser found ${tasks.length} tasks`);
+          break;
+          
+        case 'openai-first':
+        default:
+          // Try OpenAI first, fallback to simple
+          try {
+            tasks = await taskParser.parseDocument(extractionResult.text, parserContext);
+            console.log(`OpenAI parser found ${tasks.length} tasks`);
+          } catch (parserError) {
+            console.warn(`OpenAI parser failed, using simple parser:`, parserError.message);
+            // EMERGENCY INLINE PARSER - TEMPORARY FIX
+          console.log('Using emergency inline parser...');
+          const lines = extractionResult.text.split(/\r?\n/);
+          tasks = [];
+          
+          lines.forEach((line, index) => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.length < 5) return;
+            
+            let task = null;
+            
+            // Check for task patterns
+            if (trimmed.match(/TODO:/i)) {
+              task = { 
+                title: trimmed.replace(/TODO:\s*/i, '').trim(), 
+                priority: 'medium' 
+              };
+            } else if (trimmed.match(/\b(needs?|must|should|has|have)\s+(to\s+)?/i)) {
+              task = { 
+                title: trimmed, 
+                priority: 'high' 
+              };
+            } else if (trimmed.match(/^[-•*]\s+/)) {
+              task = { 
+                title: trimmed.replace(/^[-•*]\s+/, '').trim(), 
+                priority: 'medium' 
+              };
+            } else if (trimmed.match(/^\d+[.)]\s+/)) {
+              task = { 
+                title: trimmed.replace(/^\d+[.)]\s+/, '').trim(), 
+                priority: 'medium' 
+              };
+            } else if (trimmed.match(/^(Action|Task):\s*/i)) {
+              task = { 
+                title: trimmed.replace(/^(Action|Task):\s*/i, '').trim(), 
+                priority: 'high' 
+              };
+            } else if (trimmed.match(/URGENT/i)) {
+              task = { 
+                title: trimmed.replace(/URGENT:\s*/i, '').trim(), 
+                priority: 'urgent' 
+              };
+            }
+            
+            if (task && task.title.length > 3) {
+              tasks.push({
+                ...task,
+                description: trimmed,
+                confidence: 75,
+                lineNumber: index + 1,
+                sourceText: trimmed
+              });
+              console.log('Found task:', task.title);
+            }
+          });
+          
+          console.log('Inline parser found', tasks.length, 'tasks');
+          // END EMERGENCY PARSER
+          }
+          break;
+      }
+
+      // Update document with results
+      await document.markAsCompleted({
+        text: extractionResult.text,
+        tasks: tasks,
+        metadata: {
+          ...extractionResult.metadata,
+          documentType: documentType,
+          hasDeadlines: tasks.some(t => t.dueDate),
+          language: 'en', // TODO: Implement language detection
+          extractionVersion: '1.0',
+          parserUsed: this.parserMode
+        }
+      });
+
+      console.log(`Successfully processed ${document.originalName}: Found ${tasks.length} tasks`);
+
+      // Clean up file after successful processing
+      await this.cleanupFile(filePath);
+
+      return document;
+    } catch (error) {
+      console.error(`Error processing document ${documentId}:`, error);
+
+      // Mark as failed
+      try {
+        const document = await Document.findById(documentId);
+        if (document) {
+          await document.markAsFailed(error);
+        }
+      } catch (updateError) {
+        console.error('Failed to update document status:', updateError);
+      }
+
+      // Clean up file on error
+      await this.cleanupFile(filePath);
+
+      throw error;
+    } finally {
+      this.processingQueue.delete(documentId);
+    }
+  }
+
+  /**
+   * Process email attachments
+   */
+  async processEmailAttachments(emailId, attachments) {
+    const results = [];
+
+    for (const attachment of attachments) {
+      try {
+        // Check if supported
+        if (!fileTypeDetector.isSupported(attachment.mimeType)) {
+          console.log(`Skipping unsupported file type: ${attachment.mimeType}`);
+          continue;
+        }
+
+        // Create document record
+        const document = await Document.create({
+          originalName: attachment.filename,
+          filename: fileTypeDetector.sanitizeFilename(attachment.filename),
+          mimeType: attachment.mimeType,
+          size: attachment.size,
+          path: attachment.path,
+          emailId: emailId,
+          userId: attachment.userId,
+          processingStatus: 'pending'
+        });
+
+        // Process asynchronously
+        this.processDocument(document._id, attachment.path)
+          .catch(error => console.error(`Failed to process attachment ${attachment.filename}:`, error));
+
+        results.push({
+          documentId: document._id,
+          filename: attachment.filename,
+          status: 'processing'
+        });
+      } catch (error) {
+        console.error(`Error creating document for ${attachment.filename}:`, error);
+        results.push({
+          filename: attachment.filename,
+          status: 'failed',
+          error: error.message
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Get email context for better task extraction
+   */
+  async getEmailContext(emailId) {
+    try {
+      const Email = require('../models/emailModel');
+      const email = await Email.findById(emailId).select('subject from body');
+      
+      if (!email) return null;
+
+      return {
+        subject: email.subject,
+        sender: email.from,
+        emailBody: email.body ? email.body.substring(0, 500) : '' // First 500 chars
+      };
+    } catch (error) {
+      console.error('Error fetching email context:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clean up uploaded file
+   */
+  async cleanupFile(filePath) {
+    try {
+      await fs.unlink(filePath);
+      console.log(`Cleaned up file: ${filePath}`);
+    } catch (error) {
+      console.error(`Failed to cleanup file ${filePath}:`, error);
+    }
+  }
+
+  /**
+   * Process pending documents (for background job)
+   */
+  async processPendingDocuments() {
+    try {
+      const pendingDocs = await Document.findPendingDocuments();
+      console.log(`Found ${pendingDocs.length} pending documents`);
+
+      for (const doc of pendingDocs) {
+        try {
+          await this.processDocument(doc._id, doc.path);
+        } catch (error) {
+          console.error(`Failed to process pending document ${doc._id}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('Error processing pending documents:', error);
+    }
+  }
+
+  /**
+   * Get processing statistics
+   */
+  async getProcessingStats(userId) {
+    const stats = await Document.aggregate([
+      { $match: { userId: userId } },
+      {
+        $group: {
+          _id: '$processingStatus',
+          count: { $sum: 1 },
+          totalSize: { $sum: '$size' },
+          avgProcessingTime: { $avg: '$processingDuration' },
+          totalTasksFound: { $sum: { $size: '$extractedTasks' } }
+        }
+      }
+    ]);
+
+    const statsByType = await Document.aggregate([
+      { $match: { userId: userId } },
+      {
+        $group: {
+          _id: '$mimeType',
+          count: { $sum: 1 },
+          avgTasksPerDoc: { $avg: { $size: '$extractedTasks' } },
+          successRate: {
+            $avg: {
+              $cond: [{ $eq: ['$processingStatus', 'completed'] }, 1, 0]
+            }
+          }
+        }
+      }
+    ]);
+
+    return {
+      byStatus: stats,
+      byType: statsByType,
+      queueSize: this.processingQueue.size,
+      parserMode: this.parserMode
+    };
+  }
+
+  /**
+   * Reprocess a document
+   */
+  async reprocessDocument(documentId) {
+    const document = await Document.findById(documentId);
+    if (!document) {
+      throw new Error('Document not found');
+    }
+
+    if (!document.path || document.deleted) {
+      throw new Error('Document file not available');
+    }
+
+    // Reset status
+    document.processingStatus = 'pending';
+    document.processingError = null;
+    document.extractedTasks = [];
+    await document.save();
+
+    // Reprocess
+    return this.processDocument(document._id, document.path);
+  }
+
+  /**
+   * Get current parser mode
+   */
+  getParserMode() {
+    return this.parserMode;
+  }
+
+  /**
+   * Set parser mode dynamically
+   */
+  setParserMode(mode) {
+    const validModes = ['simple-only', 'openai-first', 'openai-only'];
+    if (validModes.includes(mode)) {
+      this.parserMode = mode;
+      console.log(`Document parser mode set to: ${mode}`);
+      return true;
+    }
+    return false;
+  }
+}
+
+module.exports = new AttachmentProcessor();

@@ -1,0 +1,30 @@
+FIZZTASK LOGIN FIX - QUICK REFERENCE
+====================================
+
+Demo Login Credentials:
+- Email: newuser@example.com
+- Password: demo123 (all lowercase!)
+
+If you can't login, run ANY of these:
+
+EASIEST FIXES:
+1. fix-login-now.bat          <- Simplest fix
+2. LOGIN-HELPER.bat           <- Interactive helper
+3. INSTANT-LOGIN-FIX.bat      <- Visual fix
+
+COMPLETE FIXES:
+4. COMPLETE-LOGIN-FIX.bat     <- Fixes everything
+5. FIX-LOGIN-ISSUE.bat        <- Detailed fix
+
+PASSWORD HELP:
+6. PASSWORD-HELP.bat          <- Shows password clearly
+7. SHOW-LOGIN-INFO.bat        <- Display credentials
+
+MANUAL FIXES:
+8. reset-password.bat         <- Reset password only
+9. show-credentials.ps1       <- PowerShell popup
+
+For more info, see:
+- README-LOGIN.md
+- LOGIN_CREDENTIALS.md
+- demo-login-credentials.txt

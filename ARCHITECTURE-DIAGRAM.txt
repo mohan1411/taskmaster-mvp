@@ -1,0 +1,38 @@
+
+   FizzTask Architecture - Why You Need Both Servers
+   ================================================
+
+   Your Browser (http://localhost:3000)
+         |
+         | HTTP Requests
+         ↓
+   ┌─────────────────────────┐
+   │   FRONTEND (Port 3000)  │ ← This was running ✓
+   │   - React App           │
+   │   - User Interface      │
+   │   - Login Forms         │
+   └─────────────────────────┘
+         |
+         | API Calls (http://localhost:5000/api/*)
+         ↓
+   ┌─────────────────────────┐
+   │   BACKEND (Port 5000)   │ ← This was NOT running ✗
+   │   - Express/Node.js     │    (Causing 500 errors)
+   │   - REST API            │
+   │   - Authentication      │
+   │   - Data Processing     │
+   └─────────────────────────┘
+         |
+         | Database Queries
+         ↓
+   ┌─────────────────────────┐
+   │   MongoDB (Port 27017)  │
+   │   - User Data           │
+   │   - Tasks               │
+   │   - Emails              │
+   │   - Documents           │
+   └─────────────────────────┘
+
+   The Fix: Start BOTH servers!
+   
+   Use: QUICK-FIX-NOW.bat
