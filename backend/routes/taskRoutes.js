@@ -12,25 +12,26 @@ const {
   getTaskCountByEmail
 } = require('../controllers/taskController');
 const { protect } = require('../middleware/authMiddleware');
+const { taskValidationRules, sanitizeQuery } = require('../middleware/validationMiddleware');
 
 // All routes are protected
 router.use(protect);
 
 router.route('/')
-  .get(getTasks)
-  .post(createTask);
+  .get(sanitizeQuery, getTasks)
+  .post(taskValidationRules.create, createTask);
 
 router.route('/:id')
-  .get(getTaskById)
-  .put(updateTask)
-  .delete(deleteTask);
+  .get(taskValidationRules.delete, getTaskById)
+  .put(taskValidationRules.update, updateTask)
+  .delete(taskValidationRules.delete, deleteTask);
 
 // Add PATCH route for status updates
-router.patch('/:id/status', updateTask);
+router.patch('/:id/status', taskValidationRules.update, updateTask);
 
 router.post('/extract', extractTasksFromText);
 router.post('/save-extracted', saveExtractedTasks);
-router.get('/analytics', getTaskAnalytics);
-router.get('/count', getTaskCountByEmail);
+router.get('/analytics', sanitizeQuery, getTaskAnalytics);
+router.get('/count', sanitizeQuery, getTaskCountByEmail);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const Task = require('../models/taskModel');
 const mongoose = require('mongoose');
 const config = require('../config/config');
 const { getOpenAI } = require('../utils/openaiHelper');
+const { sanitizeText, sanitizeObject, removeMongoOperators } = require('../utils/sanitizer');
 
 // Get the OpenAI instance if available
 const openai = getOpenAI();
@@ -117,16 +118,19 @@ const createTask = async (req, res) => {
   try {
     const { title, description, priority, dueDate, category, labels } = req.body;
 
-    const task = await Task.create({
+    // Sanitize input data
+    const sanitizedData = {
       user: req.user._id,
-      title,
-      description,
+      title: sanitizeText(title),
+      description: description ? sanitizeText(description) : undefined,
       priority: priority || 'medium',
       dueDate: dueDate || null,
-      category: category || 'uncategorized',
-      labels: labels || [],
+      category: sanitizeText(category || 'uncategorized'),
+      labels: labels ? labels.map(label => sanitizeText(label)) : [],
       status: 'pending'
-    });
+    };
+
+    const task = await Task.create(sanitizedData);
 
     if (task) {
       res.status(201).json(task);
@@ -155,9 +159,9 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Update task fields if provided
-    if (title) task.title = title;
-    if (description !== undefined) task.description = description;
+    // Update task fields if provided (with sanitization)
+    if (title) task.title = sanitizeText(title);
+    if (description !== undefined) task.description = sanitizeText(description);
     if (status) {
       task.status = status;
       // If marking as completed, set completedAt date

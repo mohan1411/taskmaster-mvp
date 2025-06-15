@@ -40,7 +40,13 @@
     "multer": "^1.4.4-lts.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.8",
-    "openai": "^4.0.0"
+    "openai": "^4.0.0",
+    "express-rate-limit": "^6.7.0",
+    "express-validator": "^7.0.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "xss": "^1.0.14",
+    "hpp": "^0.2.3",
+    "isomorphic-dompurify": "^1.9.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
