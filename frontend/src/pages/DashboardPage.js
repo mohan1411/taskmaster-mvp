@@ -204,8 +204,11 @@ const DashboardPage = () => {
             width: 48,
             height: 48,
             borderRadius: 1,
-            bgcolor: `${color}.50`,
-            mr: 2
+            bgcolor: (theme) => theme.palette.mode === 'dark' 
+              ? `${color}.dark` 
+              : `${color}.light`,
+            mr: 2,
+            opacity: 0.2
           }}>
             {React.cloneElement(icon, { 
               sx: { fontSize: 24, color: `${color}.main` } 

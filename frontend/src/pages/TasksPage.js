@@ -341,7 +341,7 @@ const TasksPage = () => {
         </Box>
         
         {/* Summary banner */}
-        <Paper sx={{ p: 2, mb: 3, backgroundColor: '#f8f9fa' }}>
+        <Paper sx={{ p: 2, mb: 3 }}>
           <Typography variant="h6" component="div" gutterBottom>
             Task Summary
           </Typography>
