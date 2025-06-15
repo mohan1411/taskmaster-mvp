@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Clock, AlertTriangle, User, Calendar, Flag, Edit3 } from 'lucide-react';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import WarningIcon from '@mui/icons-material/Warning';
+import PersonIcon from '@mui/icons-material/Person';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import FlagIcon from '@mui/icons-material/Flag';
+import EditIcon from '@mui/icons-material/Edit';
 import documentService from '../../services/documentService';
 import './TaskExtractionReview.css';
 
@@ -235,7 +242,7 @@ const TaskExtractionReview = ({
       <div className="task-list">
         {filteredTasks.length === 0 ? (
           <div className="no-tasks">
-            <AlertTriangle size={48} />
+            <WarningIcon sx={{ fontSize: 48 }} />
             <h3>No tasks found</h3>
             <p>
               {filterByConfidence > 0 
@@ -296,7 +303,7 @@ const TaskExtractionReview = ({
                         onClick={() => startEditing(task)}
                         title="Edit task"
                       >
-                        <Edit3 size={16} />
+                        <EditIcon sx={{ fontSize: 16 }} />
                       </button>
                     )}
                   </div>
@@ -319,7 +326,7 @@ const TaskExtractionReview = ({
 
                   <div className="task-metadata">
                     <div className="metadata-item">
-                      <Calendar size={16} />
+                      <CalendarTodayIcon sx={{ fontSize: 16 }} />
                       {editingTask?.id === task.id ? (
                         <input
                           type="date"
@@ -333,7 +340,7 @@ const TaskExtractionReview = ({
                     </div>
 
                     <div className="metadata-item">
-                      <Flag size={16} style={{ color: getPriorityColor(task.priority) }} />
+                      <FlagIcon sx={{ fontSize: 16, color: getPriorityColor(task.priority) }} />
                       {editingTask?.id === task.id ? (
                         <select
                           value={editingTask.priority}
@@ -351,7 +358,7 @@ const TaskExtractionReview = ({
 
                     {(task.assignee || editingTask?.id === task.id) && (
                       <div className="metadata-item">
-                        <User size={16} />
+                        <PersonIcon sx={{ fontSize: 16 }} />
                         {editingTask?.id === task.id ? (
                           <input
                             type="text"

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Snackbar, Alert, Slide, IconButton } from '@mui/material';
-import { X } from 'lucide-react';
+import CloseIcon from '@mui/icons-material/Close';
 
 const NotificationContext = createContext();
 
@@ -129,7 +129,7 @@ export const NotificationProvider = ({ children }) => {
               onClick={handleClose}
               sx={{ ml: 1 }}
             >
-              <X size={16} />
+              <CloseIcon fontSize="small" />
             </IconButton>
           }
         >
