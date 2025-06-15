@@ -10,6 +10,10 @@ const { extractTasksFromEmail: extractTasksHelper, extractTasksWithoutAI } = req
 const { detectFollowUpNeeds } = require('./followupController');
 const { followupExists, createFollowupIfNotExists } = require('../utils/followupUtils');
 const { getOpenAI } = require('../utils/openaiHelper');
+const QueryOptimizer = require('../utils/queryOptimizer');
+
+// Create cache for email queries
+const emailCache = QueryOptimizer.createCache(300); // 5 minute cache
 
 // Get the OpenAI instance if available
 const openai = getOpenAI();
@@ -314,21 +318,42 @@ const getEmails = async (req, res) => {
       ];
     }
     
-    // Execute query
+    // Check cache first
+    const cacheKey = `emails:${req.user._id}:${JSON.stringify(query)}:${page}:${limit}`;
+    const cachedResult = emailCache.get(cacheKey);
+    
+    if (cachedResult && !req.query.noCache) {
+      return res.json(cachedResult);
+    }
+    
+    // Execute optimized query
     const emails = await Email.find(query)
       .sort({ receivedAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .select('messageId threadId sender recipients subject snippet hasAttachments labels receivedAt isRead needsFollowUp')
+      .lean()
+      .maxTimeMS(10000);
     
-    // Get total count for pagination
-    const total = await Email.countDocuments(query);
+    // Get total count for pagination (with caching)
+    const countCacheKey = `emails:count:${req.user._id}:${JSON.stringify(query)}`;
+    let total = emailCache.get(countCacheKey);
     
-    res.json({
+    if (total === null) {
+      total = await Email.countDocuments(query).maxTimeMS(5000);
+      emailCache.set(countCacheKey, total);
+    }
+    
+    // Cache the result
+    const result = {
       emails,
       page,
       pages: Math.ceil(total / limit),
       total
-    });
+    };
+    
+    emailCache.set(cacheKey, result);
+    res.json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });

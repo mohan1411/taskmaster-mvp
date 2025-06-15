@@ -2,6 +2,10 @@ const Task = require('../models/taskModel');
 const mongoose = require('mongoose');
 const config = require('../config/config');
 const { getOpenAI } = require('../utils/openaiHelper');
+const QueryOptimizer = require('../utils/queryOptimizer');
+
+// Create cache for frequently accessed data
+const taskCache = QueryOptimizer.createCache(300); // 5 minute cache
 
 // Get the OpenAI instance if available
 const openai = getOpenAI();
@@ -66,16 +70,44 @@ const getTasks = async (req, res) => {
 
     console.log('GET TASKS: Final query:', JSON.stringify(query, null, 2));
 
-    // Execute the query with pagination
+    // Check cache first
+    const cacheKey = `tasks:${req.user._id}:${JSON.stringify(query)}:${page}:${limit}`;
+    const cachedResult = taskCache.get(cacheKey);
+    
+    if (cachedResult && !req.query.noCache) {
+      console.log('Returning cached tasks');
+      return res.json(cachedResult);
+    }
+    
+    // Execute the optimized query with pagination
     const tasks = await Task.find(query)
       .sort({ dueDate: 1, priority: -1, createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .select('title description status priority dueDate category labels completedAt createdAt')
+      .lean()
+      .maxTimeMS(10000); // 10 second timeout
     
-    // Get total count for pagination
-    const total = await Task.countDocuments(query);
+    // Get total count for pagination (also check cache)
+    const countCacheKey = `tasks:count:${req.user._id}:${JSON.stringify(query)}`;
+    let total = taskCache.get(countCacheKey);
+    
+    if (total === null) {
+      total = await Task.countDocuments(query).maxTimeMS(5000);
+      taskCache.set(countCacheKey, total);
+    }
     
     console.log(`GET TASKS: Found ${tasks.length} tasks, total: ${total}`);
+    
+    // Cache the result
+    const result = {
+      tasks,
+      page,
+      pages: Math.ceil(total / limit),
+      total
+    };
+    
+    taskCache.set(cacheKey, result);
     
     res.json({
       tasks,
