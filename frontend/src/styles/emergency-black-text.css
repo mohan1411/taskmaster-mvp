@@ -1,24 +1,50 @@
-/* EMERGENCY BLACK TEXT FIX - HIGHEST PRIORITY */
+/* EMERGENCY TEXT VISIBILITY FIX - HIGHEST PRIORITY */
 
-/* Reset all possible white text */
-html, body, #root {
+/* Light mode (default) - black text on light background */
+html:not([data-theme="dark"]) body,
+body:not([data-theme="dark"]) {
   color: #000000 !important;
   background: #fafafa !important;
 }
 
-/* Force every single element to have black text */
-* {
+/* Force black text in light mode */
+html:not([data-theme="dark"]) *,
+body:not([data-theme="dark"]) * {
   color: #000000 !important;
 }
 
-/* Override any inline styles */
-[style*="color"] {
+/* Dark mode - white text on dark background */
+[data-theme="dark"] {
+  background-color: #121212 !important;
+}
+
+[data-theme="dark"] body {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] * {
+  color: #ffffff !important;
+}
+
+/* Override any inline styles in light mode */
+html:not([data-theme="dark"]) [style*="color"] {
   color: #000000 !important;
 }
 
-/* Material-UI specific overrides */
-[class*="Mui"] {
+/* Override any inline styles in dark mode */
+[data-theme="dark"] [style*="color"] {
+  color: #ffffff !important;
+}
+
+/* Material-UI specific overrides - Light mode */
+html:not([data-theme="dark"]) [class*="Mui"] {
   color: #000000 !important;
+}
+
+/* Material-UI specific overrides - Dark mode */
+[data-theme="dark"] [class*="Mui"] {
+  color: #ffffff !important;
 }
 
 /* Typography overrides */
@@ -39,11 +65,18 @@ label, a, li, td, th, dt, dd, em, strong, b, i, u {
   color: #000000 !important;
 }
 
-/* Cards must have white background */
-.MuiCard-root,
-.MuiPaper-root {
+/* Cards - Light mode */
+html:not([data-theme="dark"]) .MuiCard-root,
+html:not([data-theme="dark"]) .MuiPaper-root {
   background: #ffffff !important;
   color: #000000 !important;
+}
+
+/* Cards - Dark mode */
+[data-theme="dark"] .MuiCard-root,
+[data-theme="dark"] .MuiPaper-root {
+  background: #1e1e1e !important;
+  color: #ffffff !important;
 }
 
 /* All children of cards */

@@ -8,154 +8,74 @@ export const forceTextVisibility = () => {
     existingStyle.remove();
   }
   
+  // Check current theme
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  
   // Create new style element
   const style = document.createElement('style');
   style.id = styleId;
   style.innerHTML = `
-    /* EMERGENCY FIX - Force black text on white backgrounds */
+    /* EMERGENCY FIX - Theme-aware visibility */
+    
+    /* Base styles */
     body {
-      color: #000000 !important;
-      background-color: #fafafa !important;
+      background-color: ${isDarkMode ? '#121212' : '#fafafa'} !important;
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
     
-    /* Force all text content to be black */
-    p, span, div, h1, h2, h3, h4, h5, h6, label, li, td, th, a {
-      color: #000000 !important;
+    .page-container {
+      background-color: ${isDarkMode ? '#121212' : '#fafafa'} !important;
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
     
-    /* Force all Material-UI components to have black text */
+    /* All text elements */
+    p, span, div, h1, h2, h3, h4, h5, h6, label, li, td, th, a,
+    .MuiTypography-root,
     [class*="MuiTypography"] {
-      color: #000000 !important;
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
     
-    /* Force all Material-UI text fields and inputs */
-    .MuiInputBase-root,
-    .MuiInputBase-input,
-    .MuiFormLabel-root {
-      color: #000000 !important;
-    }
-    
-    /* Force cards and papers to have proper contrast */
+    /* Cards and Papers */
     .MuiCard-root,
     .MuiPaper-root {
-      background-color: #ffffff !important;
-      color: #000000 !important;
+      background-color: ${isDarkMode ? '#1e1e1e' : '#ffffff'} !important;
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
     
     .MuiCard-root *,
     .MuiPaper-root * {
-      color: #000000 !important;
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
     
-    /* Page container and content */
-    .page-container,
-    .page-content,
-    .page-container *,
-    .page-content * {
-      color: #000000 !important;
+    /* Stat cards */
+    .stat-card {
+      background-color: ${isDarkMode ? '#1e1e1e' : '#ffffff'} !important;
     }
     
-    /* Ensure stat cards are visible */
-    .stat-card,
     .stat-card * {
-      color: #000000 !important;
-      background-color: #ffffff !important;
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
     
-    /* Fix any elements that might have white color explicitly set */
+    /* Buttons - preserve their styling */
+    .MuiButton-containedPrimary,
+    .MuiButton-containedSecondary {
+      color: #ffffff !important;
+    }
+    
+    /* Input fields */
+    .MuiInputBase-root,
+    .MuiInputBase-input,
+    .MuiFormLabel-root {
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
+    }
+    
+    /* Override any conflicting styles */
     [style*="color: white"],
     [style*="color:#fff"],
     [style*="color: #fff"],
     [style*="color:#ffffff"],
-    [style*="color: #ffffff"],
-    [style*="color: rgb(255"],
-    [style*="color:rgb(255"] {
-      color: #000000 !important;
-    }
-    
-    /* Force stat cards to be visible */
-    .stat-card,
-    .stat-card * {
-      color: rgba(0, 0, 0, 0.87) !important;
-    }
-    
-    /* Icon backgrounds with better colors */
-    .stat-icon-box {
-      opacity: 1 !important;
-    }
-    
-    .stat-icon-box.primary {
-      background-color: #2196f3 !important;
-      opacity: 0.1 !important;
-    }
-    
-    .stat-icon-box.error {
-      background-color: #f44336 !important;
-      opacity: 0.1 !important;
-    }
-    
-    .stat-icon-box.warning {
-      background-color: #ff9800 !important;
-      opacity: 0.1 !important;
-    }
-    
-    .stat-icon-box.info {
-      background-color: #2196f3 !important;
-      opacity: 0.1 !important;
-    }
-    
-    .stat-icon-box.success {
-      background-color: #4caf50 !important;
-      opacity: 0.1 !important;
-    }
-    
-    /* Buttons need to maintain their colors */
-    .MuiButton-contained {
-      color: white !important;
-    }
-    
-    .MuiButton-text,
-    .MuiButton-outlined {
-      color: inherit !important;
-    }
-    
-    /* Icons should use currentColor */
-    .MuiSvgIcon-root {
-      color: currentColor !important;
-    }
-    
-    /* Dark mode - only apply if background is actually dark */
-    [data-theme="dark"] body {
-      background-color: #121212 !important;
-      color: #ffffff !important;
-    }
-    
-    [data-theme="dark"] p,
-    [data-theme="dark"] span,
-    [data-theme="dark"] div,
-    [data-theme="dark"] h1,
-    [data-theme="dark"] h2,
-    [data-theme="dark"] h3,
-    [data-theme="dark"] h4,
-    [data-theme="dark"] h5,
-    [data-theme="dark"] h6,
-    [data-theme="dark"] label,
-    [data-theme="dark"] li,
-    [data-theme="dark"] td,
-    [data-theme="dark"] th,
-    [data-theme="dark"] a,
-    [data-theme="dark"] [class*="MuiTypography"] {
-      color: #ffffff !important;
-    }
-    
-    [data-theme="dark"] .MuiCard-root,
-    [data-theme="dark"] .MuiPaper-root {
-      background-color: #1e1e1e !important;
-    }
-    
-    [data-theme="dark"] .MuiCard-root *,
-    [data-theme="dark"] .MuiPaper-root * {
-      color: #ffffff !important;
+    [style*="color: #ffffff"] {
+      color: ${isDarkMode ? '#ffffff' : '#000000'} !important;
     }
   `;
   
@@ -181,6 +101,7 @@ if (typeof window !== 'undefined') {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        console.log('Theme changed, reapplying text visibility fix');
         forceTextVisibility();
       }
     });
@@ -190,12 +111,4 @@ if (typeof window !== 'undefined') {
     attributes: true,
     attributeFilter: ['data-theme']
   });
-  
-  // Also observe body for class changes
-  if (document.body) {
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-  }
 }
