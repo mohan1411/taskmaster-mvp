@@ -66,7 +66,7 @@ const FocusPage = () => {
       <div className="page-content">
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }} style={{ color: 'rgba(0, 0, 0, 0.87)' }}>
             Focus Mode
           </Typography>
           <Typography variant="body1" color="text.secondary">

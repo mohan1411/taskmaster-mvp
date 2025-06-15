@@ -130,7 +130,7 @@ const DocumentsPage = () => {
       <div className="page-content">
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
+          <Typography variant="h4" component="h1" gutterBottom style={{ color: 'rgba(0, 0, 0, 0.87)' }}>
             Document Hub
           </Typography>
           <Typography variant="body1" color="text.secondary" gutterBottom>

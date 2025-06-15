@@ -199,7 +199,6 @@ const DashboardPage = () => {
       <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
           <Box 
-            className={`stat-icon-box ${color}`}
             sx={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -207,7 +206,14 @@ const DashboardPage = () => {
               width: 48,
               height: 48,
               borderRadius: 1,
-              mr: 2
+              mr: 2,
+              backgroundColor: 
+                color === 'primary' ? 'rgba(33, 150, 243, 0.1)' :
+                color === 'error' ? 'rgba(244, 67, 54, 0.1)' :
+                color === 'warning' ? 'rgba(255, 152, 0, 0.1)' :
+                color === 'info' ? 'rgba(33, 150, 243, 0.1)' :
+                color === 'success' ? 'rgba(76, 175, 80, 0.1)' : 
+                'rgba(0, 0, 0, 0.1)'
             }}>
             {React.cloneElement(icon, { 
               sx: { fontSize: 24, color: `${color}.main` } 

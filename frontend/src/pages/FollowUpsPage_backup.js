@@ -5,7 +5,7 @@ const FollowUpsPage = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1" gutterBottom style={{ color: 'rgba(0, 0, 0, 0.87)' }}>
           Follow-ups
         </Typography>
         <Paper sx={{ p: 3, mt: 3 }}>

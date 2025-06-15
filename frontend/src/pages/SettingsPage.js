@@ -25,7 +25,7 @@ const SettingsPage = () => {
   return (
     <div className="page-container">
       <div className="page-content">
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1" gutterBottom style={{ color: 'rgba(0, 0, 0, 0.87)' }}>
           Settings
         </Typography>
         
