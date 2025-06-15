@@ -124,3 +124,5 @@ console.log*
 !package-lock.json
 !frontend/package-lock.json
 !backend/package-lock.json
+
+.vercel
