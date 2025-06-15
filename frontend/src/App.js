@@ -16,6 +16,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import GmailCallback from './components/emails/GmailCallback';
 import FocusPage from './pages/FocusPage';
 import FocusAnalyticsPage from './pages/FocusAnalyticsPage';
+import DocumentsPage from './pages/DocumentsPage';
 
 // Components
 import AppLayout from './components/layouts/AppLayout';
@@ -55,6 +56,7 @@ function App() {
         <Route path="followups" element={<FollowUpsPage />} />
         <Route path="focus" element={<FocusPage />} />
         <Route path="focus/analytics" element={<FocusAnalyticsPage />} />
+        <Route path="documents" element={<DocumentsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       

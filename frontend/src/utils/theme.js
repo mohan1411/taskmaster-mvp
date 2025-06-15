@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 
-// Create a custom theme with FizzTask colors
-const theme = createTheme({
+// Base theme configuration
+const baseTheme = {
   breakpoints: {
     values: {
       xs: 0,
@@ -122,6 +122,66 @@ const theme = createTheme({
       },
     },
   },
+};
+
+// Light theme
+export const lightTheme = createTheme({
+  ...baseTheme,
+  palette: {
+    ...baseTheme.palette,
+    mode: 'light',
+  },
 });
+
+// Dark theme
+export const darkTheme = createTheme({
+  ...baseTheme,
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#2196f3',
+      light: '#64b5f6',
+      dark: '#1976d2',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#ff9800',
+      light: '#ffb74d',
+      dark: '#f57c00',
+      contrastText: '#fff',
+    },
+    success: {
+      main: '#66bb6a',
+      light: '#81c784',
+      dark: '#388e3c',
+    },
+    error: {
+      main: '#f44336',
+      light: '#e57373',
+      dark: '#d32f2f',
+    },
+    warning: {
+      main: '#ff9800',
+      light: '#ffb74d',
+      dark: '#f57c00',
+    },
+    info: {
+      main: '#2196f3',
+      light: '#64b5f6',
+      dark: '#1976d2',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: 'rgba(255, 255, 255, 0.7)',
+    },
+  },
+});
+
+// Default theme (for backward compatibility)
+const theme = lightTheme;
 
 export default theme;

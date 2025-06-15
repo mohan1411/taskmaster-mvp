@@ -37,6 +37,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import FollowUpWidget from '../components/followups/FollowUpWidget';
+import FocusWidget from '../components/focus/FocusWidget';
 import '../styles/GlobalPages.css';
 
 // Task priority colors
@@ -305,10 +306,10 @@ const DashboardPage = () => {
           </Grid>
         </Grid>
         
-        {/* Two column layout for main content */}
+        {/* Three column layout for main content */}
         <Grid container spacing={3}>
           {/* Due Today section - Compact */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <Paper sx={{ height: '100%' }}>
               <Box 
                 sx={{ 
@@ -414,8 +415,13 @@ const DashboardPage = () => {
           </Grid>
           
           {/* Follow-ups section */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <FollowUpWidget />
+          </Grid>
+          
+          {/* Focus Mode section */}
+          <Grid item xs={12} md={4}>
+            <FocusWidget />
           </Grid>
         </Grid>
         

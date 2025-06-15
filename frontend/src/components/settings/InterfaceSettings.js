@@ -32,14 +32,16 @@ import {
   Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import api from '../../services/api';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const InterfaceSettings = () => {
+  const { isDarkMode, setThemeMode, setAutoTheme } = useThemeMode();
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const [previewTheme, setPreviewTheme] = useState('light');
+  const [previewTheme, setPreviewTheme] = useState(isDarkMode ? 'dark' : 'light');
 
   // Load settings on component mount
   useEffect(() => {
@@ -71,9 +73,12 @@ const InterfaceSettings = () => {
       
       setSuccess(true);
       
-      // Apply theme immediately (this would be handled by a theme context in a real app)
+      // Apply theme immediately using context
       if (settings.ui?.theme) {
-        document.documentElement.setAttribute('data-theme', settings.ui.theme);
+        setThemeMode(settings.ui.theme);
+      }
+      if (settings.ui?.autoTheme !== undefined) {
+        setAutoTheme(settings.ui.autoTheme);
       }
     } catch (err) {
       console.error('Error saving settings:', err);
@@ -95,10 +100,7 @@ const InterfaceSettings = () => {
 
   const themes = [
     { id: 'light', name: 'Light', color: '#fff' },
-    { id: 'dark', name: 'Dark', color: '#121212' },
-    { id: 'blue', name: 'Blue', color: '#1976d2' },
-    { id: 'green', name: 'Green', color: '#388e3c' },
-    { id: 'purple', name: 'Purple', color: '#7b1fa2' }
+    { id: 'dark', name: 'Dark', color: '#121212' }
   ];
 
   const languages = [
@@ -176,6 +178,8 @@ const InterfaceSettings = () => {
                     onClick={() => {
                       setPreviewTheme(theme.id);
                       handleSettingChange('theme', theme.id);
+                      // Apply theme immediately for preview
+                      setThemeMode(theme.id);
                     }}
                   >
                     <CardContent sx={{ textAlign: 'center', py: 2 }}>
