@@ -22,6 +22,7 @@ import AppLayout from './components/layouts/AppLayout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import NotificationHandler from './components/notifications/NotificationHandler';
 import { FocusProvider } from './context/FocusContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -63,12 +64,16 @@ function App() {
     </>
   );
   
-  return user ? (
-    <FocusProvider>
-      {appContent}
-    </FocusProvider>
-  ) : (
-    appContent
+  return (
+    <NotificationProvider>
+      {user ? (
+        <FocusProvider>
+          {appContent}
+        </FocusProvider>
+      ) : (
+        appContent
+      )}
+    </NotificationProvider>
   );
 }
 
