@@ -405,7 +405,7 @@ const TaskExtractionReview = ({
               </>
             ) : (
               <>
-                <Check size={16} />
+                <CheckIcon sx={{ fontSize: 16 }} />
                 Create {selectedTasks.size} Task{selectedTasks.size !== 1 ? 's' : ''}
               </>
             )}
