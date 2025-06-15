@@ -1,12 +1,5 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "frontend/build",
-  "framework": null,
-  "installCommand": "echo 'Using custom build script'",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ]
+  "framework": null
 }
