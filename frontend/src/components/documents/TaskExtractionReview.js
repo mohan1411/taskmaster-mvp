@@ -196,7 +196,7 @@ const TaskExtractionReview = ({
           </p>
         </div>
         <button className="close-btn" onClick={onClose}>
-          <X size={24} />
+          <CloseIcon sx={{ fontSize: 24 }} />
         </button>
       </div>
 
@@ -291,10 +291,10 @@ const TaskExtractionReview = ({
                     {editingTask?.id === task.id ? (
                       <>
                         <button className="save-btn" onClick={saveEdit} title="Save">
-                          <Check size={16} />
+                          <CheckIcon sx={{ fontSize: 16 }} />
                         </button>
                         <button className="cancel-btn" onClick={cancelEdit} title="Cancel">
-                          <X size={16} />
+                          <CloseIcon sx={{ fontSize: 16 }} />
                         </button>
                       </>
                     ) : (
