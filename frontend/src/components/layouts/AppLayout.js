@@ -20,6 +20,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
@@ -82,6 +83,7 @@ const menuItems = [
   { text: 'Tasks', icon: <TaskIcon />, path: '/tasks' },
   { text: 'Emails', icon: <EmailIcon />, path: '/emails' },
   { text: 'Follow-ups', icon: <NotificationsIcon />, path: '/followups' },
+  { text: 'Focus Mode', icon: <PsychologyIcon />, path: '/focus' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 

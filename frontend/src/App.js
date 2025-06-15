@@ -14,11 +14,14 @@ import FollowUpsPage from './pages/FollowUpsPage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import GmailCallback from './components/emails/GmailCallback';
+import FocusPage from './pages/FocusPage';
+import FocusAnalyticsPage from './pages/FocusAnalyticsPage';
 
 // Components
 import AppLayout from './components/layouts/AppLayout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import NotificationHandler from './components/notifications/NotificationHandler';
+import { FocusProvider } from './context/FocusContext';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -27,7 +30,7 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  return (
+  const appContent = (
     <>
       {/* Notification Handler - only show for authenticated users */}
       {user && <NotificationHandler />}
@@ -49,6 +52,8 @@ function App() {
         <Route path="tasks" element={<TasksPage />} />
         <Route path="emails" element={<EmailsPage />} />
         <Route path="followups" element={<FollowUpsPage />} />
+        <Route path="focus" element={<FocusPage />} />
+        <Route path="focus/analytics" element={<FocusAnalyticsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       
@@ -56,6 +61,14 @@ function App() {
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
     </>
+  );
+  
+  return user ? (
+    <FocusProvider>
+      {appContent}
+    </FocusProvider>
+  ) : (
+    appContent
   );
 }
 
