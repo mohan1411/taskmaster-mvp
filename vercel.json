@@ -1,7 +1,8 @@
 {
-  "buildCommand": "cd frontend && npm install --legacy-peer-deps && CI=false npm run build",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "frontend/build",
   "framework": null,
+  "installCommand": "echo 'Using custom build script'",
   "rewrites": [
     {
       "source": "/(.*)",
