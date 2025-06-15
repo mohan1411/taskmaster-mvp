@@ -1,0 +1,80 @@
+/* EMERGENCY BLACK TEXT FIX - HIGHEST PRIORITY */
+
+/* Reset all possible white text */
+html, body, #root {
+  color: #000000 !important;
+  background: #fafafa !important;
+}
+
+/* Force every single element to have black text */
+* {
+  color: #000000 !important;
+}
+
+/* Override any inline styles */
+[style*="color"] {
+  color: #000000 !important;
+}
+
+/* Material-UI specific overrides */
+[class*="Mui"] {
+  color: #000000 !important;
+}
+
+/* Typography overrides */
+h1, h2, h3, h4, h5, h6,
+.MuiTypography-h1,
+.MuiTypography-h2, 
+.MuiTypography-h3,
+.MuiTypography-h4,
+.MuiTypography-h5,
+.MuiTypography-h6,
+.MuiTypography-root {
+  color: #000000 !important;
+}
+
+/* Paragraph and text elements */
+p, span, div, section, article, aside, main, header, footer,
+label, a, li, td, th, dt, dd, em, strong, b, i, u {
+  color: #000000 !important;
+}
+
+/* Cards must have white background */
+.MuiCard-root,
+.MuiPaper-root {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* All children of cards */
+.MuiCard-root *,
+.MuiPaper-root *,
+.page-container *,
+.page-content * {
+  color: #000000 !important;
+}
+
+/* Stat cards specifically */
+.stat-card,
+.stat-card *,
+.stat-card .MuiTypography-root,
+.stat-card .MuiTypography-h3,
+.stat-card .MuiTypography-caption {
+  color: #000000 !important;
+  background: #ffffff !important;
+}
+
+/* Buttons - preserve their styling */
+.MuiButton-containedPrimary,
+.MuiButton-containedSecondary {
+  color: #ffffff !important;
+}
+
+/* Fix icons to use current color */
+svg {
+  fill: currentColor !important;
+}
+
+.MuiSvgIcon-root {
+  color: inherit !important;
+}
