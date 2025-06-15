@@ -183,6 +183,7 @@ const DashboardPage = () => {
   // Compact stat card component
   const StatCard = ({ icon, title, value, color, onClick }) => (
     <Card 
+      className="stat-card"
       sx={{ 
         height: 80,
         cursor: onClick ? 'pointer' : 'default',
@@ -197,16 +198,17 @@ const DashboardPage = () => {
     >
       <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: 48,
-            height: 48,
-            borderRadius: 1,
-            bgcolor: (theme) => theme.palette.mode === 'dark' ? `${color}.900` : `${color}.100`,
-            mr: 2
-          }}>
+          <Box 
+            className={`stat-icon-box ${color}`}
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              width: 48,
+              height: 48,
+              borderRadius: 1,
+              mr: 2
+            }}>
             {React.cloneElement(icon, { 
               sx: { fontSize: 24, color: `${color}.main` } 
             })}
