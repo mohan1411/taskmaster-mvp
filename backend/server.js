@@ -37,6 +37,9 @@ try {
 // Initialize Express app
 const app = express();
 
+// Trust proxy - Required for Railway and other cloud platforms
+app.set('trust proxy', true);
+
 // Connect to MongoDB
 connectDB();
 
