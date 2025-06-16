@@ -9,8 +9,8 @@ const apiLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   // Skip rate limiting in development
   skip: (req) => process.env.NODE_ENV === 'development',
-  // Trust proxy headers
-  trustProxy: true,
+  // Disable validation in production since we know Railway is a trusted proxy
+  validate: process.env.NODE_ENV !== 'production',
 });
 
 // Strict rate limiter for auth endpoints

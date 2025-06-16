@@ -37,14 +37,18 @@ try {
 // Initialize Express app
 const app = express();
 
-// Trust proxy - Required for Railway and other cloud platforms
-app.set('trust proxy', true);
+// Trust proxy - Configure for Railway
+// Railway uses specific proxy headers
+app.set('trust proxy', 1); // Trust first proxy
 
 // Connect to MongoDB
 connectDB();
 
-// Apply rate limiting to all requests
-app.use(apiLimiter);
+// Temporarily disable rate limiting to debug auth issues
+// TODO: Re-enable after fixing Railway proxy configuration
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(apiLimiter);
+// }
 
 // Body parser middleware with size limits
 app.use(express.json({ limit: '10mb' }));
