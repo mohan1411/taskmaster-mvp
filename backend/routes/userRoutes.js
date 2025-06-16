@@ -22,13 +22,14 @@ const { userValidationRules } = require('../middleware/validationMiddleware');
 const { authLimiter, passwordResetLimiter, uploadLimiter } = require('../middleware/rateLimitMiddleware');
 
 // Public routes with rate limiting and validation
-router.post('/register', authLimiter, userValidationRules.register, registerUser);
-router.post('/login', authLimiter, userValidationRules.login, loginUser);
-router.post('/refresh', authLimiter, refreshToken);
-router.post('/google', authLimiter, googleAuth);
+// TODO: Re-enable rate limiting after fixing Railway proxy configuration
+router.post('/register', /* authLimiter, */ userValidationRules.register, registerUser);
+router.post('/login', /* authLimiter, */ userValidationRules.login, loginUser);
+router.post('/refresh', /* authLimiter, */ refreshToken);
+router.post('/google', /* authLimiter, */ googleAuth);
 router.get('/google/callback', googleAuth); // Add callback route
-router.post('/forgot-password', passwordResetLimiter, forgotPassword);
-router.post('/reset-password/:token', passwordResetLimiter, resetPassword);
+router.post('/forgot-password', /* passwordResetLimiter, */ forgotPassword);
+router.post('/reset-password/:token', /* passwordResetLimiter, */ resetPassword);
 router.get('/verify-reset-token/:token', verifyResetToken);
 router.get('/verify-email/:token', verifyEmail);
 
@@ -36,7 +37,7 @@ router.get('/verify-email/:token', verifyEmail);
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, userValidationRules.updateProfile, updateUserProfile);
 router.post('/logout', protect, logoutUser);
-router.post('/upload-avatar', protect, uploadLimiter, upload.single('avatar'), uploadAvatar);
+router.post('/upload-avatar', protect, /* uploadLimiter, */ upload.single('avatar'), uploadAvatar);
 router.delete('/avatar', protect, deleteAvatar);
 router.post('/send-verification-email', protect, sendVerificationEmail);
 
