@@ -59,13 +59,27 @@ api.interceptors.response.use(
         
         const userData = JSON.parse(storedUser);
         
+        if (!userData.refreshToken) {
+          console.error('No refresh token found in user data');
+          throw new Error('No refresh token available');
+        }
+        
+        console.log('Attempting token refresh...');
+        
         // Call refresh token endpoint
         const response = await axios.post(
-          `${originalRequest.baseURL}/api/auth/refresh`,
-          { refreshToken: userData.refreshToken }
+          `${API_BASE_URL}/api/auth/refresh`,
+          { refreshToken: userData.refreshToken },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
         );
         
         const { token } = response.data;
+        
+        console.log('Token refreshed successfully');
         
         // Update stored user data
         const updatedUser = {
@@ -82,6 +96,8 @@ api.interceptors.response.use(
         // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError.response?.data || refreshError.message);
+        
         // If refresh token fails, clear user data and force login
         localStorage.removeItem('user');
         delete api.defaults.headers.common['Authorization'];
