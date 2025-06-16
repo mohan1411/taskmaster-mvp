@@ -732,7 +732,7 @@ const FollowUpsPage = () => {
                         handleOpenForm('edit', followup);
                       }}
                     >
-                      <EditIcon />
+                      <EditIcon sx={{ color: theme => theme.palette.text.primary }} />
                     </IconButton>
                     <IconButton
                       size="small"
@@ -898,7 +898,7 @@ const FollowUpsPage = () => {
                       size="small"
                       onClick={() => handleRemoveKeyPoint(index)}
                     >
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon fontSize="small" sx={{ color: theme => theme.palette.text.primary }} />
                     </IconButton>
                   </Box>
                 ))}

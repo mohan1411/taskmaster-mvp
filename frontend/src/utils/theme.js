@@ -121,6 +121,22 @@ const theme = createTheme({
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: 'inherit',
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          '& .MuiSvgIcon-root': {
+            color: 'inherit',
+          },
+        },
+      },
+    },
   },
 });
 
@@ -146,6 +162,30 @@ export const darkTheme = createTheme({
     text: {
       primary: '#ffffff',
       secondary: 'rgba(255, 255, 255, 0.7)',
+    },
+    action: {
+      active: 'rgba(255, 255, 255, 0.9)',
+      hover: 'rgba(255, 255, 255, 0.08)',
+      selected: 'rgba(255, 255, 255, 0.16)',
+      disabled: 'rgba(255, 255, 255, 0.3)',
+      disabledBackground: 'rgba(255, 255, 255, 0.12)',
+    },
+  },
+  components: {
+    ...theme.components,
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: 'rgba(255, 255, 255, 0.9)',
+        },
+      },
+    },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          color: 'inherit',
+        },
+      },
     },
   },
 });

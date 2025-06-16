@@ -223,7 +223,7 @@ const TaskList = ({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon sx={{ color: theme => theme.palette.text.secondary }} />
                   </InputAdornment>
                 ),
               }}
