@@ -31,7 +31,9 @@ import {
   Psychology,
   BatteryChargingFull,
   Schedule,
-  Coffee
+  Coffee,
+  GpsFixed,
+  Lightbulb
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useFocus } from '../../context/FocusContext';
@@ -204,10 +206,17 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
     >
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
-            🎯 Ready to Focus?
-          </Typography>
-          <IconButton size="small" onClick={() => navigate('/focus/analytics')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: 1 }}>
+            <GpsFixed sx={{ color: theme.palette.primary.main }} />
+            <Typography variant="h5" component="div">
+              Ready to Focus?
+            </Typography>
+          </Box>
+          <IconButton 
+            size="small" 
+            onClick={() => navigate('/focus/analytics')}
+            sx={{ color: theme => theme.palette.text.primary }}
+          >
             <Analytics />
           </IconButton>
         </Box>
@@ -254,9 +263,12 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
         {/* Suggested Session */}
         {suggestedTasks.length > 0 && (
           <Card variant="outlined" sx={{ mb: 3, p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              🧠 Suggested Deep Work Session
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Lightbulb sx={{ color: theme.palette.warning.main }} />
+              <Typography variant="h6">
+                Suggested Deep Work Session
+              </Typography>
+            </Box>
             
             <List dense>
               {suggestedTasks.map((task) => (
@@ -358,9 +370,9 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
                 min={1}
                 max={10}
                 marks={[
-                  { value: 1, label: '😴' },
-                  { value: 5, label: '😐' },
-                  { value: 10, label: '😊' }
+                  { value: 1, label: 'Low' },
+                  { value: 5, label: 'Mid' },
+                  { value: 10, label: 'High' }
                 ]}
               />
             </Box>

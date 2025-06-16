@@ -659,7 +659,7 @@ const FollowUpDetail = ({ followupId, onUpdate, onDelete }) => {
                       size="small"
                       onClick={() => handleRemoveKeyPoint(index)}
                     >
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon fontSize="small" sx={{ color: theme => theme.palette.text.primary }} />
                     </IconButton>
                   </Box>
                 ))}

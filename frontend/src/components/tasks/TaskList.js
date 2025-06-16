@@ -428,6 +428,7 @@ const TaskList = ({
                     <IconButton 
                       aria-label="task actions"
                       onClick={(e) => handleOpenMenu(e, task)}
+                      sx={{ color: theme => theme.palette.text.primary }}
                     >
                       <MoreVertIcon />
                     </IconButton>

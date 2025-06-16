@@ -121,6 +121,22 @@ const theme = createTheme({
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: 'inherit',
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          '& .MuiSvgIcon-root': {
+            color: 'inherit',
+          },
+        },
+      },
+    },
   },
 });
 
@@ -146,6 +162,112 @@ export const darkTheme = createTheme({
     text: {
       primary: '#ffffff',
       secondary: 'rgba(255, 255, 255, 0.7)',
+    },
+    action: {
+      active: 'rgba(255, 255, 255, 0.9)',
+      hover: 'rgba(255, 255, 255, 0.08)',
+      selected: 'rgba(255, 255, 255, 0.16)',
+      disabled: 'rgba(255, 255, 255, 0.3)',
+      disabledBackground: 'rgba(255, 255, 255, 0.12)',
+    },
+  },
+  components: {
+    ...theme.components,
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: 'rgba(255, 255, 255, 0.9)',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'inherit',
+          },
+        },
+      },
+    },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          color: 'inherit',
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: 'rgba(255, 255, 255, 0.7) !important',
+        },
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          color: 'rgba(255, 255, 255, 0.9)',
+          '& .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7)',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7)',
+          },
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiNativeSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7)',
+          },
+        },
+      },
+    },
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+        },
+      },
+    },
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiNativeSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiInput-root .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+        },
+      },
     },
   },
 });

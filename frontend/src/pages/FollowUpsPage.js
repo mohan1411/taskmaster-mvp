@@ -731,6 +731,7 @@ const FollowUpsPage = () => {
                         e.stopPropagation(); 
                         handleOpenForm('edit', followup);
                       }}
+                      sx={{ color: theme => theme.palette.text.primary }}
                     >
                       <EditIcon />
                     </IconButton>
@@ -898,7 +899,7 @@ const FollowUpsPage = () => {
                       size="small"
                       onClick={() => handleRemoveKeyPoint(index)}
                     >
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon fontSize="small" sx={{ color: theme => theme.palette.text.primary }} />
                     </IconButton>
                   </Box>
                 ))}
