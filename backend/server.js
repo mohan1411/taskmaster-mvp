@@ -137,7 +137,7 @@ const onboardingRoutes = require('./routes/onboardingRoutes');
 const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
 const focusRoutes = require('./routes/focusRoutes');
 // const documentRoutes = require('./routes/documentRoutes'); // Temporarily disabled - missing dependencies
-const testAuthRoutes = require('./routes/testAuthRoutes');
+// const testAuthRoutes = require('./routes/testAuthRoutes'); // Temporarily disabled - missing file
 
 // Define API routes
 app.use('/api/auth', userRoutes);
@@ -153,7 +153,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/unified-email', unifiedEmailRoutes);
 app.use('/api/focus', focusRoutes);
 // app.use('/api/documents', documentRoutes); // Temporarily disabled - missing dependencies
-app.use('/api/test-auth', testAuthRoutes);
+// app.use('/api/test-auth', testAuthRoutes); // Temporarily disabled - missing file
 
 // Error handling middleware
 app.use((err, req, res, next) => {
