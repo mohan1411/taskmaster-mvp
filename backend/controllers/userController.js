@@ -229,16 +229,38 @@ const refreshToken = async (req, res) => {
       return res.status(401).json({ message: 'Refresh token required' });
     }
 
-    // Verify refresh token
-    const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
+    // Try to verify refresh token with current secret first
+    let decoded;
+    let user;
+    
+    try {
+      decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
+    } catch (error) {
+      // If current secret fails and we're using a custom secret, try the default
+      if (config.refreshTokenSecret !== 'YOUR_REFRESH_SECRET') {
+        console.log('Trying fallback refresh token secret for legacy tokens');
+        try {
+          decoded = jwt.verify(refreshToken, 'YOUR_REFRESH_SECRET');
+        } catch (fallbackError) {
+          throw error; // Throw original error
+        }
+      } else {
+        throw error;
+      }
+    }
     
     // Find user with matching refresh token
-    const user = await User.findOne({
+    user = await User.findOne({
       _id: decoded.id,
       refreshToken
     });
 
     if (!user) {
+      console.error('Refresh token verification failed:', {
+        decodedUserId: decoded?.id,
+        tokenFound: !!refreshToken,
+        userFound: false
+      });
       return res.status(401).json({ message: 'Invalid refresh token' });
     }
 
