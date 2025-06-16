@@ -204,18 +204,16 @@ const DashboardPage = () => {
             width: 48,
             height: 48,
             borderRadius: 1,
-            bgcolor: (theme) => theme.palette.mode === 'dark' 
-              ? theme.palette[color].dark
-              : theme.palette[color].light,
-            mr: 2,
-            opacity: theme => theme.palette.mode === 'dark' ? 0.3 : 0.15
+            bgcolor: (theme) => {
+              const alpha = theme.palette.mode === 'dark' ? 0.2 : 0.1;
+              return theme.palette[color].main + Math.round(alpha * 255).toString(16).padStart(2, '0');
+            },
+            mr: 2
           }}>
             {React.cloneElement(icon, { 
               sx: { 
                 fontSize: 24, 
-                color: theme => theme.palette.mode === 'dark'
-                  ? theme.palette[color].light
-                  : theme.palette[color].main
+                color: theme => theme.palette[color].main
               } 
             })}
           </Box>
