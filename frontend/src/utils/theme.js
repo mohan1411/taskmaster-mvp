@@ -180,6 +180,9 @@ export const darkTheme = createTheme({
           '&:hover': {
             backgroundColor: 'rgba(255, 255, 255, 0.08)',
           },
+          '& .MuiSvgIcon-root': {
+            color: 'inherit',
+          },
         },
       },
     },
@@ -193,7 +196,15 @@ export const darkTheme = createTheme({
     MuiSelect: {
       styleOverrides: {
         icon: {
-          color: 'rgba(255, 255, 255, 0.7)',
+          color: 'rgba(255, 255, 255, 0.7) !important',
+        },
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
         },
       },
     },
@@ -212,6 +223,48 @@ export const darkTheme = createTheme({
         root: {
           '& .MuiInputAdornment-root .MuiSvgIcon-root': {
             color: 'rgba(255, 255, 255, 0.7)',
+          },
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiNativeSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7)',
+          },
+        },
+      },
+    },
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+        },
+      },
+    },
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiNativeSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
+          },
+          '& .MuiInput-root .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7) !important',
           },
         },
       },
