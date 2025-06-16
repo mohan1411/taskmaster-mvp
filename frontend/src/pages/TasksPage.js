@@ -9,7 +9,10 @@ import {
   Alert,
   LinearProgress,
   Divider,
-  Paper 
+  Paper,
+  Grid,
+  Card,
+  CardContent
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import TaskList from '../components/tasks/TaskList';
@@ -340,54 +343,64 @@ const TasksPage = () => {
           </Button>
         </Box>
         
-        {/* Summary banner */}
-        <Paper sx={{ p: 2, mb: 3 }}>
-          <Typography variant="h6" component="div" gutterBottom>
-            Task Summary
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary">
-                Total Tasks
-              </Typography>
-              <Typography variant="h6">
-                {totalTasks}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary">
-                Active Tasks
-              </Typography>
-              <Typography variant="h6">
-                {tasks.filter(task => 
-                  task.status !== 'completed' && task.status !== 'archived'
-                ).length}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary">
-                Completed
-              </Typography>
-              <Typography variant="h6">
-                {tasks.filter(task => task.status === 'completed').length}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary">
-                Overdue
-              </Typography>
-              <Typography variant="h6" color="error.main">
-                {tasks.filter(task => {
-                  if (!task.dueDate || task.status === 'completed' || task.status === 'archived') return false;
-                  const now = new Date();
-                  const dueDate = new Date(task.dueDate);
-                  return dueDate < now;
-                }).length}
-              </Typography>
-            </Box>
-          </Box>
-        </Paper>
+        {/* Summary Cards - Consistent with Follow-ups page */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Total Tasks
+                </Typography>
+                <Typography variant="h4">
+                  {totalTasks}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Active Tasks
+                </Typography>
+                <Typography variant="h4" color="primary.main">
+                  {tasks.filter(task => 
+                    task.status !== 'completed' && task.status !== 'archived'
+                  ).length}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Completed
+                </Typography>
+                <Typography variant="h4" color="success.main">
+                  {tasks.filter(task => task.status === 'completed').length}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography color="textSecondary" gutterBottom>
+                  Overdue
+                </Typography>
+                <Typography variant="h4" color="error.main">
+                  {tasks.filter(task => {
+                    if (!task.dueDate || task.status === 'completed' || task.status === 'archived') return false;
+                    const now = new Date();
+                    const dueDate = new Date(task.dueDate);
+                    return dueDate < now;
+                  }).length}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
         
         {/* Global loading indicator */}
         {loading && <LinearProgress sx={{ mb: 2 }} />}
