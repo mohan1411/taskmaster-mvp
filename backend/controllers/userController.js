@@ -249,17 +249,34 @@ const refreshToken = async (req, res) => {
       }
     }
     
-    // Find user with matching refresh token
-    user = await User.findOne({
-      _id: decoded.id,
-      refreshToken
-    });
-
+    // Find user by ID first
+    user = await User.findById(decoded.id);
+    
     if (!user) {
-      console.error('Refresh token verification failed:', {
-        decodedUserId: decoded?.id,
-        tokenFound: !!refreshToken,
-        userFound: false
+      console.error('User not found for refresh token:', {
+        decodedUserId: decoded?.id
+      });
+      return res.status(401).json({ message: 'User not found' });
+    }
+    
+    // Check if user has a refresh token stored
+    if (!user.refreshToken) {
+      console.error('User has no refresh token stored:', {
+        userId: user._id,
+        email: user.email
+      });
+      return res.status(401).json({ 
+        message: 'No refresh token found. Please login again.',
+        requiresLogin: true 
+      });
+    }
+    
+    // Verify the refresh token matches
+    if (user.refreshToken !== refreshToken) {
+      console.error('Refresh token mismatch:', {
+        userId: user._id,
+        email: user.email,
+        tokenMatch: false
       });
       return res.status(401).json({ message: 'Invalid refresh token' });
     }
