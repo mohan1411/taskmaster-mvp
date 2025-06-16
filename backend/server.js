@@ -54,6 +54,21 @@ connectDB();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Debug middleware for login endpoint
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api/auth/login', (req, res, next) => {
+    console.log('Login request received:', {
+      method: req.method,
+      hasBody: !!req.body,
+      bodyKeys: Object.keys(req.body || {}),
+      contentType: req.headers['content-type'],
+      origin: req.headers.origin,
+      hasAuthHeader: !!req.headers.authorization
+    });
+    next();
+  });
+}
+
 // Security middleware
 if (mongoSanitize) {
   app.use(mongoSanitize({

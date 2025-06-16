@@ -131,13 +131,32 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    console.log('Login attempt for email:', email);
+    console.log('Login attempt:', {
+      email: email,
+      hasPassword: !!password,
+      passwordLength: password?.length,
+      emailLowercase: email?.toLowerCase(),
+      emailTrimmed: email?.trim()
+    });
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    // Find user by email (case-insensitive)
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     
     if (!user) {
       console.log('Login failed: User not found for email:', email);
+      
+      // Debug: Check if user exists with different case
+      const userCount = await User.countDocuments();
+      const similarUsers = await User.find({ 
+        email: { $regex: new RegExp(email.split('@')[0], 'i') } 
+      }, 'email').limit(5);
+      
+      console.log('Debug info:', {
+        totalUsers: userCount,
+        searchedEmail: email,
+        similarEmails: similarUsers.map(u => u.email)
+      });
+      
       return res.status(401).json({ message: 'Invalid email or password' });
     }
     
