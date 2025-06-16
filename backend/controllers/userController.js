@@ -249,8 +249,13 @@ const refreshToken = async (req, res) => {
       token: newAccessToken
     });
   } catch (error) {
-    console.error(error);
-    if (error.name === 'JsonWebTokenError') {
+    console.error('Refresh token error:', {
+      errorName: error.name,
+      errorMessage: error.message,
+      refreshTokenSecret: config.refreshTokenSecret === 'YOUR_REFRESH_SECRET' ? 'DEFAULT_NOT_SET' : 'CUSTOM_SET'
+    });
+    
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Invalid refresh token' });
     }
     res.status(500).json({ message: 'Server error', error: error.message });

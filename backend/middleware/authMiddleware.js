@@ -30,13 +30,22 @@ const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
+      console.error('Auth middleware error:', {
+        errorName: error.name,
+        errorMessage: error.message,
+        tokenReceived: !!token,
+        endpoint: req.originalUrl
+      });
+      
       if (error.name === 'JsonWebTokenError') {
         return res.status(401).json({ message: 'Not authorized, invalid token' });
       }
       if (error.name === 'TokenExpiredError') {
-        return res.status(401).json({ message: 'Not authorized, token expired' });
+        return res.status(401).json({ 
+          message: 'Your session has expired. Please login again.',
+          expired: true 
+        });
       }
-      console.error('Auth middleware error:', error);
       return res.status(401).json({ message: 'Not authorized, token failed' });
     }
   } else {
