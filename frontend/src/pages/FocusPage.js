@@ -5,7 +5,7 @@ import ActiveFocusSession from '../components/focus/ActiveFocusSession';
 import SessionCompletion from '../components/focus/SessionCompletion';
 import DistractionShield from '../components/focus/DistractionShield';
 import FocusModeLauncher from '../components/focus/FocusModeLauncherV2';
-import { Box, Alert, Button, Typography, Container, Paper } from '@mui/material';
+import { Box, Alert, Button, Typography, Container, Paper, Grid, Card, CardContent } from '@mui/material';
 import { useTasks } from '../hooks/useTasks';
 import '../styles/GlobalPages.css';
 
@@ -76,40 +76,56 @@ const FocusPage = () => {
 
         {/* Stats Summary */}
         {userMetrics && (
-          <Box sx={{ mb: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Paper sx={{ p: 2, minWidth: 120 }}>
-              <Typography variant="h4" color="primary">
-                {Math.floor(userMetrics.todaysFocusTime / 60)}h
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Today
-              </Typography>
-            </Paper>
-            <Paper sx={{ p: 2, minWidth: 120 }}>
-              <Typography variant="h4" color="success.main">
-                {userMetrics.streak || 0}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Day Streak
-              </Typography>
-            </Paper>
-            <Paper sx={{ p: 2, minWidth: 120 }}>
-              <Typography variant="h4" color="warning.main">
-                {userMetrics.weeklyStats?.sessionsCompleted || 0}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Sessions
-              </Typography>
-            </Paper>
-            <Paper sx={{ p: 2, minWidth: 120 }}>
-              <Typography variant="h4" color="info.main">
-                {Math.round(userMetrics.currentEnergyLevel * 100)}%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Energy Level
-              </Typography>
-            </Paper>
-          </Box>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Today
+                  </Typography>
+                  <Typography variant="h4" color="primary">
+                    {Math.floor(userMetrics.todaysFocusTime / 60)}h
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Day Streak
+                  </Typography>
+                  <Typography variant="h4" color="success.main">
+                    {userMetrics.streak || 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Sessions
+                  </Typography>
+                  <Typography variant="h4" color="warning.main">
+                    {userMetrics.weeklyStats?.sessionsCompleted || 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    Energy Level
+                  </Typography>
+                  <Typography variant="h4" color="info.main">
+                    {Math.round(userMetrics.currentEnergyLevel * 100)}%
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         )}
 
         {/* Focus Mode Launcher */}
