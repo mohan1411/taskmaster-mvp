@@ -102,6 +102,11 @@ const LoginPage = () => {
       try {
         setIsSubmitting(true);
         setError(null);
+        console.log('Login form values:', {
+          email: values.email,
+          emailLength: values.email.length,
+          hasPassword: !!values.password
+        });
         await login(values.email, values.password);
         navigate('/dashboard');
       } catch (err) {

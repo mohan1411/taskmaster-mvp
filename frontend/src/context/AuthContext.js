@@ -81,6 +81,12 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     setError(null);
     
+    console.log('AuthContext login called with:', {
+      email,
+      emailLength: email.length,
+      emailChars: email.split('').map((c, i) => `${i}:'${c}'`).join(', ')
+    });
+    
     try {
       const response = await api.post('/api/auth/login', {
         email,

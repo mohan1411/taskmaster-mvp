@@ -54,16 +54,17 @@ connectDB();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Debug middleware for login endpoint
+// Debug middleware for login endpoint - BEFORE sanitization
 if (process.env.NODE_ENV === 'production') {
   app.use('/api/auth/login', (req, res, next) => {
-    console.log('Login request received:', {
+    console.log('Login request BEFORE sanitization:', {
       method: req.method,
       hasBody: !!req.body,
       bodyKeys: Object.keys(req.body || {}),
+      email: req.body?.email,
+      emailChars: req.body?.email?.split('').map((c, i) => `${i}:'${c}'`).join(', '),
       contentType: req.headers['content-type'],
-      origin: req.headers.origin,
-      hasAuthHeader: !!req.headers.authorization
+      origin: req.headers.origin
     });
     next();
   });
@@ -71,16 +72,35 @@ if (process.env.NODE_ENV === 'production') {
 
 // Security middleware
 if (mongoSanitize) {
-  app.use(mongoSanitize({
-    replaceWith: '_',
-    onSanitize: ({ req, key }) => {
-      console.warn(`Blocked MongoDB operator in ${key}`);
+  // Temporarily disable for login endpoint to test
+  app.use((req, res, next) => {
+    if (req.path === '/api/auth/login') {
+      console.log('Skipping mongoSanitize for login endpoint');
+      next();
+    } else {
+      mongoSanitize({
+        replaceWith: '_',
+        onSanitize: ({ req, key }) => {
+          console.warn(`Blocked MongoDB operator in ${key}`);
+        }
+      })(req, res, next);
     }
-  }));
+  });
 }
 
 if (hpp) {
   app.use(hpp());
+}
+
+// Debug middleware for login endpoint - AFTER sanitization
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api/auth/login', (req, res, next) => {
+    console.log('Login request AFTER sanitization:', {
+      email: req.body?.email,
+      emailChars: req.body?.email?.split('').map((c, i) => `${i}:'${c}'`).join(', ')
+    });
+    next();
+  });
 }
 
 // CORS configuration for fizztask.com

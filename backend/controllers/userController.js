@@ -133,10 +133,13 @@ const loginUser = async (req, res) => {
     
     console.log('Login attempt:', {
       email: email,
+      emailChars: email.split('').map((c, i) => `${i}:'${c}'`).join(', '),
       hasPassword: !!password,
       passwordLength: password?.length,
       emailLowercase: email?.toLowerCase(),
-      emailTrimmed: email?.trim()
+      emailTrimmed: email?.trim(),
+      hasDot: email.includes('.'),
+      dotIndex: email.indexOf('.')
     });
 
     // Find user by email (case-insensitive)
