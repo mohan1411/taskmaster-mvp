@@ -180,52 +180,26 @@ const DashboardPage = () => {
     fetchDashboardData();
   }, []);
   
-  // Compact stat card component
-  const StatCard = ({ icon, title, value, color, onClick }) => (
+  // Stat card component - Consistent with Follow-ups page
+  const StatCard = ({ title, value, color, onClick }) => (
     <Card 
       sx={{ 
-        height: 80,
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.2s',
         '&:hover': onClick ? { 
           transform: 'translateY(-2px)', 
-          boxShadow: 2,
-          bgcolor: 'action.hover' 
+          boxShadow: 3
         } : {}
       }}
       onClick={onClick}
     >
-      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: 48,
-            height: 48,
-            borderRadius: 1,
-            bgcolor: (theme) => {
-              const alpha = theme.palette.mode === 'dark' ? 0.2 : 0.1;
-              return theme.palette[color].main + Math.round(alpha * 255).toString(16).padStart(2, '0');
-            },
-            mr: 2
-          }}>
-            {React.cloneElement(icon, { 
-              sx: { 
-                fontSize: 24, 
-                color: theme => theme.palette[color].main
-              } 
-            })}
-          </Box>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h3" sx={{ fontSize: '1.75rem', fontWeight: 600, lineHeight: 1 }}>
-              {value}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {title}
-            </Typography>
-          </Box>
-        </Box>
+      <CardContent>
+        <Typography color="textSecondary" gutterBottom>
+          {title}
+        </Typography>
+        <Typography variant="h4" color={`${color}.main`}>
+          {value}
+        </Typography>
       </CardContent>
     </Card>
   );
@@ -272,39 +246,35 @@ const DashboardPage = () => {
           </Alert>
         )}
         
-        {/* Compact Stats Grid */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={6} sm={3}>
+        {/* Stats Grid - Consistent with Follow-ups page */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              icon={<CheckCircleOutline />}
               title="Active Tasks"
               value={stats.pendingTasks}
               color="primary"
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              icon={<ErrorIcon />}
               title="Overdue"
               value={stats.overdueCount}
               color="error"
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              icon={<NotificationIcon />}
               title="Follow-ups"
               value={stats.followUpCount}
               color="warning"
               onClick={() => navigate('/followups')}
             />
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              icon={<EmailIcon />}
-              title="Unread"
+              title="Unread Emails"
               value={stats.unreadEmailCount}
               color="info"
               onClick={() => navigate('/emails')}
