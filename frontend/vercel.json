@@ -7,5 +7,15 @@
       "source": "/(.*)",
       "destination": "/"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "master": false,
+      "develop": false,
+      "feature/*": false,
+      "bugfix/*": false,
+      "improvement/*": false
+    }
+  }
 }
