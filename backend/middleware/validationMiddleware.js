@@ -23,8 +23,8 @@ const userValidationRules = {
     body('email')
       .trim()
       .notEmpty().withMessage('Email is required')
-      .isEmail().withMessage('Please provide a valid email')
-      .normalizeEmail(),
+      .isEmail().withMessage('Please provide a valid email'),
+      // Removed .normalizeEmail() as it strips dots from Gmail addresses
     body('password')
       .notEmpty().withMessage('Password is required')
       .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
@@ -37,8 +37,8 @@ const userValidationRules = {
     body('email')
       .trim()
       .notEmpty().withMessage('Email is required')
-      .isEmail().withMessage('Please provide a valid email')
-      .normalizeEmail(),
+      .isEmail().withMessage('Please provide a valid email'),
+      // Removed .normalizeEmail() as it strips dots from Gmail addresses
     body('password')
       .notEmpty().withMessage('Password is required'),
     handleValidationErrors
@@ -53,8 +53,8 @@ const userValidationRules = {
     body('email')
       .optional()
       .trim()
-      .isEmail().withMessage('Please provide a valid email')
-      .normalizeEmail(),
+      .isEmail().withMessage('Please provide a valid email'),
+      // Removed .normalizeEmail() as it strips dots from Gmail addresses
     body('password')
       .optional()
       .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
@@ -148,8 +148,8 @@ const followupValidationRules = {
     body('contactEmail')
       .trim()
       .notEmpty().withMessage('Contact email is required')
-      .isEmail().withMessage('Please provide a valid email')
-      .normalizeEmail(),
+      .isEmail().withMessage('Please provide a valid email'),
+      // Removed .normalizeEmail() as it strips dots from Gmail addresses
     body('dueDate')
       .notEmpty().withMessage('Due date is required')
       .isISO8601().withMessage('Invalid date format'),
@@ -171,8 +171,8 @@ const followupValidationRules = {
     body('contactEmail')
       .optional()
       .trim()
-      .isEmail().withMessage('Please provide a valid email')
-      .normalizeEmail(),
+      .isEmail().withMessage('Please provide a valid email'),
+      // Removed .normalizeEmail() as it strips dots from Gmail addresses
     body('dueDate')
       .optional()
       .isISO8601().withMessage('Invalid date format'),
