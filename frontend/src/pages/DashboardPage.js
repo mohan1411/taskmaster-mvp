@@ -205,13 +205,18 @@ const DashboardPage = () => {
             height: 48,
             borderRadius: 1,
             bgcolor: (theme) => theme.palette.mode === 'dark' 
-              ? `${color}.dark` 
-              : `${color}.light`,
+              ? theme.palette[color].dark
+              : theme.palette[color].light,
             mr: 2,
-            opacity: 0.2
+            opacity: theme => theme.palette.mode === 'dark' ? 0.3 : 0.15
           }}>
             {React.cloneElement(icon, { 
-              sx: { fontSize: 24, color: `${color}.main` } 
+              sx: { 
+                fontSize: 24, 
+                color: theme => theme.palette.mode === 'dark'
+                  ? theme.palette[color].light
+                  : theme.palette[color].main
+              } 
             })}
           </Box>
           <Box sx={{ flexGrow: 1 }}>

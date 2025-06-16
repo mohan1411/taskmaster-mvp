@@ -181,7 +181,7 @@ const AppLayout = () => {
         <ListItem disablePadding>
           <ListItemButton onClick={handleLogout}>
             <ListItemIcon>
-              <LogoutIcon />
+              <LogoutIcon sx={{ color: theme => theme.palette.text.primary }} />
             </ListItemIcon>
             <ListItemText primary="Logout" />
           </ListItemButton>
