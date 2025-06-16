@@ -131,16 +131,7 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    console.log('Login attempt:', {
-      email: email,
-      emailChars: email.split('').map((c, i) => `${i}:'${c}'`).join(', '),
-      hasPassword: !!password,
-      passwordLength: password?.length,
-      emailLowercase: email?.toLowerCase(),
-      emailTrimmed: email?.trim(),
-      hasDot: email.includes('.'),
-      dotIndex: email.indexOf('.')
-    });
+    console.log('Login attempt for email:', email);
 
     // Find user by email (case-insensitive)
     const user = await User.findOne({ email: email.toLowerCase().trim() });
