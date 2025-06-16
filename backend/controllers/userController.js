@@ -292,9 +292,25 @@ const refreshToken = async (req, res) => {
         email: user.email,
         tokenMatch: false,
         storedFirst10: user.refreshToken.substring(0, 10),
-        providedFirst10: refreshToken.substring(0, 10)
+        providedFirst10: refreshToken.substring(0, 10),
+        storedLast10: user.refreshToken.substring(user.refreshToken.length - 10),
+        providedLast10: refreshToken.substring(refreshToken.length - 10),
+        lengthMatch: user.refreshToken.length === refreshToken.length,
+        storedLength: user.refreshToken.length,
+        providedLength: refreshToken.length
       });
-      return res.status(401).json({ message: 'Invalid refresh token' });
+      
+      // Check if it's a whitespace issue
+      const trimmedStored = user.refreshToken.trim();
+      const trimmedProvided = refreshToken.trim();
+      if (trimmedStored === trimmedProvided) {
+        console.log('WHITESPACE ISSUE DETECTED - tokens match when trimmed');
+        // Accept the token if it matches when trimmed
+        user.refreshToken = trimmedProvided;
+        await user.save();
+      } else {
+        return res.status(401).json({ message: 'Invalid refresh token' });
+      }
     }
 
     // Generate new access token
