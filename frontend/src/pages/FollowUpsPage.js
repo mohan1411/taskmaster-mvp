@@ -731,8 +731,9 @@ const FollowUpsPage = () => {
                         e.stopPropagation(); 
                         handleOpenForm('edit', followup);
                       }}
+                      sx={{ color: theme => theme.palette.text.primary }}
                     >
-                      <EditIcon sx={{ color: theme => theme.palette.text.primary }} />
+                      <EditIcon />
                     </IconButton>
                     <IconButton
                       size="small"

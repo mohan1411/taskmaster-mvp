@@ -302,11 +302,19 @@ const DocumentHistory = ({ onViewDocument, onReprocessDocument }) => {
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => onViewDocument?.(doc)} size="small">
-                      <ViewIcon sx={{ color: theme => theme.palette.text.primary }} />
+                    <IconButton 
+                      onClick={() => onViewDocument?.(doc)} 
+                      size="small"
+                      sx={{ color: theme => theme.palette.text.primary }}
+                    >
+                      <ViewIcon />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(doc.id)} size="small">
-                      <DeleteIcon sx={{ color: theme => theme.palette.text.primary }} />
+                    <IconButton 
+                      onClick={() => handleDelete(doc.id)} 
+                      size="small"
+                      sx={{ color: theme => theme.palette.error.main }}
+                    >
+                      <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>

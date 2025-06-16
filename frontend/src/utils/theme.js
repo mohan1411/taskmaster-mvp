@@ -177,6 +177,9 @@ export const darkTheme = createTheme({
       styleOverrides: {
         root: {
           color: 'rgba(255, 255, 255, 0.9)',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          },
         },
       },
     },
@@ -184,6 +187,32 @@ export const darkTheme = createTheme({
       styleOverrides: {
         root: {
           color: 'inherit',
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: 'rgba(255, 255, 255, 0.7)',
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          color: 'rgba(255, 255, 255, 0.9)',
+          '& .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7)',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+            color: 'rgba(255, 255, 255, 0.7)',
+          },
         },
       },
     },

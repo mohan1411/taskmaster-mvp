@@ -212,8 +212,12 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               Ready to Focus?
             </Typography>
           </Box>
-          <IconButton size="small" onClick={() => navigate('/focus/analytics')}>
-            <Analytics sx={{ color: theme => theme.palette.text.primary }} />
+          <IconButton 
+            size="small" 
+            onClick={() => navigate('/focus/analytics')}
+            sx={{ color: theme => theme.palette.text.primary }}
+          >
+            <Analytics />
           </IconButton>
         </Box>
 
