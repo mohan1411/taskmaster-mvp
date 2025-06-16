@@ -224,6 +224,12 @@ const updateUserProfile = async (req, res) => {
 const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
+    
+    console.log('Refresh token request received:', {
+      hasRefreshToken: !!refreshToken,
+      tokenLength: refreshToken?.length,
+      bodyKeys: Object.keys(req.body)
+    });
 
     if (!refreshToken) {
       return res.status(401).json({ message: 'Refresh token required' });
@@ -250,7 +256,7 @@ const refreshToken = async (req, res) => {
     }
     
     // Find user by ID first
-    user = await User.findById(decoded.id);
+    user = await User.findById(decoded.id).select('+refreshToken');
     
     if (!user) {
       console.error('User not found for refresh token:', {
@@ -258,6 +264,14 @@ const refreshToken = async (req, res) => {
       });
       return res.status(401).json({ message: 'User not found' });
     }
+    
+    console.log('User found for refresh:', {
+      userId: user._id,
+      email: user.email,
+      hasStoredRefreshToken: !!user.refreshToken,
+      storedTokenLength: user.refreshToken?.length,
+      providedTokenLength: refreshToken?.length
+    });
     
     // Check if user has a refresh token stored
     if (!user.refreshToken) {
@@ -276,7 +290,9 @@ const refreshToken = async (req, res) => {
       console.error('Refresh token mismatch:', {
         userId: user._id,
         email: user.email,
-        tokenMatch: false
+        tokenMatch: false,
+        storedFirst10: user.refreshToken.substring(0, 10),
+        providedFirst10: refreshToken.substring(0, 10)
       });
       return res.status(401).json({ message: 'Invalid refresh token' });
     }

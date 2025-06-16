@@ -54,6 +54,17 @@ connectDB();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Debug middleware for refresh endpoint
+app.use('/api/auth/refresh', (req, res, next) => {
+  console.log('Refresh endpoint hit:', {
+    method: req.method,
+    headers: req.headers,
+    hasBody: !!req.body,
+    bodyContent: req.body
+  });
+  next();
+});
+
 // Security middleware
 if (mongoSanitize) {
   app.use(mongoSanitize({
