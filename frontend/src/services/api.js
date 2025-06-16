@@ -98,12 +98,21 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError.response?.data || refreshError.message);
         
+        // Check if it's a token mismatch (user logged in elsewhere)
+        const errorMessage = refreshError.response?.data?.message || '';
+        if (errorMessage.includes('Invalid refresh token') || errorMessage.includes('mismatch')) {
+          console.log('Refresh token mismatch - user may have logged in elsewhere');
+        }
+        
         // If refresh token fails, clear user data and force login
         localStorage.removeItem('user');
         delete api.defaults.headers.common['Authorization'];
         
-        // Redirect to login page
-        window.location.href = '/login?session=expired';
+        // Redirect to login page with appropriate message
+        const sessionParam = errorMessage.includes('Invalid refresh token') 
+          ? 'session=invalid' 
+          : 'session=expired';
+        window.location.href = `/login?${sessionParam}`;
         
         return Promise.reject(refreshError);
       }

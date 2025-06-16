@@ -74,6 +74,12 @@ const LoginPage = () => {
       setOpenSnackbar(true);
     }
     
+    // Check for invalid session (logged in elsewhere)
+    if (location.search.includes('session=invalid')) {
+      setError('Your session is invalid. You may have logged in from another device.');
+      setOpenSnackbar(true);
+    }
+    
     // Check for OAuth error
     if (location.search.includes('error=')) {
       setError('Google login failed. Please try again.');
