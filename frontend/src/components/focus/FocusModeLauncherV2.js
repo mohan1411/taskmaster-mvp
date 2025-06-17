@@ -43,6 +43,7 @@ import { useFocus } from '../../context/FocusContext';
 import { useNavigate } from 'react-router-dom';
 import DistractionBlocker from './DistractionBlocker';
 import SmartTaskSelector from './SmartTaskSelector';
+import EnergyLevelTracker from './EnergyLevelTracker';
 import focusService from '../../services/focusService';
 
 const QUICK_START_OPTIONS = [
@@ -293,38 +294,41 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
           </ButtonGroup>
         </Box>
 
-        {/* Smart Task Selection Toggle */}
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-          <ToggleButtonGroup
-            value={useSmartSelection}
-            exclusive
-            onChange={(e, value) => value !== null && setUseSmartSelection(value)}
-            size="small"
-          >
-            <ToggleButton value={true}>
-              <AutoAwesome sx={{ mr: 1 }} />
-              Smart Selection
-            </ToggleButton>
-            <ToggleButton value={false}>
-              <Task sx={{ mr: 1 }} />
-              Manual Selection
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
+        {/* Smart Task Selection Toggle - Always show */}
+        {tasks && tasks.length > 0 && (
+          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+            <ToggleButtonGroup
+              value={useSmartSelection}
+              exclusive
+              onChange={(e, value) => value !== null && setUseSmartSelection(value)}
+              size="small"
+            >
+              <ToggleButton value={true}>
+                <AutoAwesome sx={{ mr: 1 }} />
+                Smart Selection
+              </ToggleButton>
+              <ToggleButton value={false}>
+                <Task sx={{ mr: 1 }} />
+                Manual Selection
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
 
         {/* Smart Task Selector or Manual Selector */}
-        {useSmartSelection ? (
-          <SmartTaskSelector
-            tasks={tasks}
-            sessionDuration={duration}
-            sessionType={sessionType}
-            energyLevel={energyLevel}
-            onTasksSelected={setSmartSelectedTasks}
-            recentSessions={recentSessions}
-          />
-        ) : (
-          /* Suggested Session */
-          suggestedTasks.length > 0 && (
+        {tasks && tasks.length > 0 && (
+          useSmartSelection ? (
+            <SmartTaskSelector
+              tasks={tasks}
+              sessionDuration={duration}
+              sessionType={sessionType}
+              energyLevel={energyLevel}
+              onTasksSelected={setSmartSelectedTasks}
+              recentSessions={recentSessions}
+            />
+          ) : (
+            /* Suggested Session */
+            suggestedTasks.length > 0 && (
           <Card variant="outlined" sx={{ mb: 3, p: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Lightbulb sx={{ color: theme.palette.warning.main }} />
@@ -376,7 +380,20 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               </Typography>
             </Box>
           </Card>
+            )
           )
+        )}
+
+        {/* No tasks message with Smart Selection preview */}
+        {(!tasks || tasks.length === 0) && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2" gutterBottom>
+              <strong>Smart Task Selection Available!</strong>
+            </Typography>
+            <Typography variant="body2">
+              Create some tasks to unlock AI-powered task recommendations based on your energy level, deadlines, and work patterns.
+            </Typography>
+          </Alert>
         )}
 
         {/* Distraction Blocking Settings */}
@@ -431,23 +448,13 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               </ButtonGroup>
             </Box>
 
-            {/* Energy Level */}
-            <Box sx={{ mb: 3 }}>
-              <Typography gutterBottom>
-                Energy Level: {energyLevel}/10
-              </Typography>
-              <Slider
-                value={energyLevel}
-                onChange={(e, v) => setEnergyLevel(v)}
-                min={1}
-                max={10}
-                marks={[
-                  { value: 1, label: 'Low' },
-                  { value: 5, label: 'Mid' },
-                  { value: 10, label: 'High' }
-                ]}
-              />
-            </Box>
+            {/* Energy Level Tracker */}
+            <EnergyLevelTracker
+              currentEnergy={energyLevel}
+              onEnergyChange={setEnergyLevel}
+              showRecommendations={true}
+              historicalData={[]}
+            />
 
             {/* Environment Settings */}
             <Box>
