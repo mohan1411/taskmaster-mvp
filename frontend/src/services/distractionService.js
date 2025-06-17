@@ -19,6 +19,7 @@ class DistractionService {
     this.emergencyContacts = [];
     this.tabMonitor = null;
     this.originalTitle = document.title;
+    this.visibilityLog = [];
   }
 
   // Start blocking distractions
@@ -272,6 +273,14 @@ class DistractionService {
 
   // Stop visibility tracking
   stopVisibilityTracking() {
+    // Check if visibility log exists
+    if (!this.visibilityLog || !Array.isArray(this.visibilityLog)) {
+      return {
+        totalDistractedTime: 0,
+        distractionCount: 0
+      };
+    }
+    
     // Calculate total distraction time
     let totalDistractedTime = 0;
     
