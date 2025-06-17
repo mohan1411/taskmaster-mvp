@@ -490,10 +490,17 @@ export const FocusProvider = ({ children }) => {
     if (!focusSession.active || !focusSession.apiSessionId) return;
     
     try {
-      const sessionDuration = focusSession.timeElapsed;
+      const sessionDuration = focusSession.timeElapsed || 0;
       const flowDuration = focusSession.flowState && focusSession.flowStartTime 
         ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
         : 0;
+      
+      console.log('Session end data:', {
+        sessionDuration,
+        flowDuration,
+        focusSession,
+        completedCount: focusSession.completed?.length || 0
+      });
       
       // Ensure all completed tasks are marked as complete in the database
       if (focusSession.completed && focusSession.completed.length > 0) {
@@ -531,6 +538,10 @@ export const FocusProvider = ({ children }) => {
       console.log('Ending focus session with API:', apiEndData);
       
       // Call API to end session
+      console.log('Calling focusService.endSession with:', {
+        sessionId: focusSession.apiSessionId,
+        data: apiEndData
+      });
       await focusService.endSession(focusSession.apiSessionId, apiEndData);
       
       // Update metrics
@@ -600,8 +611,22 @@ export const FocusProvider = ({ children }) => {
       }
       
     } catch (error) {
+      console.error('Focus session end error - Full details:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        focusSession,
+        apiEndData: {
+          actualDuration: Math.round(sessionDuration),
+          completedTasks: focusSession.completed,
+          focusScore: Math.round((realtimeData.flowScore || 0) * 100),
+          distractions: {
+            blocked: distractionState.queuedNotifications.length,
+            encountered: realtimeData.distractionsToday
+          }
+        }
+      });
       showError('Error ending focus session.');
-      console.error('Focus session end error:', error);
     }
   }, [focusSession, realtimeData.flowScore, userMetrics.currentEnergyLevel, distractionState.queuedNotifications.length, showSuccess, showInfo, showError]);
   

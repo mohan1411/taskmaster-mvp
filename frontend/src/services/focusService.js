@@ -68,10 +68,21 @@ const focusService = {
   // End session
   endSession: async (sessionId, endData) => {
     try {
+      console.log('focusService.endSession called with:', {
+        sessionId,
+        endData,
+        url: `/api/focus/sessions/${sessionId}/end`
+      });
       const response = await api.post(`/api/focus/sessions/${sessionId}/end`, endData);
+      console.log('focusService.endSession response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Error ending session:', error);
+      console.error('Error ending session in focusService:', {
+        error,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       throw error;
     }
   },
