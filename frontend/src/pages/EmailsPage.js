@@ -168,7 +168,7 @@ const EmailsPage = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container email-page">
       <div className="page-content">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
