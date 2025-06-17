@@ -225,28 +225,44 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
         </Box>
         
         {/* Score Card */}
-        <Card sx={{ mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+        <Card sx={{ 
+          mb: 3, 
+          bgcolor: theme => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
+          color: theme => theme.palette.text.primary
+        }}>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
-          <TrophyIcon sx={{ fontSize: 60, mb: 2, color: '#FFD700' }} />
-          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 1 }}>
+          <TrophyIcon sx={{ fontSize: 60, mb: 2, color: 'warning.main' }} />
+          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}>
             {sessionScore}
           </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
+          <Typography variant="body1" color="text.secondary">
             points earned
           </Typography>
           
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 3 }}>
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5">{Math.round(sessionData.duration || 0)}</Typography>
-              <Typography variant="caption">minutes focused</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                {Math.round(sessionData.duration || 0)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                minutes focused
+              </Typography>
             </Box>
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5">{sessionData.tasksCompleted || 0}</Typography>
-              <Typography variant="caption">tasks completed</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                {sessionData.tasksCompleted || 0}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                tasks completed
+              </Typography>
             </Box>
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5">{completionRate}%</Typography>
-              <Typography variant="caption">completion rate</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                {completionRate}%
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                completion rate
+              </Typography>
             </Box>
           </Box>
         </CardContent>
@@ -574,26 +590,41 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                       <TrophyIcon color="warning" /> Performance Score
                     </Typography>
                     <Divider sx={{ mb: 2 }} />
-                    <Box sx={{ textAlign: 'center', py: 2 }}>
-                      <Typography variant="h3" color="primary" fontWeight="600">
-                        {sessionScore}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        points earned
-                      </Typography>
-                      <Box sx={{ mt: 2 }}>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={Math.min(100, (sessionScore / 200) * 100)} 
-                          sx={{ 
-                            height: 8, 
-                            borderRadius: 4,
-                            bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                            '& .MuiLinearProgress-bar': {
-                              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)'
-                            }
-                          }} 
-                        />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Session Score:</Typography>
+                        <Typography variant="body2" fontWeight="500">
+                          {sessionScore} pts
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Performance:</Typography>
+                        <Typography variant="body2" fontWeight="500" color={getPerformanceColor(completionRate)}>
+                          {completionRate >= 90 ? 'Excellent' : completionRate >= 70 ? 'Good' : 'Fair'}
+                        </Typography>
+                      </Box>
+                      <Divider sx={{ my: 1 }} />
+                      <Box sx={{ textAlign: 'center', mt: 1 }}>
+                        <Typography variant="h4" color="primary" fontWeight="600">
+                          {sessionScore}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          total points
+                        </Typography>
+                        <Box sx={{ mt: 2 }}>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={Math.min(100, (sessionScore / 200) * 100)} 
+                            sx={{ 
+                              height: 6, 
+                              borderRadius: 3,
+                              bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                              '& .MuiLinearProgress-bar': {
+                                bgcolor: 'primary.main'
+                              }
+                            }} 
+                          />
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
