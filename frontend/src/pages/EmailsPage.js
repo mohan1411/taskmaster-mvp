@@ -3,7 +3,6 @@ import {
   Box, 
   Typography, 
   Paper, 
-  Container, 
   Button, 
   CircularProgress, 
   Alert,
@@ -170,7 +169,7 @@ const EmailsPage = () => {
 
   return (
     <div className="page-container">
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <div className="page-content">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
             <Typography variant="h4" gutterBottom>
@@ -304,7 +303,7 @@ const EmailsPage = () => {
             )}
           </>
         )}
-      </Container>
+      </div>
     </div>
   );
 };
