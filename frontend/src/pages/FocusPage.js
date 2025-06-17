@@ -128,12 +128,6 @@ const FocusPage = () => {
           </Grid>
         )}
 
-        {/* FORCE NEW VERSION TEST */}
-        <Alert severity="error" sx={{ mb: 2 }}>
-          <Typography variant="h6">TEST: You should see this red alert!</Typography>
-          <Typography>If you see this, the page is updating correctly.</Typography>
-        </Alert>
-        
         {/* Focus Mode Launcher */}
         <FocusModeLauncher tasks={tasks} />
 

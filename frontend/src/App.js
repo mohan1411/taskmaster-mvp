@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-// import notificationInterceptor from './utils/notificationInterceptor'; // Temporarily disabled
+import notificationInterceptor from './utils/notificationInterceptor';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -31,12 +31,11 @@ function App() {
   
   // Initialize notification interceptor
   useEffect(() => {
-    // Temporarily disabled to fix permission error
-    // notificationInterceptor.init();
+    notificationInterceptor.init();
     
     return () => {
       // Cleanup if needed
-      // notificationInterceptor.restore();
+      notificationInterceptor.restore();
     };
   }, []);
 

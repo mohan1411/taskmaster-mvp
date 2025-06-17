@@ -15,17 +15,22 @@ class NotificationInterceptor {
       return;
     }
 
-    // Store original methods
-    this.originalRequestPermission = Notification.requestPermission;
-    
-    // Override global notification methods
-    this.interceptNotifications();
-    this.interceptPermissionRequests();
-    
-    // Listen for service worker messages
-    this.interceptServiceWorkerNotifications();
-    
-    this.intercepted = true;
+    try {
+      // Store original methods
+      this.originalRequestPermission = Notification.requestPermission;
+      
+      // Override global notification methods
+      this.interceptNotifications();
+      this.interceptPermissionRequests();
+      
+      // Listen for service worker messages
+      this.interceptServiceWorkerNotifications();
+      
+      this.intercepted = true;
+    } catch (error) {
+      console.warn('Could not initialize notification interceptor:', error);
+      // Continue without notification interception
+    }
   }
 
   // Intercept notification creation
