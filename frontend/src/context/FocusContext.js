@@ -498,15 +498,12 @@ export const FocusProvider = ({ children }) => {
       // Ensure all completed tasks are marked as complete in the database
       if (focusSession.completed && focusSession.completed.length > 0) {
         console.log('Syncing completed tasks to database...');
-        for (const task of focusSession.completed) {
+        for (const taskId of focusSession.completed) {
           try {
-            // Skip if already marked as completed
-            if (task.status !== 'completed') {
-              await taskService.updateTaskStatus(task._id || task.id, 'completed');
-              console.log('Synced task completion:', task.title);
-            }
+            // Task IDs are already marked as completed when completeCurrentTask is called
+            console.log('Task already marked as completed:', taskId);
           } catch (error) {
-            console.error('Failed to sync task completion:', task.title, error);
+            console.error('Failed to sync task completion:', taskId, error);
           }
         }
       }
@@ -517,7 +514,7 @@ export const FocusProvider = ({ children }) => {
         energyLevel: {
           end: endData.energyLevelEnd || userMetrics.currentEnergyLevel * 10
         },
-        completedTasks: focusSession.completed.map(task => task._id || task.id),
+        completedTasks: focusSession.completed, // Already an array of IDs
         focusScore: Math.round((realtimeData.flowScore || 0) * 100),
         distractions: {
           blocked: distractionState.queuedNotifications.length,
@@ -525,7 +522,7 @@ export const FocusProvider = ({ children }) => {
         },
         flowMetrics: {
           totalFlowTime: flowDuration,
-          flowEntries: flowTracker.current.getFlowEntries ? flowTracker.current.getFlowEntries().length : 0
+          flowEntries: flowTracker.current.currentSession?.flowEvents?.length || 0
         },
         notes: endData.notes || '',
         endReason: reason
