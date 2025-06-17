@@ -551,6 +551,20 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                         <Typography variant="caption" color="text.secondary">
                           total minutes
                         </Typography>
+                        <Box sx={{ mt: 2 }}>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={Math.min(100, (sessionData.duration / (sessionData.plannedDuration || sessionData.sessionDuration || sessionData.duration || 1)) * 100)} 
+                            sx={{ 
+                              height: 6, 
+                              borderRadius: 3,
+                              bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                              '& .MuiLinearProgress-bar': {
+                                bgcolor: 'primary.main'
+                              }
+                            }} 
+                          />
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
@@ -593,6 +607,20 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                         <Typography variant="caption" color="text.secondary">
                           focus score
                         </Typography>
+                        <Box sx={{ mt: 2 }}>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={Math.round((sessionData.focusScore || 0) * 100)} 
+                            sx={{ 
+                              height: 6, 
+                              borderRadius: 3,
+                              bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                              '& .MuiLinearProgress-bar': {
+                                bgcolor: 'secondary.main'
+                              }
+                            }} 
+                          />
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
