@@ -325,41 +325,57 @@ const ActiveFocusSession = ({ onEndSession }) => {
   }, [focusSession.timeElapsed, focusPreferences.breakRatio, focusSession.breakTime]);
   
   const handleEndSession = async (endData = {}) => {
-    await endFocusSession('user_ended', endData);
-    
-    // Clean up task data for display - remove MongoDB properties
-    const allTasks = [...(focusSession.tasks || [])];
-    if (focusSession.currentTask) {
-      allTasks.unshift(focusSession.currentTask);
-    }
-    
-    const cleanTasks = allTasks.map(task => ({
-      id: task._id || task.id,
-      title: task.title,
-      estimatedDuration: task.estimatedDuration
-    }));
-    
-    const completedTaskIds = focusSession.completed.map(task => {
-      if (typeof task === 'string') return task;
-      if (typeof task === 'object' && task !== null) {
-        return task._id || task.id;
+    try {
+      await endFocusSession('user_ended', endData);
+      
+      // Clean up task data for display - remove MongoDB properties
+      const allTasks = [...(focusSession.tasks || [])];
+      if (focusSession.currentTask) {
+        allTasks.unshift(focusSession.currentTask);
       }
-      return null;
-    }).filter(id => id !== null);
-    
-    onEndSession?.({ 
-      duration: Math.round(focusSession.timeElapsed),
-      sessionDuration: Math.round(focusSession.timeElapsed),
-      plannedDuration: focusSession.duration,
-      tasksCompleted: completedTaskIds.length,
-      tasks: cleanTasks,
-      completed: completedTaskIds,
-      flowDuration: focusSession.flowState && focusSession.flowStartTime 
-        ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
-        : 0,
-      distractionsBlocked: 0, // TODO: Get from distraction service
-      ...endData 
-    });
+      
+      const cleanTasks = allTasks.map(task => ({
+        id: task._id || task.id,
+        title: task.title,
+        estimatedDuration: task.estimatedDuration
+      }));
+      
+      const completedTaskIds = focusSession.completed.map(task => {
+        if (typeof task === 'string') return task;
+        if (typeof task === 'object' && task !== null) {
+          return task._id || task.id;
+        }
+        return null;
+      }).filter(id => id !== null);
+      
+      onEndSession?.({ 
+        duration: Math.round(focusSession.timeElapsed || 0),
+        sessionDuration: Math.round(focusSession.timeElapsed || 0),
+        plannedDuration: focusSession.duration || 0,
+        tasksCompleted: completedTaskIds.length,
+        tasks: cleanTasks,
+        completed: completedTaskIds,
+        flowDuration: focusSession.flowState && focusSession.flowStartTime 
+          ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
+          : 0,
+        distractionsBlocked: 0, // TODO: Get from distraction service
+        ...endData 
+      });
+    } catch (error) {
+      console.error('Error in handleEndSession:', error);
+      // Still try to call onEndSession with minimal data
+      onEndSession?.({ 
+        duration: 0,
+        sessionDuration: 0,
+        plannedDuration: 0,
+        tasksCompleted: 0,
+        tasks: [],
+        completed: [],
+        flowDuration: 0,
+        distractionsBlocked: 0,
+        ...endData 
+      });
+    }
   };
   
   const handleCompleteTask = () => {
