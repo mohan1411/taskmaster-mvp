@@ -35,6 +35,8 @@ import {
 } from '@mui/icons-material';
 import { useFocus } from '../../context/FocusContext';
 import BreakMode from './BreakMode';
+import FocusTimer from './FocusTimer';
+import axios from 'axios';
 
 // Ambient background component
 const AmbientBackground = ({ soundType, playing }) => {
@@ -245,6 +247,8 @@ const ActiveFocusSession = ({ onEndSession }) => {
     focusSession,
     focusPreferences,
     endFocusSession,
+    pauseFocusSession,
+    resumeFocusSession,
     completeCurrentTask,
     skipCurrentTask,
     trackActivity
@@ -305,14 +309,26 @@ const ActiveFocusSession = ({ onEndSession }) => {
     }
   }, [focusSession.timeElapsed, focusPreferences.breakRatio, focusSession.breakTime]);
   
-  const handleEndSession = async () => {
-    await endFocusSession('user_ended');
-    onEndSession?.();
+  const handleEndSession = async (endData = {}) => {
+    await endFocusSession('user_ended', endData);
+    onEndSession?.({ 
+      sessionDuration: focusSession.timeElapsed,
+      tasksCompleted: focusSession.completed,
+      ...endData 
+    });
   };
   
   const handleCompleteTask = () => {
     completeCurrentTask();
     trackActivity('task_completion');
+  };
+  
+  const handlePauseResume = async () => {
+    if (focusSession.breakTime) {
+      await resumeFocusSession();
+    } else {
+      await pauseFocusSession();
+    }
   };
   
   const handleSkipTask = () => {
@@ -701,8 +717,8 @@ const ActiveFocusSession = ({ onEndSession }) => {
         >
           <Button
             variant="outlined"
-            startIcon={<PauseIcon />}
-            onClick={() => {/* Pause logic */}}
+            startIcon={focusSession.breakTime ? <PlayIcon /> : <PauseIcon />}
+            onClick={handlePauseResume}
             size="large"
             sx={{ 
               borderRadius: 2,
@@ -714,7 +730,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
               transition: 'all 0.2s ease'
             }}
           >
-            Pause
+            {focusSession.breakTime ? 'Resume' : 'Pause'}
           </Button>
           
           {focusSession.currentTask && (
