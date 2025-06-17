@@ -535,14 +535,6 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                           {Math.round(sessionData.duration || 0)} min
                         </Typography>
                       </Box>
-                      {sessionData.flowDuration > 0 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" color="text.secondary">Flow State:</Typography>
-                          <Typography variant="body2" fontWeight="500" color="secondary.main">
-                            {Math.round(sessionData.flowDuration || 0)} min
-                          </Typography>
-                        </Box>
-                      )}
                       <Divider sx={{ my: 1 }} />
                       <Box sx={{ textAlign: 'center', mt: 1 }}>
                         <Typography variant="h4" color="primary" fontWeight="600">
@@ -581,12 +573,6 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     </Typography>
                     <Divider sx={{ mb: 2 }} />
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" color="text.secondary">Focus Score:</Typography>
-                        <Typography variant="body2" fontWeight="500" color="success.main">
-                          {Math.round((sessionData.focusScore || 0) * 100)}%
-                        </Typography>
-                      </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography variant="body2" color="text.secondary">Interruptions Blocked:</Typography>
                         <Typography variant="body2" fontWeight="500">
