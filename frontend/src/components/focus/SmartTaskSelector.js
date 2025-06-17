@@ -20,7 +20,8 @@ import {
   FormControlLabel,
   Switch,
   Rating,
-  Stack
+  Stack,
+  CircularProgress
 } from '@mui/material';
 import {
   AutoAwesome,

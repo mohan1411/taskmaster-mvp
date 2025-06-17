@@ -27,7 +27,8 @@ import {
   Lightbulb,
   Warning,
   Info,
-  CheckCircle
+  CheckCircle,
+  Timer
 } from '@mui/icons-material';
 import { format, startOfWeek, differenceInMinutes } from 'date-fns';
 
