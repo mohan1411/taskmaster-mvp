@@ -8,20 +8,31 @@ exports.startSession = async (req, res) => {
   try {
     const {
       plannedDuration,
+      duration, // Support both naming conventions
       sessionType,
       taskIds,
+      tasks, // Support tasks array with objects
       energyLevel,
       environment
     } = req.body;
 
+    // Support both duration and plannedDuration
+    const sessionDuration = plannedDuration || duration;
+    
+    // Extract task IDs from tasks array if provided
+    let taskIdList = taskIds;
+    if (!taskIdList && tasks && Array.isArray(tasks)) {
+      taskIdList = tasks.map(task => task._id || task.id);
+    }
+
     // Validate tasks belong to user
-    if (taskIds && taskIds.length > 0) {
-      const tasks = await Task.find({
-        _id: { $in: taskIds },
+    if (taskIdList && taskIdList.length > 0) {
+      const validTasks = await Task.find({
+        _id: { $in: taskIdList },
         user: req.user._id
       });
       
-      if (tasks.length !== taskIds.length) {
+      if (validTasks.length !== taskIdList.length) {
         return res.status(400).json({ message: 'Some tasks not found or unauthorized' });
       }
     }
@@ -30,11 +41,11 @@ exports.startSession = async (req, res) => {
     const session = new FocusSession({
       user: req.user._id,
       startTime: new Date(),
-      plannedDuration,
+      plannedDuration: sessionDuration,
       sessionType: sessionType || 'regular',
-      tasks: taskIds ? taskIds.map(taskId => ({
+      tasks: taskIdList ? taskIdList.map(taskId => ({
         task: taskId,
-        plannedDuration: Math.floor(plannedDuration / taskIds.length),
+        plannedDuration: Math.floor(sessionDuration / taskIdList.length),
         completed: false,
         progress: 0
       })) : [],
