@@ -625,7 +625,7 @@ export const FocusProvider = ({ children }) => {
       });
       showError('Error ending focus session.');
     }
-  }, [focusSession, realtimeData, userMetrics, distractionState, showSuccess, showInfo, showError, logFocusEvent, taskService, focusService, distractionService, flowTracker, setUserMetrics, setFocusSession, restoreFocusEnvironment]);
+  }, [focusSession, realtimeData.flowScore, realtimeData.distractionsToday, userMetrics.currentEnergyLevel, distractionState.queuedNotifications, showSuccess, showInfo, showError, logFocusEvent]);
   
   // Apply focus environment settings
   const applyFocusEnvironment = useCallback(async (environment = {}) => {
