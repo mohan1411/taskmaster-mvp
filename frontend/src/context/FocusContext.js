@@ -490,12 +490,14 @@ export const FocusProvider = ({ children }) => {
     if (!focusSession.active || !focusSession.apiSessionId) return;
     
     // Define variables outside try block so they're accessible in catch
-    const sessionDuration = focusSession.timeElapsed || 0;
-    const flowDuration = focusSession.flowState && focusSession.flowStartTime 
-      ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
-      : 0;
+    let sessionDuration = 0;
+    let flowDuration = 0;
     
     try {
+      sessionDuration = focusSession.timeElapsed || 0;
+      flowDuration = focusSession.flowState && focusSession.flowStartTime 
+        ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
+        : 0;
       
       console.log('Session end data:', {
         sessionDuration,
@@ -623,7 +625,7 @@ export const FocusProvider = ({ children }) => {
       });
       showError('Error ending focus session.');
     }
-  }, [focusSession, realtimeData.flowScore, userMetrics.currentEnergyLevel, distractionState.queuedNotifications.length, showSuccess, showInfo, showError]);
+  }, [focusSession, realtimeData, userMetrics, distractionState, showSuccess, showInfo, showError, logFocusEvent, taskService, focusService, distractionService, flowTracker, setUserMetrics, setFocusSession, restoreFocusEnvironment]);
   
   // Apply focus environment settings
   const applyFocusEnvironment = useCallback(async (environment = {}) => {
