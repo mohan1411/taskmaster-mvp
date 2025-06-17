@@ -489,11 +489,13 @@ export const FocusProvider = ({ children }) => {
   const endFocusSession = useCallback(async (reason = 'completed', endData = {}) => {
     if (!focusSession.active || !focusSession.apiSessionId) return;
     
+    // Define variables outside try block so they're accessible in catch
+    const sessionDuration = focusSession.timeElapsed || 0;
+    const flowDuration = focusSession.flowState && focusSession.flowStartTime 
+      ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
+      : 0;
+    
     try {
-      const sessionDuration = focusSession.timeElapsed || 0;
-      const flowDuration = focusSession.flowState && focusSession.flowStartTime 
-        ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
-        : 0;
       
       console.log('Session end data:', {
         sessionDuration,
@@ -616,15 +618,8 @@ export const FocusProvider = ({ children }) => {
         message: error.message,
         stack: error.stack,
         focusSession,
-        apiEndData: {
-          actualDuration: Math.round(sessionDuration),
-          completedTasks: focusSession.completed,
-          focusScore: Math.round((realtimeData.flowScore || 0) * 100),
-          distractions: {
-            blocked: distractionState.queuedNotifications.length,
-            encountered: realtimeData.distractionsToday
-          }
-        }
+        sessionDuration,
+        flowDuration
       });
       showError('Error ending focus session.');
     }
