@@ -384,17 +384,31 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
           )
         )}
 
-        {/* No tasks message with Smart Selection preview */}
-        {(!tasks || tasks.length === 0) && (
-          <Alert severity="info" sx={{ mb: 3 }}>
-            <Typography variant="body2" gutterBottom>
-              <strong>Smart Task Selection Available!</strong>
-            </Typography>
-            <Typography variant="body2">
-              Create some tasks to unlock AI-powered task recommendations based on your energy level, deadlines, and work patterns.
-            </Typography>
-          </Alert>
-        )}
+        {/* Energy Level Tracker - Always visible */}
+        <Box sx={{ mb: 3 }}>
+          <EnergyLevelTracker
+            currentEnergy={energyLevel}
+            onEnergyChange={setEnergyLevel}
+            showRecommendations={true}
+            historicalData={[]}
+          />
+        </Box>
+
+        {/* Always show Smart Selection info */}
+        <Alert 
+          severity="info" 
+          sx={{ mb: 3 }}
+          icon={<AutoAwesome />}
+        >
+          <Typography variant="body2" gutterBottom>
+            <strong>🎯 New: Smart Task Selection with AI!</strong>
+          </Typography>
+          <Typography variant="body2">
+            {tasks && tasks.length > 0 
+              ? 'Toggle between Smart and Manual selection above to get AI-powered task recommendations.'
+              : 'Create some tasks to unlock AI-powered recommendations based on your energy, deadlines, and patterns.'}
+          </Typography>
+        </Alert>
 
         {/* Distraction Blocking Settings */}
         <Box sx={{ mb: 3 }}>
