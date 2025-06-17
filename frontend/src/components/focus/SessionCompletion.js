@@ -36,6 +36,7 @@ import {
   EmojiEvents as TrophyIcon
 } from '@mui/icons-material';
 import { useFocus } from '../../context/FocusContext';
+import '../../styles/GlobalPages.css';
 
 // Achievement badges system
 const ACHIEVEMENTS = {
@@ -211,14 +212,22 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
   };
   
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
-      {/* Header */}
-      <Card sx={{ mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-        <CardContent sx={{ textAlign: 'center', py: 4 }}>
-          <TrophyIcon sx={{ fontSize: 60, mb: 2, color: '#FFD700' }} />
-          <Typography variant="h4" gutterBottom>
-            Focus Session Complete!
+    <div className="page-container">
+      <div className="page-content">
+        {/* Page Header */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }}>
+            Focus Session Complete
           </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Great work! Here's your session summary and achievements.
+          </Typography>
+        </Box>
+        
+        {/* Score Card */}
+        <Card sx={{ mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+          <CardContent sx={{ textAlign: 'center', py: 4 }}>
+          <TrophyIcon sx={{ fontSize: 60, mb: 2, color: '#FFD700' }} />
           <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 1 }}>
             {sessionScore}
           </Typography>
@@ -272,8 +281,8 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Session Performance
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <StatsIcon color="primary" /> Session Performance
               </Typography>
               
               <Box sx={{ mb: 3 }}>
@@ -343,8 +352,8 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           {sessionData.tasks && sessionData.tasks.length > 0 && (
             <Card sx={{ mt: 2 }}>
               <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Tasks Completed ({sessionData.tasksCompleted}/{sessionData.tasks.length})
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TaskIcon color="primary" /> Tasks Completed ({sessionData.tasksCompleted}/{sessionData.tasks.length})
                 </Typography>
                 <List dense>
                   {sessionData.tasks.map((task, index) => {
@@ -387,8 +396,8 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           {/* Session Rating */}
           <Card sx={{ mb: 2 }}>
             <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h6" gutterBottom>
-                Rate This Session
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <StarIcon color="warning" /> Rate This Session
               </Typography>
               <Rating
                 value={sessionRating}
@@ -405,8 +414,8 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           {/* Quick Stats */}
           <Card sx={{ mb: 2 }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Today's Progress
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <StreakIcon color="warning" /> Today's Progress
               </Typography>
               
               <Box sx={{ mb: 2 }}>
@@ -469,54 +478,132 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
         </Grid>
       </Grid>
       
-      {/* Detailed Breakdown */}
-      <Card sx={{ mt: 3 }}>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Detailed Session Breakdown</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Time Distribution
-                </Typography>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="body2">
-                    Planned Duration: {Math.round(sessionData.plannedDuration || sessionData.sessionDuration || sessionData.duration || 0)} min
-                  </Typography>
-                  <Typography variant="body2">
-                    Actual Duration: {Math.round(sessionData.duration || 0)} min
-                  </Typography>
-                  {sessionData.flowDuration > 0 && (
-                    <Typography variant="body2">
-                      Flow State: {Math.round(sessionData.flowDuration || 0)} min
+        {/* Detailed Breakdown */}
+        <Card sx={{ mt: 3 }}>
+          <Accordion defaultExpanded>
+            <AccordionSummary 
+              expandIcon={<ExpandMoreIcon />}
+              sx={{ 
+                backgroundColor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                '&:hover': {
+                  backgroundColor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'
+                }
+              }}
+            >
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <StatsIcon /> Detailed Session Breakdown
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2,
+                    bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' 
+                  }}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TimeIcon color="primary" /> Time Distribution
                     </Typography>
-                  )}
-                </Box>
+                    <Divider sx={{ mb: 2 }} />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Planned Duration:</Typography>
+                        <Typography variant="body2" fontWeight="500">
+                          {Math.round(sessionData.plannedDuration || sessionData.sessionDuration || sessionData.duration || 0)} min
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Actual Duration:</Typography>
+                        <Typography variant="body2" fontWeight="500">
+                          {Math.round(sessionData.duration || 0)} min
+                        </Typography>
+                      </Box>
+                      {sessionData.flowDuration > 0 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="body2" color="text.secondary">Flow State:</Typography>
+                          <Typography variant="body2" fontWeight="500" color="secondary.main">
+                            {Math.round(sessionData.flowDuration || 0)} min
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2,
+                    bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' 
+                  }}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <FlowIcon color="secondary" /> Focus Quality
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Focus Score:</Typography>
+                        <Typography variant="body2" fontWeight="500" color="success.main">
+                          {Math.round((sessionData.focusScore || 0) * 100)}%
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Interruptions Blocked:</Typography>
+                        <Typography variant="body2" fontWeight="500">
+                          {sessionData.distractionsBlocked || 0}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Task Switches:</Typography>
+                        <Typography variant="body2" fontWeight="500">
+                          {sessionData.taskSwitches || 0}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2,
+                    bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' 
+                  }}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TrophyIcon color="warning" /> Performance Score
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <Box sx={{ textAlign: 'center', py: 2 }}>
+                      <Typography variant="h3" color="primary" fontWeight="600">
+                        {sessionScore}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        points earned
+                      </Typography>
+                      <Box sx={{ mt: 2 }}>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={Math.min(100, (sessionScore / 200) * 100)} 
+                          sx={{ 
+                            height: 8, 
+                            borderRadius: 4,
+                            bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)'
+                            }
+                          }} 
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
+                </Grid>
               </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Focus Quality
-                </Typography>
-                <Box>
-                  <Typography variant="body2">
-                    Focus Score: {Math.round((sessionData.focusScore || 0) * 100)}%
-                  </Typography>
-                  <Typography variant="body2">
-                    Interruptions: {sessionData.distractionsBlocked || 0}
-                  </Typography>
-                  <Typography variant="body2">
-                    Task Switches: {sessionData.taskSwitches || 0}
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
-      </Card>
-    </Box>
+            </AccordionDetails>
+          </Accordion>
+        </Card>
+      </div>
+    </div>
   );
 };
 
