@@ -106,12 +106,6 @@
   overflow-x: auto !important;
 }
 
-/* Special spacing for email page */
-.page-container.email-page {
-  margin-left: 240px !important;
-  width: calc(100vw - 240px) !important;
-}
-
 /* Mobile responsiveness */
 @media (max-width: 900px) {
   .page-container {
@@ -119,11 +113,6 @@
     width: 100vw !important;
     margin-top: 56px !important;
     padding: 16px !important;
-  }
-  
-  .page-container.email-page {
-    margin-left: 0 !important;
-    width: 100vw !important;
   }
   
   .cards-grid-2,
@@ -173,11 +162,6 @@
     padding: 20px 24px !important;
     box-sizing: border-box !important;
     overflow-y: auto !important;
-  }
-  
-  .page-container.email-page {
-    margin-left: 240px !important;
-    width: calc(100vw - 240px) !important;
   }
 }
 
