@@ -20,7 +20,9 @@ import {
   IconButton,
   Tooltip,
   Alert,
-  CircularProgress
+  CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   PlayArrow,
@@ -33,12 +35,15 @@ import {
   Schedule,
   Coffee,
   GpsFixed,
-  Lightbulb
+  Lightbulb,
+  AutoAwesome
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useFocus } from '../../context/FocusContext';
 import { useNavigate } from 'react-router-dom';
 import DistractionBlocker from './DistractionBlocker';
+import SmartTaskSelector from './SmartTaskSelector';
+import focusService from '../../services/focusService';
 
 const QUICK_START_OPTIONS = [
   { duration: 25, label: '25 min', description: 'Quick Focus' },
@@ -73,14 +78,31 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
     showReminders: true,
     strictMode: false
   });
+  const [useSmartSelection, setUseSmartSelection] = useState(true);
+  const [recentSessions, setRecentSessions] = useState([]);
+  const [smartSelectedTasks, setSmartSelectedTasks] = useState([]);
 
   useEffect(() => {
     if (tasks && tasks.length > 0) {
-      loadSuggestedTasks();
+      if (!useSmartSelection) {
+        loadSuggestedTasks();
+      }
     }
     const currentEnergy = calculateCurrentEnergy ? calculateCurrentEnergy() : 0.7;
     setEnergyLevel(Math.round(currentEnergy * 10));
-  }, [tasks, duration]);
+    
+    // Load recent sessions for smart selection
+    loadRecentSessions();
+  }, [tasks, duration, useSmartSelection]);
+
+  const loadRecentSessions = async () => {
+    try {
+      const response = await focusService.getSessionHistory({ days: 7 });
+      setRecentSessions(response.sessions || []);
+    } catch (error) {
+      console.error('Error loading recent sessions:', error);
+    }
+  };
 
   const loadSuggestedTasks = async () => {
     // Filter incomplete tasks
@@ -158,7 +180,8 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
     
     setIsLoading(true);
     try {
-      const selectedTaskObjects = suggestedTasks.filter(t => selectedTasks.includes(t._id));
+      const taskIdsToUse = useSmartSelection ? smartSelectedTasks : selectedTasks;
+      const selectedTaskObjects = tasks.filter(t => taskIdsToUse.includes(t._id || t.id));
       
       console.log('Starting session with tasks:', selectedTaskObjects);
       
@@ -270,8 +293,38 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
           </ButtonGroup>
         </Box>
 
-        {/* Suggested Session */}
-        {suggestedTasks.length > 0 && (
+        {/* Smart Task Selection Toggle */}
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+          <ToggleButtonGroup
+            value={useSmartSelection}
+            exclusive
+            onChange={(e, value) => value !== null && setUseSmartSelection(value)}
+            size="small"
+          >
+            <ToggleButton value={true}>
+              <AutoAwesome sx={{ mr: 1 }} />
+              Smart Selection
+            </ToggleButton>
+            <ToggleButton value={false}>
+              <Task sx={{ mr: 1 }} />
+              Manual Selection
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
+        {/* Smart Task Selector or Manual Selector */}
+        {useSmartSelection ? (
+          <SmartTaskSelector
+            tasks={tasks}
+            sessionDuration={duration}
+            sessionType={sessionType}
+            energyLevel={energyLevel}
+            onTasksSelected={setSmartSelectedTasks}
+            recentSessions={recentSessions}
+          />
+        ) : (
+          /* Suggested Session */
+          suggestedTasks.length > 0 && (
           <Card variant="outlined" sx={{ mb: 3, p: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Lightbulb sx={{ color: theme.palette.warning.main }} />
@@ -323,6 +376,7 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               </Typography>
             </Box>
           </Card>
+          )
         )}
 
         {/* Distraction Blocking Settings */}
@@ -417,7 +471,7 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
             size="large"
             fullWidth
             onClick={handleStartSession}
-            disabled={isLoading || selectedTasks.length === 0}
+            disabled={isLoading || (useSmartSelection ? smartSelectedTasks.length === 0 : selectedTasks.length === 0)}
             startIcon={isLoading ? <CircularProgress size={20} /> : <PlayArrow />}
           >
             {isLoading ? 'Starting...' : 'Start Focus Session'}
