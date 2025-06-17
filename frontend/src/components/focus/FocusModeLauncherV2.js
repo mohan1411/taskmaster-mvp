@@ -38,6 +38,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { useFocus } from '../../context/FocusContext';
 import { useNavigate } from 'react-router-dom';
+import DistractionBlocker from './DistractionBlocker';
 
 const QUICK_START_OPTIONS = [
   { duration: 25, label: '25 min', description: 'Quick Focus' },
@@ -66,6 +67,12 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
   const [ambientSound, setAmbientSound] = useState('lofi');
   const [suggestedTasks, setSuggestedTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [distractionSettings, setDistractionSettings] = useState({
+    blockNotifications: true,
+    blockSites: false,
+    showReminders: true,
+    strictMode: false
+  });
 
   useEffect(() => {
     if (tasks && tasks.length > 0) {
@@ -162,9 +169,12 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
         environment: {
           ambientSound: showAdvanced ? ambientSound : 'lofi',
           pauseNotifications,
-          blockNotifications: pauseNotifications,
-          blockSites: true,
-          theme: 'focus_dark'
+          blockNotifications: distractionSettings.blockNotifications,
+          blockSites: distractionSettings.blockSites,
+          theme: 'focus_dark',
+          strictMode: distractionSettings.strictMode,
+          emergencyContacts: [],
+          customBlockedSites: []
         }
       });
       
@@ -314,6 +324,14 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
             </Box>
           </Card>
         )}
+
+        {/* Distraction Blocking Settings */}
+        <Box sx={{ mb: 3 }}>
+          <DistractionBlocker 
+            isActive={false}
+            onSettingsChange={setDistractionSettings}
+          />
+        </Box>
 
         {/* Advanced Settings */}
         {showAdvanced && (

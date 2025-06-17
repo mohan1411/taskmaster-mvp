@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 import { detectFlowState, FlowTracker } from '../utils/flowDetection';
 import taskService from '../services/taskService';
 import focusService from '../services/focusService';
+import distractionService from '../services/distractionService';
 
 const FocusContext = createContext();
 
@@ -457,6 +458,16 @@ export const FocusProvider = ({ children }) => {
       // Apply focus environment
       await applyFocusEnvironment(config.environment);
       
+      // Start distraction blocking
+      if (config.environment?.blockNotifications || config.environment?.pauseNotifications) {
+        await distractionService.startBlocking({
+          blockNotifications: true,
+          blockSites: config.environment?.blockSites || false,
+          emergencyContacts: config.environment?.emergencyContacts || [],
+          customSites: config.environment?.customBlockedSites || []
+        });
+      }
+      
       // Initialize flow tracking
       flowTracker.current.startSession(apiSession._id);
       
@@ -561,6 +572,14 @@ export const FocusProvider = ({ children }) => {
       // Clean up environment
       await restoreFocusEnvironment();
       
+      // Stop distraction blocking
+      const distractionResult = await distractionService.stopBlocking();
+      
+      // Update session data with distraction metrics
+      if (distractionResult.queuedNotifications?.length > 0) {
+        apiEndData.distractions.blocked = distractionResult.queuedNotifications.length;
+      }
+      
       // Reset session state
       setFocusSession({
         active: false,
@@ -598,10 +617,15 @@ export const FocusProvider = ({ children }) => {
     try {
       // Enable Do Not Disturb
       if ('Notification' in window && environment.blockNotifications !== false) {
-        // We can't actually block notifications, but we can track them
+        // Request notification permission if not granted
+        if (Notification.permission === 'default') {
+          await Notification.requestPermission();
+        }
+        
         setDistractionState(prev => ({
           ...prev,
-          queuedNotifications: []
+          queuedNotifications: [],
+          blockingActive: true
         }));
       }
       
@@ -614,6 +638,12 @@ export const FocusProvider = ({ children }) => {
       // Apply visual theme
       if (environment.theme === 'focus_dark') {
         document.documentElement.setAttribute('data-focus-mode', 'true');
+      }
+      
+      // Apply site blocking
+      if (environment.blockSites) {
+        // This is handled by distractionService
+        console.log('Site blocking enabled');
       }
       
     } catch (error) {
@@ -655,6 +685,13 @@ export const FocusProvider = ({ children }) => {
     
     const { source, urgency, sender } = distraction;
     
+    // Log the distraction
+    logFocusEvent('distraction_encountered', {
+      source,
+      urgency,
+      blocked: urgency !== 'critical'
+    });
+    
     // Critical interruptions always get through
     if (urgency === 'critical') {
       return { action: 'allow', reason: 'critical' };
@@ -672,6 +709,16 @@ export const FocusProvider = ({ children }) => {
         distractionsToday: prev.distractionsToday + 1
       }));
       
+      // Log to API if session is active
+      if (focusSession.apiSessionId) {
+        focusService.logDistraction(focusSession.apiSessionId, {
+          type: source,
+          severity: urgency,
+          blocked: true,
+          timestamp: Date.now()
+        }).catch(console.error);
+      }
+      
       return { action: 'block', reason: 'flow_protection' };
     }
     
@@ -687,7 +734,7 @@ export const FocusProvider = ({ children }) => {
     }
     
     return { action: 'allow' };
-  }, [focusSession.active, focusSession.flowState, focusPreferences.blockLevel]);
+  }, [focusSession.active, focusSession.flowState, focusSession.apiSessionId, focusPreferences.blockLevel, logFocusEvent]);
   
   // Pause focus session
   const pauseFocusSession = useCallback(async () => {

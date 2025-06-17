@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import notificationInterceptor from './utils/notificationInterceptor';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -27,6 +28,16 @@ import { NotificationProvider } from './context/NotificationContext';
 
 function App() {
   const { user, isLoading } = useAuth();
+  
+  // Initialize notification interceptor
+  useEffect(() => {
+    notificationInterceptor.init();
+    
+    return () => {
+      // Cleanup if needed
+      notificationInterceptor.restore();
+    };
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;

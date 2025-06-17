@@ -36,6 +36,7 @@ import {
 import { useFocus } from '../../context/FocusContext';
 import BreakMode from './BreakMode';
 import FocusTimer from './FocusTimer';
+import distractionService from '../../services/distractionService';
 import axios from 'axios';
 
 // Ambient background component
@@ -274,6 +275,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
   const [showBreakReminder, setShowBreakReminder] = useState(false);
   const [inBreakMode, setInBreakMode] = useState(false);
   const [breakType, setBreakType] = useState('short-break');
+  const [distractionStatus, setDistractionStatus] = useState(null);
   
   // Calculate session stats
   const tasksCompleted = focusSession.completed?.length || 0;
@@ -294,6 +296,19 @@ const ActiveFocusSession = ({ onEndSession }) => {
       document.removeEventListener('click', handleActivity);
     };
   }, [trackActivity]);
+  
+  // Update distraction status
+  useEffect(() => {
+    const updateStatus = () => {
+      const status = distractionService.getStatus();
+      setDistractionStatus(status);
+    };
+    
+    updateStatus();
+    const interval = setInterval(updateStatus, 5000); // Update every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
   
   // Break reminder logic
   useEffect(() => {
@@ -493,6 +508,15 @@ const ActiveFocusSession = ({ onEndSession }) => {
                 color="success"
                 size="small"
                 sx={{ animation: 'pulse 2s infinite' }}
+              />
+            )}
+            
+            {distractionStatus?.isBlocking && (
+              <Chip
+                icon={<NotesIcon />}
+                label={`${distractionStatus.blockedNotifications} Blocked`}
+                color="warning"
+                size="small"
               />
             )}
             
