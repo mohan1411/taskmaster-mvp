@@ -8,6 +8,13 @@ const focusService = {
       return response.data;
     } catch (error) {
       console.error('Error starting focus session:', error);
+      if (error.response) {
+        console.error('Error response:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+      }
       throw error;
     }
   },

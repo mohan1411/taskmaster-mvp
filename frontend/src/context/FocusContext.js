@@ -405,14 +405,11 @@ export const FocusProvider = ({ children }) => {
       // Prepare session data for API
       const sessionData = {
         plannedDuration: config.duration || focusPreferences.defaultDuration,
+        duration: config.duration || focusPreferences.defaultDuration, // Support both naming
         sessionType: config.sessionType || 'work',
-        tasks: allTasks.map(task => ({
-          task: task._id || task.id,
-          plannedDuration: task.estimatedDuration || 30
-        })),
-        energyLevel: {
-          start: userMetrics.currentEnergyLevel * 10 // Convert 0-1 to 0-10 scale
-        },
+        tasks: allTasks, // Send full task objects - backend will extract IDs
+        taskIds: allTasks.map(task => task._id || task.id), // Also send just IDs
+        energyLevel: userMetrics.currentEnergyLevel * 10, // Convert 0-1 to 0-10 scale
         environment: config.environment || {
           soundType: focusPreferences.ambientSound,
           blockingLevel: focusPreferences.blockLevel
