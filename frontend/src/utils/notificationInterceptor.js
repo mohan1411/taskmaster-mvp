@@ -63,8 +63,23 @@ class NotificationInterceptor {
     
     // Copy static properties and methods
     Object.setPrototypeOf(window.Notification, this.originalNotification);
-    window.Notification.permission = this.originalNotification.permission;
-    window.Notification.maxActions = this.originalNotification.maxActions;
+    
+    // Use Object.defineProperty for read-only properties
+    try {
+      Object.defineProperty(window.Notification, 'permission', {
+        get: () => this.originalNotification.permission,
+        configurable: true
+      });
+      
+      if ('maxActions' in this.originalNotification) {
+        Object.defineProperty(window.Notification, 'maxActions', {
+          get: () => this.originalNotification.maxActions,
+          configurable: true
+        });
+      }
+    } catch (e) {
+      console.warn('Could not copy Notification static properties:', e);
+    }
   }
 
   // Intercept permission requests
