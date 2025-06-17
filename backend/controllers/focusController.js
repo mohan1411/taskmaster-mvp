@@ -5,6 +5,12 @@ const User = require('../models/userModel');
 
 // Start a new focus session
 exports.startSession = async (req, res) => {
+  console.log('Focus session start request received:', {
+    body: req.body,
+    user: req.user ? req.user._id : 'No user',
+    headers: req.headers
+  });
+  
   try {
     const {
       plannedDuration,
@@ -71,7 +77,16 @@ exports.startSession = async (req, res) => {
     });
   } catch (error) {
     console.error('Error starting focus session:', error);
-    res.status(500).json({ message: 'Error starting focus session' });
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({ 
+      message: 'Error starting focus session',
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
