@@ -543,6 +543,15 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                           </Typography>
                         </Box>
                       )}
+                      <Divider sx={{ my: 1 }} />
+                      <Box sx={{ textAlign: 'center', mt: 1 }}>
+                        <Typography variant="h4" color="primary" fontWeight="600">
+                          {Math.round(sessionData.duration || 0)}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          total minutes
+                        </Typography>
+                      </Box>
                     </Box>
                   </Box>
                 </Grid>
@@ -574,6 +583,15 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                         <Typography variant="body2" color="text.secondary">Task Switches:</Typography>
                         <Typography variant="body2" fontWeight="500">
                           {sessionData.taskSwitches || 0}
+                        </Typography>
+                      </Box>
+                      <Divider sx={{ my: 1 }} />
+                      <Box sx={{ textAlign: 'center', mt: 1 }}>
+                        <Typography variant="h4" color="secondary" fontWeight="600">
+                          {Math.round((sessionData.focusScore || 0) * 100)}%
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          focus score
                         </Typography>
                       </Box>
                     </Box>
