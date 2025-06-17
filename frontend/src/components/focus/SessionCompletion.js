@@ -87,22 +87,28 @@ const ACHIEVEMENTS = {
 const calculateSessionScore = (sessionData) => {
   let score = 0;
   
+  const duration = sessionData.duration || 0;
+  const tasksCompleted = sessionData.tasksCompleted || 0;
+  const flowDuration = sessionData.flowDuration || 0;
+  const distractionsBlocked = sessionData.distractionsBlocked || 0;
+  const plannedDuration = sessionData.plannedDuration || sessionData.sessionDuration || duration || 1;
+  
   // Base points for completion
-  score += Math.min(sessionData.duration, 120) * 0.5; // 0.5 points per minute, max 60
+  score += Math.min(duration, 120) * 0.5; // 0.5 points per minute, max 60
   
   // Task completion bonus
-  score += sessionData.tasksCompleted * 10;
+  score += tasksCompleted * 10;
   
   // Flow state bonus
-  if (sessionData.flowDuration > 0) {
-    score += sessionData.flowDuration * 2; // 2 points per flow minute
+  if (flowDuration > 0) {
+    score += flowDuration * 2; // 2 points per flow minute
   }
   
   // Distraction resistance bonus
-  score += sessionData.distractionsBlocked * 5;
+  score += distractionsBlocked * 5;
   
   // Completion rate bonus
-  const completionRate = sessionData.duration / sessionData.plannedDuration;
+  const completionRate = duration / plannedDuration;
   if (completionRate >= 1) score += 20; // Full completion bonus
   else if (completionRate >= 0.8) score += 10; // 80% completion bonus
   
@@ -154,7 +160,9 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
   const [newAchievements, setNewAchievements] = useState([]);
   
   const sessionScore = calculateSessionScore(sessionData);
-  const completionRate = Math.round((sessionData.duration / sessionData.plannedDuration) * 100);
+  const duration = sessionData.duration || 0;
+  const plannedDuration = sessionData.plannedDuration || sessionData.sessionDuration || duration || 1;
+  const completionRate = Math.round((duration / plannedDuration) * 100);
   
   useEffect(() => {
     const achievements = checkAchievements(sessionData, userMetrics);
@@ -220,11 +228,11 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 3 }}>
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5">{sessionData.duration}</Typography>
+              <Typography variant="h5">{Math.round(sessionData.duration || 0)}</Typography>
               <Typography variant="caption">minutes focused</Typography>
             </Box>
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5">{sessionData.tasksCompleted}</Typography>
+              <Typography variant="h5">{sessionData.tasksCompleted || 0}</Typography>
               <Typography variant="caption">tasks completed</Typography>
             </Box>
             <Box sx={{ textAlign: 'center' }}>
@@ -288,12 +296,12 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2">Flow State Duration</Typography>
                     <Typography variant="body2" fontWeight="bold">
-                      {sessionData.flowDuration} minutes
+                      {Math.round(sessionData.flowDuration || 0)} minutes
                     </Typography>
                   </Box>
                   <LinearProgress
                     variant="determinate"
-                    value={(sessionData.flowDuration / sessionData.duration) * 100}
+                    value={Math.min(100, Math.round(((sessionData.flowDuration || 0) / (sessionData.duration || 1)) * 100))}
                     color="secondary"
                     sx={{ height: 8, borderRadius: 4 }}
                   />
@@ -309,7 +317,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                         Time Focused
                       </Typography>
                       <Typography variant="h6">
-                        {Math.floor(sessionData.duration / 60)}h {sessionData.duration % 60}m
+                        {Math.floor((sessionData.duration || 0) / 60)}h {Math.round((sessionData.duration || 0) % 60)}m
                       </Typography>
                     </Box>
                   </Box>
@@ -322,7 +330,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                         Distractions Blocked
                       </Typography>
                       <Typography variant="h6">
-                        {sessionData.distractionsBlocked}
+                        {sessionData.distractionsBlocked || 0}
                       </Typography>
                     </Box>
                   </Box>
@@ -411,7 +419,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <TimeIcon color="primary" />
                   <Typography variant="body2">
-                    {userMetrics.todaysFocusTime} min focused today
+                    {Math.round(userMetrics.todaysFocusTime || 0)} min focused today
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -475,14 +483,14 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                 </Typography>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2">
-                    Planned Duration: {sessionData.plannedDuration} min
+                    Planned Duration: {Math.round(sessionData.plannedDuration || sessionData.sessionDuration || sessionData.duration || 0)} min
                   </Typography>
                   <Typography variant="body2">
-                    Actual Duration: {sessionData.duration} min
+                    Actual Duration: {Math.round(sessionData.duration || 0)} min
                   </Typography>
                   {sessionData.flowDuration > 0 && (
                     <Typography variant="body2">
-                      Flow State: {sessionData.flowDuration} min
+                      Flow State: {Math.round(sessionData.flowDuration || 0)} min
                     </Typography>
                   )}
                 </Box>
@@ -494,10 +502,10 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                 </Typography>
                 <Box>
                   <Typography variant="body2">
-                    Focus Score: {Math.round(sessionData.focusScore * 100)}%
+                    Focus Score: {Math.round((sessionData.focusScore || 0) * 100)}%
                   </Typography>
                   <Typography variant="body2">
-                    Interruptions: {sessionData.distractionsBlocked}
+                    Interruptions: {sessionData.distractionsBlocked || 0}
                   </Typography>
                   <Typography variant="body2">
                     Task Switches: {sessionData.taskSwitches || 0}

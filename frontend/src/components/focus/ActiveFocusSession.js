@@ -348,14 +348,16 @@ const ActiveFocusSession = ({ onEndSession }) => {
     }).filter(id => id !== null);
     
     onEndSession?.({ 
-      duration: focusSession.timeElapsed,
-      sessionDuration: focusSession.timeElapsed,
+      duration: Math.round(focusSession.timeElapsed),
+      sessionDuration: Math.round(focusSession.timeElapsed),
+      plannedDuration: focusSession.duration,
       tasksCompleted: completedTaskIds.length,
       tasks: cleanTasks,
       completed: completedTaskIds,
       flowDuration: focusSession.flowState && focusSession.flowStartTime 
         ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
         : 0,
+      distractionsBlocked: 0, // TODO: Get from distraction service
       ...endData 
     });
   };
