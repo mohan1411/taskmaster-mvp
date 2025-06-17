@@ -326,9 +326,36 @@ const ActiveFocusSession = ({ onEndSession }) => {
   
   const handleEndSession = async (endData = {}) => {
     await endFocusSession('user_ended', endData);
+    
+    // Clean up task data for display - remove MongoDB properties
+    const allTasks = [...(focusSession.tasks || [])];
+    if (focusSession.currentTask) {
+      allTasks.unshift(focusSession.currentTask);
+    }
+    
+    const cleanTasks = allTasks.map(task => ({
+      id: task._id || task.id,
+      title: task.title,
+      estimatedDuration: task.estimatedDuration
+    }));
+    
+    const completedTaskIds = focusSession.completed.map(task => {
+      if (typeof task === 'string') return task;
+      if (typeof task === 'object' && task !== null) {
+        return task._id || task.id;
+      }
+      return null;
+    }).filter(id => id !== null);
+    
     onEndSession?.({ 
+      duration: focusSession.timeElapsed,
       sessionDuration: focusSession.timeElapsed,
-      tasksCompleted: focusSession.completed,
+      tasksCompleted: completedTaskIds.length,
+      tasks: cleanTasks,
+      completed: completedTaskIds,
+      flowDuration: focusSession.flowState && focusSession.flowStartTime 
+        ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
+        : 0,
       ...endData 
     });
   };

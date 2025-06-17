@@ -339,28 +339,35 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                   Tasks Completed ({sessionData.tasksCompleted}/{sessionData.tasks.length})
                 </Typography>
                 <List dense>
-                  {sessionData.tasks.map((task, index) => (
-                    <ListItem key={index} divider>
-                      <ListItemIcon>
-                        {sessionData.completed.includes(task.id) ? (
-                          <CheckIcon color="success" />
-                        ) : (
-                          <TaskIcon color="disabled" />
+                  {sessionData.tasks.map((task, index) => {
+                    const taskId = typeof task === 'string' ? task : (task.id || task._id);
+                    const taskTitle = typeof task === 'string' ? `Task ${taskId}` : task.title;
+                    const taskDuration = typeof task === 'object' ? task.estimatedDuration : null;
+                    const isCompleted = sessionData.completed.includes(taskId);
+                    
+                    return (
+                      <ListItem key={index} divider>
+                        <ListItemIcon>
+                          {isCompleted ? (
+                            <CheckIcon color="success" />
+                          ) : (
+                            <TaskIcon color="disabled" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={taskTitle}
+                          secondary={taskDuration ? `${taskDuration} min` : null}
+                          sx={{
+                            textDecoration: isCompleted ? 'line-through' : 'none',
+                            opacity: isCompleted ? 0.7 : 1
+                          }}
+                        />
+                        {isCompleted && (
+                          <Chip label="Completed" size="small" color="success" />
                         )}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={task.title}
-                        secondary={task.estimatedDuration ? `${task.estimatedDuration} min` : null}
-                        sx={{
-                          textDecoration: sessionData.completed.includes(task.id) ? 'line-through' : 'none',
-                          opacity: sessionData.completed.includes(task.id) ? 0.7 : 1
-                        }}
-                      />
-                      {sessionData.completed.includes(task.id) && (
-                        <Chip label="Completed" size="small" color="success" />
-                      )}
-                    </ListItem>
-                  ))}
+                      </ListItem>
+                    );
+                  })}
                 </List>
               </CardContent>
             </Card>

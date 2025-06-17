@@ -96,7 +96,6 @@ export const FocusProvider = ({ children }) => {
           
           // Find tasks that haven't been completed yet
           const remainingTasks = allTasks.filter(task => !completedTaskIds.includes(task._id));
-          const completedTasks = allTasks.filter(task => completedTaskIds.includes(task._id));
           const currentTask = remainingTasks[0] || null;
           
           const restoredSession = {
@@ -106,7 +105,7 @@ export const FocusProvider = ({ children }) => {
             startTime: new Date(apiSession.startTime).getTime(),
             duration: apiSession.plannedDuration,
             tasks: remainingTasks.slice(1), // Exclude current task
-            completed: completedTasks,
+            completed: completedTaskIds, // Store only IDs, not full objects
             currentTask: currentTask,
             timeElapsed: Math.floor((Date.now() - new Date(apiSession.startTime).getTime()) / 60000),
             breakTime: apiSession.status === 'paused',
@@ -797,7 +796,7 @@ export const FocusProvider = ({ children }) => {
     
     setFocusSession(prev => ({
       ...prev,
-      completed: [...prev.completed, completedTask],
+      completed: [...prev.completed, completedTask._id || completedTask.id],
       tasks: remainingTasks,
       currentTask: nextTask
     }));
