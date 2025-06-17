@@ -19,7 +19,7 @@ This document outlines the git workflow when working with Claude (AI assistant) 
 
 ### 1. When Claude Makes Code Changes
 
-Claude works in the Windows mount location and commits changes:
+Claude works in the Windows mount location, commits, AND pushes changes:
 
 ```bash
 # Claude's actions (automatic):
@@ -27,22 +27,25 @@ Claude works in the Windows mount location and commits changes:
 # 2. Commits the changes:
 git add .
 git commit -m "Fix: Description of changes"
+# 3. Pushes to GitHub:
+git push origin develop
 ```
 
 ### 2. You Sync Changes to WSL
 
-After Claude commits changes, you sync them to your WSL development environment:
+After Claude pushes changes, you sync them to your WSL development environment:
 
 ```bash
-# Step 1: Push Claude's commits to remote (from WSL)
+# RECOMMENDED METHOD (forces exact sync):
 cd ~/projects/TaskMaster/MVP-Development
-git push origin develop
+git fetch origin
+git reset --hard origin/develop
 
-# Step 2: The changes are now in your WSL environment
-# Your dev server will auto-reload with the changes
+# Alternative (if no local changes):
+git pull origin develop
 ```
 
-**Note**: No need to pull because pushing from WSL automatically updates your local branch with Claude's commits.
+**Important**: Use `git reset --hard` when you want to ensure your WSL environment exactly matches what Claude pushed to GitHub. This avoids any cache or merge issues.
 
 ### 3. Regular Development Workflow
 
@@ -91,13 +94,14 @@ git push origin main
 
 ## Common Scenarios
 
-### Scenario 1: Claude Made Changes
+### Scenario 1: Claude Made and Pushed Changes
 
 ```bash
-# Claude says: "I've committed changes to fix the stat cards"
+# Claude says: "I've pushed changes to fix the stat cards"
 # You run:
 cd ~/projects/TaskMaster/MVP-Development
-git push origin develop
+git fetch origin
+git reset --hard origin/develop
 # Changes are now live in your dev environment
 ```
 
@@ -145,7 +149,7 @@ git diff HEAD~1  # See what changed in the last commit
 
 | Task | Command | Location |
 |------|---------|----------|
-| Push Claude's changes | `git push origin develop` | WSL |
+| Sync Claude's changes | `git fetch origin && git reset --hard origin/develop` | WSL |
 | Start new feature | `git checkout -b feature/name` | WSL |
 | Check changes | `git status` | WSL |
 | View history | `git log --oneline` | WSL |
@@ -154,6 +158,20 @@ git diff HEAD~1  # See what changed in the last commit
 
 ## Troubleshooting
 
+### "Changes not reflecting after git pull"
+```bash
+# This happens when React cache holds old code
+# Solution: Use reset --hard to force sync
+git fetch origin
+git reset --hard origin/develop
+
+# Then clear React cache:
+cd frontend
+rm -rf node_modules/.cache
+rm -rf build
+npm start
+```
+
 ### "Your local changes would be overwritten"
 ```bash
 # If you don't need local changes
@@ -161,7 +179,8 @@ git checkout -- path/to/file
 
 # If you want to keep local changes
 git stash
-git push origin develop
+git fetch origin
+git reset --hard origin/develop
 git stash pop
 ```
 
@@ -204,10 +223,17 @@ git config user.email
 
 ## Summary
 
-1. **Claude** makes and commits changes in Windows location
-2. **You** push those commits from WSL location
+1. **Claude** makes, commits, AND pushes changes from Windows location
+2. **You** sync those changes to WSL using `git fetch && git reset --hard origin/develop`
 3. **All** other git operations happen in WSL
-4. **Never** need to use git from Windows location
+4. **Never** need to manually push Claude's commits
 5. **Always** develop and run servers from WSL location
 
 This workflow ensures security, performance, and consistency while allowing Claude to assist with code changes.
+
+## Quick Command for Syncing Claude's Changes
+
+```bash
+# Copy and paste this when Claude says "I've pushed changes"
+cd ~/projects/TaskMaster/MVP-Development && git fetch origin && git reset --hard origin/develop
+```
