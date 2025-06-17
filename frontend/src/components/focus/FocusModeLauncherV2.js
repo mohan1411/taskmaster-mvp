@@ -60,7 +60,6 @@ const SESSION_TYPES = [
 ];
 
 const FocusModeLauncherV2 = ({ tasks = [] }) => {
-  console.log('FocusModeLauncherV2 loaded - Smart features should be visible');
   const theme = useTheme();
   const navigate = useNavigate();
   const { startFocusSession, focusPreferences, userMetrics, calculateCurrentEnergy } = useFocus();
@@ -96,6 +95,17 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
     // Load recent sessions for smart selection
     loadRecentSessions();
   }, [tasks, duration, useSmartSelection]);
+
+  // Debug effect
+  useEffect(() => {
+    console.log('Smart Selection State:', {
+      useSmartSelection,
+      smartSelectedTasks,
+      selectedTasks,
+      smartCount: smartSelectedTasks.length,
+      manualCount: selectedTasks.length
+    });
+  }, [useSmartSelection, smartSelectedTasks, selectedTasks]);
 
   const loadRecentSessions = async () => {
     try {
@@ -168,21 +178,23 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
   };
 
   const handleStartSession = async () => {
+    const taskIdsToUse = useSmartSelection ? smartSelectedTasks : selectedTasks;
+    
     console.log('Starting focus session with:', {
       duration,
       sessionType,
-      selectedTasks,
-      tasksCount: selectedTasks.length
+      useSmartSelection,
+      taskIds: taskIdsToUse,
+      tasksCount: taskIdsToUse.length
     });
     
-    if (selectedTasks.length === 0) {
+    if (taskIdsToUse.length === 0) {
       alert('Please select at least one task');
       return;
     }
     
     setIsLoading(true);
     try {
-      const taskIdsToUse = useSmartSelection ? smartSelectedTasks : selectedTasks;
       const selectedTaskObjects = tasks.filter(t => taskIdsToUse.includes(t._id || t.id));
       
       console.log('Starting session with tasks:', selectedTaskObjects);
