@@ -60,6 +60,7 @@ const SESSION_TYPES = [
 ];
 
 const FocusModeLauncherV2 = ({ tasks = [] }) => {
+  console.log('FocusModeLauncherV2 loaded - Smart features should be visible');
   const theme = useTheme();
   const navigate = useNavigate();
   const { startFocusSession, focusPreferences, userMetrics, calculateCurrentEnergy } = useFocus();
@@ -239,11 +240,18 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
       }}
     >
       <CardContent sx={{ p: 3 }}>
+        {/* TEST: This should be visible */}
+        <Alert severity="success" sx={{ mb: 2 }}>
+          <Typography variant="body2">
+            🚀 NEW: Smart AI Task Selection is now available! Energy tracking included!
+          </Typography>
+        </Alert>
+        
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: 1 }}>
             <GpsFixed sx={{ color: theme.palette.primary.main }} />
             <Typography variant="h5" component="div">
-              Ready to Focus?
+              Ready to Focus? (v2 with Smart Selection)
             </Typography>
           </Box>
           <IconButton 
