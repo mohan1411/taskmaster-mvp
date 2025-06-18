@@ -4,12 +4,12 @@
 .page-container {
   position: relative !important;
   min-height: calc(100vh - 64px) !important;
-  margin-left: 0 !important; /* Removed gap - content starts right after sidebar */
+  margin-left: 240px !important; /* Account for sidebar width */
   margin-top: 64px !important;
   padding: 20px 24px !important; /* Reduced from 24px 32px */
   box-sizing: border-box !important;
   overflow-y: auto !important;
-  width: 100% !important;
+  width: calc(100% - 240px) !important; /* Subtract sidebar width */
 }
 
 /* Content wrapper */
@@ -155,9 +155,9 @@
   .page-container {
     /* Use viewport-relative units for better cross-environment compatibility */
     position: relative !important;
-    margin-left: 0 !important; /* Removed gap */
+    margin-left: 240px !important; /* Account for sidebar width */
     margin-top: 64px !important;
-    width: 100% !important;
+    width: calc(100% - 240px) !important; /* Subtract sidebar width */
     min-height: calc(100vh - 64px) !important;
     padding: 20px 24px !important;
     box-sizing: border-box !important;
