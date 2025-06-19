@@ -43,6 +43,14 @@ const EmailList = ({
   onExtractTasks,
   onDetectFollowUp
 }) => {
+  console.log('EmailList received props:', { emails, loading, emailsLength: emails?.length });
+  console.log('First email:', emails && emails[0]);
+  console.log('Is emails an array?', Array.isArray(emails));
+  console.log('Emails type:', typeof emails);
+  
+  // Ensure emails is always an array
+  const emailsArray = Array.isArray(emails) ? emails : [];
+  
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -114,7 +122,7 @@ const EmailList = ({
   };
 
   // Filter emails by search term
-  const filteredEmails = emails.filter(email => {
+  const filteredEmails = emailsArray.filter(email => {
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
@@ -126,6 +134,8 @@ const EmailList = ({
       (email.snippet && email.snippet.toLowerCase().includes(searchLower))
     );
   });
+  
+  console.log('Filtered emails:', filteredEmails, 'Count:', filteredEmails.length);
 
   return (
     <Box>
