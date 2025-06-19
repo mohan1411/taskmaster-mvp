@@ -475,49 +475,56 @@ const extractTasksFromEmail = async (req, res) => {
       });
     }
     
-    // Get user settings
-    const settings = await Settings.findOne({ user: req.user._id });
-    
-    if (!settings || !settings.integrations.google.connected) {
-      return res.status(400).json({ message: 'Google integration not connected' });
-    }
-    
-    const tokenInfo = settings.integrations.google.tokenInfo;
-    
-    // Create OAuth2 client
-    const oauth2Client = createOAuth2Client({
-      access_token: tokenInfo.accessToken,
-      refresh_token: tokenInfo.refreshToken,
-    });
-    
-    // Create Gmail API client
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-    
-    // Get full message content
-    const messageData = await gmail.users.messages.get({
-      userId: 'me',
-      id: email.messageId,
-      format: 'full'
-    });
-    
     // Extract message body
     let messageBody = '';
     
-    if (messageData.data.payload.parts) {
-      // Multipart message
-      messageData.data.payload.parts.forEach(part => {
-        if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
-          const bodyData = part.body.data;
-          if (bodyData) {
-            const decodedBody = Buffer.from(bodyData, 'base64').toString('utf8');
-            messageBody += decodedBody;
-          }
-        }
+    // First check if the email has a body stored in the database (for sample/test emails)
+    if (email.body) {
+      console.log('Using email body from database');
+      messageBody = email.body;
+    } else {
+      // Try to fetch from Gmail if connected
+      const settings = await Settings.findOne({ user: req.user._id });
+      
+      if (!settings || !settings.integrations.google.connected) {
+        console.log('Gmail not connected and no body in database');
+        return res.status(400).json({ message: 'Email body not available. Gmail integration not connected.' });
+      }
+      
+      const tokenInfo = settings.integrations.google.tokenInfo;
+      
+      // Create OAuth2 client
+      const oauth2Client = createOAuth2Client({
+        access_token: tokenInfo.accessToken,
+        refresh_token: tokenInfo.refreshToken,
       });
-    } else if (messageData.data.payload.body && messageData.data.payload.body.data) {
-      // Single part message
-      const bodyData = messageData.data.payload.body.data;
-      messageBody = Buffer.from(bodyData, 'base64').toString('utf8');
+      
+      // Create Gmail API client
+      const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+      
+      // Get full message content
+      const messageData = await gmail.users.messages.get({
+        userId: 'me',
+        id: email.messageId,
+        format: 'full'
+      });
+      
+      if (messageData.data.payload.parts) {
+        // Multipart message
+        messageData.data.payload.parts.forEach(part => {
+          if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
+            const bodyData = part.body.data;
+            if (bodyData) {
+              const decodedBody = Buffer.from(bodyData, 'base64').toString('utf8');
+              messageBody += decodedBody;
+            }
+          }
+        });
+      } else if (messageData.data.payload.body && messageData.data.payload.body.data) {
+        // Single part message
+        const bodyData = messageData.data.payload.body.data;
+        messageBody = Buffer.from(bodyData, 'base64').toString('utf8');
+      }
     }
     
     // Strip HTML if present
