@@ -243,7 +243,19 @@ exports.resumeSession = async (req, res) => {
 exports.endSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const { energyLevel, abandoned } = req.body;
+    const { 
+      actualDuration,
+      energyLevel, 
+      completedTasks,
+      focusScore,
+      distractions,
+      flowMetrics,
+      notes,
+      endReason,
+      abandoned 
+    } = req.body;
+    
+    console.log('Ending session with data:', req.body);
 
     const session = await FocusSession.findOne({
       _id: sessionId,
@@ -255,8 +267,41 @@ exports.endSession = async (req, res) => {
       return res.status(404).json({ message: 'Session not found' });
     }
 
+    // Update session with provided data
     if (energyLevel) {
-      session.energyLevel.end = energyLevel;
+      if (typeof energyLevel === 'object' && energyLevel.end) {
+        session.energyLevel.end = energyLevel.end;
+      } else if (typeof energyLevel === 'number') {
+        session.energyLevel.end = energyLevel;
+      }
+    }
+    
+    if (actualDuration) {
+      session.actualDuration = actualDuration;
+    }
+    
+    if (completedTasks && Array.isArray(completedTasks)) {
+      session.completedTasks = completedTasks;
+    }
+    
+    if (focusScore !== undefined) {
+      session.focusScore = focusScore;
+    }
+    
+    if (distractions) {
+      session.distractions = distractions;
+    }
+    
+    if (flowMetrics) {
+      session.flowMetrics = flowMetrics;
+    }
+    
+    if (notes) {
+      session.notes = notes;
+    }
+    
+    if (endReason) {
+      session.endReason = endReason;
     }
 
     if (abandoned) {
