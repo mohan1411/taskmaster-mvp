@@ -31,7 +31,8 @@ const mockOpenAI = {
       });
       
       return {
-        data: response.data
+        data: response.data,
+        status: response.status
       };
     } catch (error) {
       console.error('Error calling OpenAI API:', error.message);
