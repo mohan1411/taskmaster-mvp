@@ -45,13 +45,16 @@ const EmailsPage = () => {
       setError(null);
 
       // Check Gmail connection
-      const { connected } = await emailService.checkGmailConnection();
-      setIsConnected(connected);
-
-      if (connected) {
-        // Load emails if connected
-        await loadEmails();
+      try {
+        const { connected } = await emailService.checkGmailConnection();
+        setIsConnected(connected);
+      } catch (err) {
+        console.log('Gmail not connected, will show local emails');
+        setIsConnected(false);
       }
+
+      // Always load emails (both Gmail and local emails)
+      await loadEmails();
     } catch (err) {
       console.error('Error checking connection:', err);
       setError('Failed to check Gmail connection');
