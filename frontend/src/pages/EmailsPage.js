@@ -104,12 +104,9 @@ const EmailsPage = () => {
 
   const handleConnectionChange = (connected) => {
     setIsConnected(connected);
-    if (connected) {
-      loadEmails();
-    } else {
-      setEmails([]);
-      setEmailStats({ total: 0, unread: 0, synced: 0 });
-    }
+    // Always reload emails - this will show Gmail emails when connected
+    // and local/database emails when not connected
+    loadEmails();
   };
 
   const handleExtractTasks = async (email) => {
