@@ -307,10 +307,27 @@ exports.endSession = async (req, res) => {
     if (abandoned) {
       session.status = 'abandoned';
       session.endTime = new Date();
-      session.actualDuration = Math.round((session.endTime - session.startTime) / 1000 / 60);
+      if (!actualDuration) {
+        session.actualDuration = Math.round((session.endTime - session.startTime) / 1000 / 60);
+      }
     } else {
-      await session.endSession();
+      // Set end time and status
+      session.endTime = new Date();
+      session.status = 'completed';
+      
+      // Use provided actualDuration or calculate it
+      if (!actualDuration) {
+        session.actualDuration = Math.round((session.endTime - session.startTime) / 1000 / 60);
+      }
+      
+      // Calculate focus score if not provided
+      if (focusScore === undefined || focusScore === null) {
+        session.focusScore = session.calculateFocusScore();
+      }
     }
+    
+    // Save the session with all updates
+    await session.save();
 
     // Update focus pattern with session data
     const pattern = await FocusPattern.findOne({ user: req.user._id });
@@ -319,13 +336,18 @@ exports.endSession = async (req, res) => {
     }
 
     // Update task statuses if completed
-    const completedTaskIds = session.tasks
-      .filter(t => t.completed)
-      .map(t => t.task);
+    // Use completedTasks from request if available, otherwise check session.tasks
+    let taskIdsToComplete = completedTasks || [];
     
-    if (completedTaskIds.length > 0) {
+    if (!completedTasks || completedTasks.length === 0) {
+      taskIdsToComplete = session.tasks
+        .filter(t => t.completed)
+        .map(t => t.task);
+    }
+    
+    if (taskIdsToComplete.length > 0) {
       await Task.updateMany(
-        { _id: { $in: completedTaskIds } },
+        { _id: { $in: taskIdsToComplete } },
         { status: 'completed', completedAt: new Date() }
       );
     }
