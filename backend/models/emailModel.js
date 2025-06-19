@@ -46,7 +46,12 @@ const emailSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  // We'll store email content separately, not in DB
+  // Email body - for testing/sample emails only
+  // Production emails fetch body from Gmail API
+  body: {
+    type: String,
+    required: false
+  },
   taskExtracted: {
     type: Boolean,
     default: false
