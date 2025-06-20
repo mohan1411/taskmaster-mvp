@@ -8,6 +8,8 @@ const connectDB = require('./config/db');
 const config = require('./config/config');
 const { scheduleReminderJob } = require('./jobs/reminderJob');
 const { apiLimiter } = require('./middleware/rateLimitMiddleware');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Security dependencies
 let helmet, morgan, mongoSanitize, xss, hpp;
@@ -140,6 +142,12 @@ const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
 const focusRoutes = require('./routes/focusRoutes');
 // const documentRoutes = require('./routes/documentRoutes'); // Temporarily disabled - missing dependencies
 // const testAuthRoutes = require('./routes/testAuthRoutes'); // Temporarily disabled - missing file
+
+// Swagger UI - serve API documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'FizzTask API Documentation'
+}));
 
 // Define API routes
 app.use('/api/auth', userRoutes);
