@@ -140,6 +140,7 @@ const testRoutes = require('./routes/testRoutes');
 const onboardingRoutes = require('./routes/onboardingRoutes');
 const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
 const focusRoutes = require('./routes/focusRoutes');
+const agentRoutes = require('./routes/agentRoutes');
 // const documentRoutes = require('./routes/documentRoutes'); // Temporarily disabled - missing dependencies
 // const testAuthRoutes = require('./routes/testAuthRoutes'); // Temporarily disabled - missing file
 
@@ -162,6 +163,7 @@ app.use('/api/test', testRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/unified-email', unifiedEmailRoutes);
 app.use('/api/focus', focusRoutes);
+app.use('/api/agents', agentRoutes);
 // app.use('/api/documents', documentRoutes); // Temporarily disabled - missing dependencies
 // app.use('/api/test-auth', testAuthRoutes); // Temporarily disabled - missing file
 
