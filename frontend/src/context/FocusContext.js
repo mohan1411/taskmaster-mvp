@@ -556,7 +556,15 @@ export const FocusProvider = ({ children }) => {
         sessionId: focusSession.apiSessionId,
         data: apiEndData
       });
-      await focusService.endSession(focusSession.apiSessionId, apiEndData);
+      try {
+        await focusService.endSession(focusSession.apiSessionId, apiEndData);
+      } catch (apiError) {
+        console.error('API error ending session:', apiError);
+        // If the session is already ended, that's okay - continue with cleanup
+        if (apiError.response?.data?.message !== 'Session already ended') {
+          throw apiError; // Re-throw if it's a different error
+        }
+      }
       
       // Update metrics
       setUserMetrics(prev => ({
@@ -597,6 +605,9 @@ export const FocusProvider = ({ children }) => {
       if (distractionResult.queuedNotifications?.length > 0) {
         apiEndData.distractions.blocked = distractionResult.queuedNotifications.length;
       }
+      
+      // Clear localStorage session before resetting state
+      localStorage.removeItem('fizztask-active-focus-session');
       
       // Reset session state
       setFocusSession({

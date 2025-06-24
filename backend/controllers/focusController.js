@@ -264,6 +264,21 @@ exports.endSession = async (req, res) => {
     });
 
     if (!session) {
+      // Check if session exists but is already completed
+      const existingSession = await FocusSession.findOne({
+        _id: sessionId,
+        user: req.user._id
+      });
+      
+      if (existingSession && existingSession.status === 'completed') {
+        console.log('Session already completed:', sessionId);
+        return res.json({
+          message: 'Session already ended',
+          session: existingSession
+        });
+      }
+      
+      console.error('Session not found or unauthorized:', sessionId);
       return res.status(404).json({ message: 'Session not found' });
     }
 
