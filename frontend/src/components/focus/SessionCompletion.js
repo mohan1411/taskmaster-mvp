@@ -42,7 +42,7 @@ import {
 } from '@mui/icons-material';
 import { useFocus } from '../../context/FocusContext';
 import taskService from '../../services/taskService';
-import { useNotification } from '../../hooks/useNotification';
+import { useNotification } from '../../context/NotificationContext';
 import '../../styles/GlobalPages.css';
 
 // Achievement badges system
