@@ -284,11 +284,11 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
       <div className="page-content">
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }}>
-            Focus Session Complete
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500, color: 'red' }}>
+            🚨 DEBUG MODE - Focus Session Complete 🚨
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Great work! Here's your session summary and achievements.
+          <Typography variant="body1" color="error">
+            If you see this RED text, the component is updating correctly!
           </Typography>
         </Box>
         
