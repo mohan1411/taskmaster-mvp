@@ -124,6 +124,26 @@ export const FocusProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error loading active session:', error);
+        // If we get a 404, clear any stale session from localStorage
+        if (error.response?.status === 404) {
+          console.log('No active session found on server, clearing localStorage');
+          localStorage.removeItem('fizztask-active-focus-session');
+          setFocusSession({
+            active: false,
+            id: null,
+            apiSessionId: null,
+            startTime: null,
+            duration: 0,
+            tasks: [],
+            completed: [],
+            currentTask: null,
+            timeElapsed: 0,
+            breakTime: false,
+            flowState: false,
+            flowStartTime: null,
+            status: null
+          });
+        }
       }
     };
     
@@ -560,10 +580,16 @@ export const FocusProvider = ({ children }) => {
         await focusService.endSession(focusSession.apiSessionId, apiEndData);
       } catch (apiError) {
         console.error('API error ending session:', apiError);
-        // If the session is already ended, that's okay - continue with cleanup
-        if (apiError.response?.data?.message !== 'Session already ended') {
+        // If the session is already ended or not found, that's okay - continue with cleanup
+        const errorMessage = apiError.response?.data?.message || '';
+        const isSessionNotFound = apiError.response?.status === 404;
+        const isSessionAlreadyEnded = errorMessage === 'Session already ended';
+        
+        if (!isSessionNotFound && !isSessionAlreadyEnded) {
           throw apiError; // Re-throw if it's a different error
         }
+        
+        console.log('Session not found or already ended - continuing with local cleanup');
       }
       
       // Update metrics

@@ -278,7 +278,11 @@ exports.endSession = async (req, res) => {
         });
       }
       
-      console.error('Session not found or unauthorized:', sessionId);
+      console.error('Session not found or unauthorized:', {
+        sessionId,
+        userId: req.user._id,
+        existingSession: existingSession ? 'exists but different status' : 'does not exist'
+      });
       return res.status(404).json({ message: 'Session not found' });
     }
 
