@@ -179,6 +179,13 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
     const achievements = checkAchievements(sessionData, userMetrics);
     setNewAchievements(achievements);
     
+    console.log('SessionCompletion received data:', {
+      sessionData,
+      tasks: sessionData.tasks,
+      completed: sessionData.completed,
+      tasksCompleted: sessionData.tasksCompleted
+    });
+    
     // Log session completion
     logFocusEvent('session_completed_view', {
       sessionId: sessionData.sessionId,
@@ -444,12 +451,21 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     const isCompleted = sessionData.completed.includes(taskId);
                     const isPendingCompletion = pendingTaskCompletions.has(taskId);
                     
+                    console.log('Task in SessionCompletion:', {
+                      task,
+                      taskId,
+                      taskTitle,
+                      isCompleted,
+                      completedArray: sessionData.completed,
+                      shouldShowCheckbox: !isCompleted
+                    });
+                    
                     return (
                       <ListItem 
                         key={index} 
                         divider
                         secondaryAction={
-                          !isCompleted && (
+                          !isCompleted ? (
                             <Tooltip title="Mark as completed">
                               <Checkbox
                                 edge="end"
@@ -460,7 +476,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                                 disabled={isUpdatingTasks}
                               />
                             </Tooltip>
-                          )
+                          ) : null
                         }
                       >
                         <ListItemIcon>
@@ -493,7 +509,10 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                 }) && (
                   <Alert severity="info" sx={{ mt: 2 }}>
                     <Typography variant="body2">
-                      Did you complete any tasks you forgot to mark during the session? Check them above!
+                      Did you complete any tasks you forgot to mark during the session? Check the boxes above to mark them as complete!
+                    </Typography>
+                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                      Look for checkboxes on the right side of each uncompleted task.
                     </Typography>
                   </Alert>
                 )}
