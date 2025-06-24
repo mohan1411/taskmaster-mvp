@@ -424,6 +424,12 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           </Card>
           
           {/* Task Summary */}
+          {console.log('Before task rendering:', {
+            hasTasks: !!sessionData.tasks,
+            tasksLength: sessionData.tasks?.length,
+            tasks: sessionData.tasks,
+            condition: sessionData.tasks && sessionData.tasks.length > 0
+          })}
           {sessionData.tasks && sessionData.tasks.length > 0 && (
             <Card sx={{ mt: 2, border: 2, borderColor: 'primary.main' }}>
               <CardContent>
