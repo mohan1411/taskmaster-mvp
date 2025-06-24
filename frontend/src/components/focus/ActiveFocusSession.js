@@ -277,6 +277,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
   const [breakType, setBreakType] = useState('short-break');
   const [distractionStatus, setDistractionStatus] = useState(null);
   const [isEndingSession, setIsEndingSession] = useState(false);
+  const isEndingSessionRef = useRef(false);
   
   // Calculate session stats
   const tasksCompleted = focusSession.completed?.length || 0;
@@ -326,9 +327,14 @@ const ActiveFocusSession = ({ onEndSession }) => {
   }, [focusSession.timeElapsed, focusPreferences.breakRatio, focusSession.breakTime]);
   
   const handleEndSession = async (endData = {}) => {
-    if (isEndingSession) return; // Prevent multiple clicks
+    if (isEndingSession || isEndingSessionRef.current) {
+      console.log('End session already in progress, ignoring click');
+      return; // Prevent multiple clicks
+    }
     
+    console.log('Starting end session process');
     setIsEndingSession(true);
+    isEndingSessionRef.current = true;
     try {
       // Capture session data BEFORE ending the session (which resets the state)
       const allTasks = [...(focusSession.tasks || [])];
@@ -373,6 +379,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
     } catch (error) {
       console.error('Error in handleEndSession:', error);
       setIsEndingSession(false); // Reset loading state on error
+      isEndingSessionRef.current = false;
       // Still try to call onEndSession with minimal data
       const fallbackData = { 
         duration: focusSession.timeElapsed || 0,
