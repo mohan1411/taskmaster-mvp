@@ -170,6 +170,15 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
   const [pendingTaskCompletions, setPendingTaskCompletions] = useState(new Set());
   const [isUpdatingTasks, setIsUpdatingTasks] = useState(false);
   
+  // Debug logging
+  console.log('=== SessionCompletion Debug ===');
+  console.log('Component mounted/rendered');
+  console.log('sessionData:', sessionData);
+  console.log('sessionData.tasks:', sessionData?.tasks);
+  console.log('tasks type:', typeof sessionData?.tasks);
+  console.log('tasks length:', sessionData?.tasks?.length);
+  console.log('=== End Debug ===');
+  
   const sessionScore = calculateSessionScore(sessionData);
   const duration = sessionData.duration || 0;
   const plannedDuration = sessionData.plannedDuration || sessionData.sessionDuration || duration || 1;
@@ -424,6 +433,11 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           </Card>
           
           {/* Task Summary */}
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            DEBUG: Tasks = {JSON.stringify(sessionData.tasks)} | 
+            Length = {sessionData.tasks?.length} | 
+            Has tasks = {sessionData.tasks ? 'YES' : 'NO'}
+          </Alert>
           {console.log('Before task rendering:', {
             hasTasks: !!sessionData.tasks,
             tasksLength: sessionData.tasks?.length,
