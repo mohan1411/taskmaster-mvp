@@ -326,9 +326,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
   
   const handleEndSession = async (endData = {}) => {
     try {
-      await endFocusSession('user_ended', endData);
-      
-      // Clean up task data for display - remove MongoDB properties
+      // Capture session data BEFORE ending the session (which resets the state)
       const allTasks = [...(focusSession.tasks || [])];
       if (focusSession.currentTask) {
         allTasks.unshift(focusSession.currentTask);
@@ -348,7 +346,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
         return null;
       }).filter(id => id !== null);
       
-      onEndSession?.({ 
+      const sessionData = { 
         duration: Math.round(focusSession.timeElapsed || 0),
         sessionDuration: Math.round(focusSession.timeElapsed || 0),
         plannedDuration: focusSession.duration || 0,
@@ -358,23 +356,31 @@ const ActiveFocusSession = ({ onEndSession }) => {
         flowDuration: focusSession.flowState && focusSession.flowStartTime 
           ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
           : 0,
-        distractionsBlocked: 0, // TODO: Get from distraction service
+        distractionsBlocked: distractionStatus.queuedNotifications || 0,
         ...endData 
-      });
+      };
+      
+      // Call the callback FIRST (before the session state is reset)
+      onEndSession?.(sessionData);
+      
+      // THEN end the session (which will reset the state)
+      await endFocusSession('user_ended', endData);
+      
     } catch (error) {
       console.error('Error in handleEndSession:', error);
       // Still try to call onEndSession with minimal data
-      onEndSession?.({ 
-        duration: 0,
-        sessionDuration: 0,
-        plannedDuration: 0,
-        tasksCompleted: 0,
+      const fallbackData = { 
+        duration: focusSession.timeElapsed || 0,
+        sessionDuration: focusSession.timeElapsed || 0,
+        plannedDuration: focusSession.duration || 0,
+        tasksCompleted: focusSession.completed.length || 0,
         tasks: [],
         completed: [],
         flowDuration: 0,
         distractionsBlocked: 0,
         ...endData 
-      });
+      };
+      onEndSession?.(fallbackData);
     }
   };
   
