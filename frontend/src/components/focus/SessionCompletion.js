@@ -443,7 +443,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     </Button>
                   )}
                 </Box>
-                <List dense sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
+                <Box sx={{ bgcolor: 'background.paper', borderRadius: 1, p: 1 }}>
                   {sessionData.tasks.map((task, index) => {
                     const taskId = typeof task === 'string' ? task : (task.id || task._id);
                     const taskTitle = typeof task === 'string' ? `Task ${taskId}` : task.title;
@@ -461,43 +461,22 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     });
                     
                     return (
-                      <ListItem 
-                        key={index} 
-                        divider
+                      <Box 
+                        key={index}
                         sx={{ 
-                          pr: 8,
-                          bgcolor: isPendingCompletion ? 'action.selected' : 'transparent',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          p: 2,
+                          mb: 1,
+                          border: 1,
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          bgcolor: isPendingCompletion ? 'action.selected' : 'background.paper',
                           '&:hover': { bgcolor: 'action.hover' }
                         }}
-                        secondaryAction={
-                          !isCompleted ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              {!isPendingCompletion && (
-                                <Chip 
-                                  label="Click to complete →" 
-                                  size="small" 
-                                  color="info"
-                                  sx={{ fontSize: '0.75rem' }}
-                                />
-                              )}
-                              <Checkbox
-                                checked={isPendingCompletion}
-                                onChange={() => handleTaskCompletionToggle(taskId)}
-                                icon={<UncheckedIcon />}
-                                checkedIcon={<CompletedIcon />}
-                                disabled={isUpdatingTasks}
-                                sx={{
-                                  '& .MuiSvgIcon-root': { fontSize: 28 },
-                                  bgcolor: 'background.paper',
-                                  borderRadius: 1,
-                                  p: 0.5
-                                }}
-                              />
-                            </Box>
-                          ) : null
-                        }
                       >
-                        <ListItemIcon>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           {isCompleted ? (
                             <CheckIcon color="success" />
                           ) : isPendingCompletion ? (
@@ -505,22 +484,58 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                           ) : (
                             <TaskIcon color="disabled" />
                           )}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={taskTitle}
-                          secondary={taskDuration ? `${taskDuration} min` : null}
-                          sx={{
-                            textDecoration: isCompleted ? 'line-through' : 'none',
-                            opacity: isCompleted ? 0.7 : 1
-                          }}
-                        />
-                        {isCompleted && (
-                          <Chip label="Completed" size="small" color="success" />
-                        )}
-                      </ListItem>
+                          <Box>
+                            <Typography 
+                              variant="body1"
+                              sx={{
+                                textDecoration: isCompleted ? 'line-through' : 'none',
+                                opacity: isCompleted ? 0.7 : 1
+                              }}
+                            >
+                              {taskTitle}
+                            </Typography>
+                            {taskDuration && (
+                              <Typography variant="caption" color="text.secondary">
+                                {taskDuration} min
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {isCompleted ? (
+                            <Chip label="Completed" size="small" color="success" />
+                          ) : (
+                            <>
+                              {!isPendingCompletion && (
+                                <Typography variant="caption" color="info.main" sx={{ mr: 1 }}>
+                                  Click checkbox →
+                                </Typography>
+                              )}
+                              <Checkbox
+                                checked={isPendingCompletion}
+                                onChange={() => handleTaskCompletionToggle(taskId)}
+                                disabled={isUpdatingTasks}
+                                sx={{
+                                  '& .MuiSvgIcon-root': { 
+                                    fontSize: 32,
+                                    color: isPendingCompletion ? 'primary.main' : 'action.active'
+                                  },
+                                  bgcolor: 'background.default',
+                                  borderRadius: 1,
+                                  p: 1,
+                                  '&:hover': {
+                                    bgcolor: 'action.hover'
+                                  }
+                                }}
+                              />
+                            </>
+                          )}
+                        </Box>
+                      </Box>
                     );
                   })}
-                </List>
+                </Box>
                 {sessionData.tasks.some(task => {
                   const taskId = typeof task === 'string' ? task : (task.id || task._id);
                   return !sessionData.completed.includes(taskId);
