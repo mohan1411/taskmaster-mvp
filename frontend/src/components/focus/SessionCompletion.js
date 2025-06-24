@@ -425,7 +425,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           
           {/* Task Summary */}
           {sessionData.tasks && sessionData.tasks.length > 0 && (
-            <Card sx={{ mt: 2 }}>
+            <Card sx={{ mt: 2, border: 2, borderColor: 'primary.main' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -443,7 +443,7 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     </Button>
                   )}
                 </Box>
-                <List dense>
+                <List dense sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
                   {sessionData.tasks.map((task, index) => {
                     const taskId = typeof task === 'string' ? task : (task.id || task._id);
                     const taskTitle = typeof task === 'string' ? `Task ${taskId}` : task.title;
@@ -464,18 +464,36 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                       <ListItem 
                         key={index} 
                         divider
+                        sx={{ 
+                          pr: 8,
+                          bgcolor: isPendingCompletion ? 'action.selected' : 'transparent',
+                          '&:hover': { bgcolor: 'action.hover' }
+                        }}
                         secondaryAction={
                           !isCompleted ? (
-                            <Tooltip title="Mark as completed">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {!isPendingCompletion && (
+                                <Chip 
+                                  label="Click to complete →" 
+                                  size="small" 
+                                  color="info"
+                                  sx={{ fontSize: '0.75rem' }}
+                                />
+                              )}
                               <Checkbox
-                                edge="end"
                                 checked={isPendingCompletion}
                                 onChange={() => handleTaskCompletionToggle(taskId)}
                                 icon={<UncheckedIcon />}
                                 checkedIcon={<CompletedIcon />}
                                 disabled={isUpdatingTasks}
+                                sx={{
+                                  '& .MuiSvgIcon-root': { fontSize: 28 },
+                                  bgcolor: 'background.paper',
+                                  borderRadius: 1,
+                                  p: 0.5
+                                }}
                               />
-                            </Tooltip>
+                            </Box>
                           ) : null
                         }
                       >
