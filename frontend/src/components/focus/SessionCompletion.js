@@ -19,7 +19,10 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Rating
+  Rating,
+  Checkbox,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import {
   CheckCircle as CheckIcon,
@@ -33,9 +36,13 @@ import {
   Assignment as TaskIcon,
   Block as BlockIcon,
   LocalFireDepartment as StreakIcon,
-  EmojiEvents as TrophyIcon
+  EmojiEvents as TrophyIcon,
+  RadioButtonUnchecked as UncheckedIcon,
+  CheckCircleOutline as CompletedIcon
 } from '@mui/icons-material';
 import { useFocus } from '../../context/FocusContext';
+import taskService from '../../services/taskService';
+import { useNotification } from '../../hooks/useNotification';
 import '../../styles/GlobalPages.css';
 
 // Achievement badges system
@@ -155,10 +162,13 @@ const checkAchievements = (sessionData, userMetrics) => {
 
 const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }) => {
   const { userMetrics, logFocusEvent } = useFocus();
+  const { showSuccess, showError } = useNotification();
   const navigate = useNavigate();
   const [sessionRating, setSessionRating] = useState(0);
   const [sessionNotes, setSessionNotes] = useState('');
   const [newAchievements, setNewAchievements] = useState([]);
+  const [pendingTaskCompletions, setPendingTaskCompletions] = useState(new Set());
+  const [isUpdatingTasks, setIsUpdatingTasks] = useState(false);
   
   const sessionScore = calculateSessionScore(sessionData);
   const duration = sessionData.duration || 0;
@@ -191,6 +201,48 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
     } else {
       navigator.clipboard.writeText(shareText);
       // Could show a toast notification here
+    }
+  };
+  
+  const handleTaskCompletionToggle = (taskId) => {
+    setPendingTaskCompletions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+  
+  const handleUpdateTaskCompletions = async () => {
+    if (pendingTaskCompletions.size === 0) return;
+    
+    setIsUpdatingTasks(true);
+    try {
+      // Update each task
+      const updatePromises = Array.from(pendingTaskCompletions).map(taskId =>
+        taskService.updateTaskStatus(taskId, 'completed')
+      );
+      
+      await Promise.all(updatePromises);
+      
+      showSuccess(`${pendingTaskCompletions.size} task(s) marked as completed`);
+      
+      // Clear the pending completions
+      setPendingTaskCompletions(new Set());
+      
+      // Log the event
+      logFocusEvent('post_session_task_completion', {
+        taskIds: Array.from(pendingTaskCompletions),
+        count: pendingTaskCompletions.size
+      });
+    } catch (error) {
+      console.error('Error updating task completions:', error);
+      showError('Failed to update task status');
+    } finally {
+      setIsUpdatingTasks(false);
     }
   };
   
@@ -368,21 +420,54 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           {sessionData.tasks && sessionData.tasks.length > 0 && (
             <Card sx={{ mt: 2 }}>
               <CardContent>
-                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <TaskIcon color="primary" /> Tasks Completed ({sessionData.tasksCompleted}/{sessionData.tasks.length})
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <TaskIcon color="primary" /> Tasks ({sessionData.tasksCompleted}/{sessionData.tasks.length})
+                  </Typography>
+                  {pendingTaskCompletions.size > 0 && (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={handleUpdateTaskCompletions}
+                      disabled={isUpdatingTasks}
+                      startIcon={<CheckIcon />}
+                    >
+                      Mark {pendingTaskCompletions.size} as Complete
+                    </Button>
+                  )}
+                </Box>
                 <List dense>
                   {sessionData.tasks.map((task, index) => {
                     const taskId = typeof task === 'string' ? task : (task.id || task._id);
                     const taskTitle = typeof task === 'string' ? `Task ${taskId}` : task.title;
                     const taskDuration = typeof task === 'object' ? task.estimatedDuration : null;
                     const isCompleted = sessionData.completed.includes(taskId);
+                    const isPendingCompletion = pendingTaskCompletions.has(taskId);
                     
                     return (
-                      <ListItem key={index} divider>
+                      <ListItem 
+                        key={index} 
+                        divider
+                        secondaryAction={
+                          !isCompleted && (
+                            <Tooltip title="Mark as completed">
+                              <Checkbox
+                                edge="end"
+                                checked={isPendingCompletion}
+                                onChange={() => handleTaskCompletionToggle(taskId)}
+                                icon={<UncheckedIcon />}
+                                checkedIcon={<CompletedIcon />}
+                                disabled={isUpdatingTasks}
+                              />
+                            </Tooltip>
+                          )
+                        }
+                      >
                         <ListItemIcon>
                           {isCompleted ? (
                             <CheckIcon color="success" />
+                          ) : isPendingCompletion ? (
+                            <CompletedIcon color="primary" />
                           ) : (
                             <TaskIcon color="disabled" />
                           )}
@@ -402,6 +487,16 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     );
                   })}
                 </List>
+                {sessionData.tasks.some(task => {
+                  const taskId = typeof task === 'string' ? task : (task.id || task._id);
+                  return !sessionData.completed.includes(taskId);
+                }) && (
+                  <Alert severity="info" sx={{ mt: 2 }}>
+                    <Typography variant="body2">
+                      Did you complete any tasks you forgot to mark during the session? Check them above!
+                    </Typography>
+                  </Alert>
+                )}
               </CardContent>
             </Card>
           )}
