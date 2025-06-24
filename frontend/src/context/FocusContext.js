@@ -487,7 +487,17 @@ export const FocusProvider = ({ children }) => {
   
   // End focus session
   const endFocusSession = useCallback(async (reason = 'completed', endData = {}) => {
-    if (!focusSession.active || !focusSession.apiSessionId) return;
+    console.log('endFocusSession called:', {
+      active: focusSession.active,
+      apiSessionId: focusSession.apiSessionId,
+      reason,
+      endData
+    });
+    
+    if (!focusSession.active || !focusSession.apiSessionId) {
+      console.error('Cannot end session - session not active or missing apiSessionId');
+      return;
+    }
     
     // Define variables outside try block so they're accessible in catch
     let sessionDuration = 0;

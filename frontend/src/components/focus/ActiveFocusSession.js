@@ -276,6 +276,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
   const [inBreakMode, setInBreakMode] = useState(false);
   const [breakType, setBreakType] = useState('short-break');
   const [distractionStatus, setDistractionStatus] = useState(null);
+  const [isEndingSession, setIsEndingSession] = useState(false);
   
   // Calculate session stats
   const tasksCompleted = focusSession.completed?.length || 0;
@@ -325,6 +326,9 @@ const ActiveFocusSession = ({ onEndSession }) => {
   }, [focusSession.timeElapsed, focusPreferences.breakRatio, focusSession.breakTime]);
   
   const handleEndSession = async (endData = {}) => {
+    if (isEndingSession) return; // Prevent multiple clicks
+    
+    setIsEndingSession(true);
     try {
       // Capture session data BEFORE ending the session (which resets the state)
       const allTasks = [...(focusSession.tasks || [])];
@@ -368,6 +372,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
       
     } catch (error) {
       console.error('Error in handleEndSession:', error);
+      setIsEndingSession(false); // Reset loading state on error
       // Still try to call onEndSession with minimal data
       const fallbackData = { 
         duration: focusSession.timeElapsed || 0,
@@ -578,7 +583,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
             </Tooltip>
             
             <Tooltip title="End Session">
-              <IconButton onClick={handleEndSession} color="error">
+              <IconButton onClick={handleEndSession} color="error" disabled={isEndingSession}>
                 <CloseIcon />
               </IconButton>
             </Tooltip>
@@ -874,6 +879,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
             startIcon={<StopIcon />}
             onClick={handleEndSession}
             size="large"
+            disabled={isEndingSession}
             sx={{ 
               borderRadius: 2,
               px: 3,
@@ -886,7 +892,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
               transition: 'all 0.2s ease'
             }}
           >
-            End Session
+            {isEndingSession ? 'Ending...' : 'End Session'}
           </Button>
         </Box>
         
