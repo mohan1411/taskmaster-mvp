@@ -170,15 +170,6 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
   const [pendingTaskCompletions, setPendingTaskCompletions] = useState(new Set());
   const [isUpdatingTasks, setIsUpdatingTasks] = useState(false);
   
-  // Debug logging
-  console.log('=== SessionCompletion Debug ===');
-  console.log('Component mounted/rendered');
-  console.log('sessionData:', sessionData);
-  console.log('sessionData.tasks:', sessionData?.tasks);
-  console.log('tasks type:', typeof sessionData?.tasks);
-  console.log('tasks length:', sessionData?.tasks?.length);
-  console.log('=== End Debug ===');
-  
   const sessionScore = calculateSessionScore(sessionData);
   const duration = sessionData.duration || 0;
   const plannedDuration = sessionData.plannedDuration || sessionData.sessionDuration || duration || 1;
@@ -187,13 +178,6 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
   useEffect(() => {
     const achievements = checkAchievements(sessionData, userMetrics);
     setNewAchievements(achievements);
-    
-    console.log('SessionCompletion received data:', {
-      sessionData,
-      tasks: sessionData.tasks,
-      completed: sessionData.completed,
-      tasksCompleted: sessionData.tasksCompleted
-    });
     
     // Log session completion
     logFocusEvent('session_completed_view', {
@@ -284,11 +268,11 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
       <div className="page-content">
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500, color: 'red' }}>
-            🚨 DEBUG MODE - Focus Session Complete 🚨
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }}>
+            Focus Session Complete
           </Typography>
-          <Typography variant="body1" color="error">
-            If you see this RED text, the component is updating correctly!
+          <Typography variant="body1" color="text.secondary">
+            Great work! Here's your session summary and achievements.
           </Typography>
         </Box>
         
@@ -433,17 +417,6 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
           </Card>
           
           {/* Task Summary */}
-          <Alert severity="warning" sx={{ mt: 2 }}>
-            DEBUG: Tasks = {JSON.stringify(sessionData.tasks)} | 
-            Length = {sessionData.tasks?.length} | 
-            Has tasks = {sessionData.tasks ? 'YES' : 'NO'}
-          </Alert>
-          {console.log('Before task rendering:', {
-            hasTasks: !!sessionData.tasks,
-            tasksLength: sessionData.tasks?.length,
-            tasks: sessionData.tasks,
-            condition: sessionData.tasks && sessionData.tasks.length > 0
-          })}
           {sessionData.tasks && sessionData.tasks.length > 0 && (
             <Card sx={{ mt: 2, border: 2, borderColor: 'primary.main' }}>
               <CardContent>
@@ -471,14 +444,6 @@ const SessionCompletion = ({ sessionData, onStartNew, onViewAnalytics, onClose }
                     const isCompleted = sessionData.completed.includes(taskId);
                     const isPendingCompletion = pendingTaskCompletions.has(taskId);
                     
-                    console.log('Task in SessionCompletion:', {
-                      task,
-                      taskId,
-                      taskTitle,
-                      isCompleted,
-                      completedArray: sessionData.completed,
-                      shouldShowCheckbox: !isCompleted
-                    });
                     
                     return (
                       <Box 
