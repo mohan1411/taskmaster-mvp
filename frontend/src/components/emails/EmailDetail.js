@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme, useMediaQuery } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Paper,
@@ -21,7 +21,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  LinearProgress
+  LinearProgress,
+  useMediaQuery
 } from '@mui/material';
 import {
   Close as CloseIcon,
