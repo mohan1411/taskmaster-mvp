@@ -91,7 +91,7 @@ const FocusModeLauncher = ({ tasks = [], onStartSession }) => {
   const navigate = useNavigate();
   
   const [expanded, setExpanded] = useState(false);
-  const [customDuration, setCustomDuration] = useState(focusPreferences.defaultDuration || 90);
+  const [customDuration, setCustomDuration] = useState(focusPreferences.defaultDuration || 25);
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [environment, setEnvironment] = useState({
     ambientSound: focusPreferences.ambientSound || 'lofi',
@@ -385,14 +385,17 @@ const FocusModeLauncher = ({ tasks = [], onStartSession }) => {
                   value={customDuration}
                   onChange={(e, value) => setCustomDuration(value)}
                   min={15}
-                  max={180}
+                  max={120}
                   step={5}
                   marks={[
+                    { value: 15, label: '15m' },
                     { value: 25, label: '25m' },
+                    { value: 45, label: '45m' },
                     { value: 60, label: '1h' },
                     { value: 90, label: '1.5h' },
                     { value: 120, label: '2h' }
                   ]}
+                  valueLabelDisplay="auto"
                 />
               </Grid>
               
