@@ -244,8 +244,16 @@ const SessionHistoryChart = ({ sessions, timeRange = '7d' }) => {
                   style={{ fontSize: '0.875rem' }}
                 />
                 <YAxis 
+                  yAxisId="left"
                   stroke={theme.palette.text.secondary}
                   style={{ fontSize: '0.875rem' }}
+                />
+                <YAxis 
+                  yAxisId="right"
+                  orientation="right"
+                  stroke={theme.palette.text.secondary}
+                  style={{ fontSize: '0.875rem' }}
+                  domain={[0, 100]}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
@@ -256,6 +264,7 @@ const SessionHistoryChart = ({ sessions, timeRange = '7d' }) => {
                   strokeWidth={2}
                   dot={{ fill: theme.palette.primary.main }}
                   name="Focus Hours"
+                  yAxisId="left"
                 />
                 <Line
                   type="monotone"
