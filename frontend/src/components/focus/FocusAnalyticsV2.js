@@ -272,7 +272,7 @@ const FocusAnalyticsV2 = () => {
                 Tasks Completed
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Score: {stats.avgScore}/100
+                {stats.totalSessions > 0 ? `Score: ${stats.avgScore}/100` : 'No focus sessions yet'}
               </Typography>
             </CardContent>
           </Card>
