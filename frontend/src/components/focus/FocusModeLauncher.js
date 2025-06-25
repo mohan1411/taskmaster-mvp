@@ -386,11 +386,11 @@ const FocusModeLauncher = ({ tasks = [], onStartSession }) => {
                   onChange={(e, value) => setCustomDuration(value)}
                   min={15}
                   max={180}
-                  step={15}
+                  step={5}
                   marks={[
                     { value: 25, label: '25m' },
-                    { value: 45, label: '45m' },
-                    { value: 90, label: '90m' },
+                    { value: 60, label: '1h' },
+                    { value: 90, label: '1.5h' },
                     { value: 120, label: '2h' }
                   ]}
                 />
