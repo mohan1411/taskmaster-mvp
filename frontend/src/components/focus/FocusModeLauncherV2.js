@@ -117,10 +117,9 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
   };
 
   const loadSuggestedTasks = async () => {
-    // Filter incomplete tasks
+    // Filter incomplete tasks - include all priority levels
     const incompleteTasks = tasks.filter(task => 
       task.status !== 'completed' && 
-      task.priority !== 'low' &&
       (!task.estimatedDuration || task.estimatedDuration <= duration)
     );
 
