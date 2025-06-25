@@ -25,6 +25,7 @@ import {
 import { useFocus } from '../../context/FocusContext';
 import { useTasks } from '../../hooks/useTasks';
 import focusService from '../../services/focusService';
+import taskService from '../../services/taskService';
 import SessionHistoryChart from './analytics/SessionHistoryChart';
 import ProductivityHeatmap from './analytics/ProductivityHeatmap';
 import FocusInsights from './analytics/FocusInsights';
@@ -48,6 +49,7 @@ const FocusAnalyticsV2 = () => {
     stats: null,
     pattern: null
   });
+  const [completedTasksCount, setCompletedTasksCount] = useState(0);
 
   useEffect(() => {
     fetchAnalyticsData();
@@ -59,14 +61,18 @@ const FocusAnalyticsV2 = () => {
     
     try {
       // Fetch multiple data sources in parallel
-      const [sessionsRes, statsRes, patternRes] = await Promise.all([
+      const [sessionsRes, statsRes, patternRes, tasksRes] = await Promise.all([
         focusService.getSessionHistory({ 
           days: timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 7 
         }),
         focusService.getFocusStats(
           timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 7
         ),
-        focusService.getFocusPattern()
+        focusService.getFocusPattern(),
+        taskService.getTasks({ 
+          status: 'completed',
+          limit: 1000
+        })
       ]);
 
       setAnalyticsData({
@@ -74,6 +80,9 @@ const FocusAnalyticsV2 = () => {
         stats: statsRes,
         pattern: patternRes
       });
+      
+      // Set the total completed tasks count
+      setCompletedTasksCount(tasksRes.total || tasksRes.tasks.length);
     } catch (err) {
       console.error('Error fetching analytics:', err);
       setError('Failed to load analytics data');
@@ -257,7 +266,7 @@ const FocusAnalyticsV2 = () => {
                 <TaskIcon />
               </Avatar>
               <Typography variant="h4" color="success.main" sx={{ fontSize: '1.75rem' }}>
-                {stats.totalTasks}
+                {completedTasksCount}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Tasks Completed
