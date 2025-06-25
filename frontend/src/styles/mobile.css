@@ -185,11 +185,11 @@ html, body {
 
 /* Mobile-optimized cards */
 @media (max-width: 600px) {
-  /* Full width cards with reduced padding */
+  /* Full width cards with proper spacing */
   .MuiCard-root {
-    margin-left: -8px;
-    margin-right: -8px;
-    border-radius: 0;
+    width: 100%;
+    margin: 0;
+    border-radius: 8px;
   }
   
   /* Stacked card actions */

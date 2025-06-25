@@ -190,7 +190,9 @@ const DashboardPage = () => {
       sx={{ 
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.2s',
-        minHeight: { xs: 110, sm: 'auto' },
+        minHeight: { xs: 100, sm: 'auto' },
+        width: '100%',
+        height: '100%',
         '&:hover': onClick ? { 
           transform: 'translateY(-2px)', 
           boxShadow: 3
@@ -286,8 +288,8 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: { xs: 3, sm: 4 } }}>
-          <Grid item xs={6} sm={6} md={3}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 3, sm: 4 }, mx: { xs: -1, sm: 0 } }}>
+          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
             <StatCard
               title="Active Tasks"
               value={stats.pendingTasks}
@@ -295,7 +297,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={6} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
             <StatCard
               title="Overdue"
               value={stats.overdueCount}
@@ -303,7 +305,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={6} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
             <StatCard
               title="Follow-ups"
               value={stats.followUpCount}
@@ -311,7 +313,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/followups')}
             />
           </Grid>
-          <Grid item xs={6} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
             <StatCard
               title="Unread Emails"
               value={stats.unreadEmailCount}
@@ -325,7 +327,7 @@ const DashboardPage = () => {
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
           {/* Due Today section - Compact */}
           <Grid item xs={12} md={4}>
-            <Paper sx={{ height: '100%' }}>
+            <Paper sx={{ height: '100%', width: '100%' }}>
               <Box 
                 sx={{ 
                   p: 2, 

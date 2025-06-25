@@ -21,6 +21,15 @@
   min-height: 100% !important;
 }
 
+/* Mobile content wrapper */
+@media (max-width: 900px) {
+  .page-content {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
 /* Compact Typography Scale */
 .page-container h1 {
   font-size: 1.75rem !important; /* Reduced from 2rem */
@@ -113,8 +122,9 @@
     margin-left: 0 !important;
     width: 100% !important;
     margin-top: 56px !important;
-    padding: 16px !important;
+    padding: 12px !important;
     min-height: calc(100vh - 56px) !important;
+    max-width: 100% !important;
   }
   
   .cards-grid-2,

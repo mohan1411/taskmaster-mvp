@@ -4,10 +4,17 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* Force consistent container behavior for dashboard */
@@ -16,6 +23,13 @@ body {
   margin: 0 auto !important;
   padding: 0 24px !important;
   width: 100% !important;
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
 }
 
 .full-height {
