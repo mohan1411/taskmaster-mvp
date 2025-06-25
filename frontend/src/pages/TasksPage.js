@@ -324,8 +324,8 @@ const TasksPage = () => {
         severity: 'success'
       });
       
-      // Refresh stats when status changes
-      fetchTaskStats();
+      // Refresh completed count when status changes
+      fetchCompletedCount();
       
     } catch (err) {
       console.error('Error updating task status:', err);
