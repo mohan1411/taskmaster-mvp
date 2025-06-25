@@ -1,6 +1,7 @@
 {
   "short_name": "FizzTask",
   "name": "FizzTask - Add Fizz to Your Tasks",
+  "description": "AI-powered task management and email productivity app",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,16 +11,52 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
     }
   ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#2196f3",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["productivity", "business"],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "label": "Dashboard view"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "type": "image/png",
+      "sizes": "375x812",
+      "label": "Mobile view"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Task",
+      "short_name": "New Task",
+      "description": "Create a new task",
+      "url": "/tasks?action=create",
+      "icons": [{ "src": "/icons/add-task.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Focus Mode",
+      "short_name": "Focus",
+      "description": "Start a focus session",
+      "url": "/focus",
+      "icons": [{ "src": "/icons/focus.png", "sizes": "96x96" }]
+    }
+  ]
 }

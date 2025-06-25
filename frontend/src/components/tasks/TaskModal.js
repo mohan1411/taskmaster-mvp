@@ -7,7 +7,9 @@ import {
   Button,
   IconButton,
   Box,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import TaskForm from './TaskForm';
@@ -20,6 +22,9 @@ const TaskModal = ({
   isSubmitting, 
   error 
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const handleSubmit = (taskData) => {
     onSubmit(taskData);
   };
@@ -30,6 +35,7 @@ const TaskModal = ({
       onClose={onClose}
       fullWidth
       maxWidth="md"
+      fullScreen={isMobile}
       aria-labelledby="task-dialog-title"
     >
       <DialogTitle id="task-dialog-title">

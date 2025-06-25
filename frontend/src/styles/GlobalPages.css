@@ -110,9 +110,10 @@
 @media (max-width: 900px) {
   .page-container {
     margin-left: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
     margin-top: 56px !important;
     padding: 16px !important;
+    min-height: calc(100vh - 56px) !important;
   }
   
   .cards-grid-2,
@@ -120,11 +121,74 @@
   .cards-grid-4 {
     grid-template-columns: 1fr !important;
   }
+  
+  /* Reduce typography sizes on tablets */
+  .page-container h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .page-container h4 {
+    font-size: 1.25rem !important;
+  }
 }
 
+/* Small mobile devices */
 @media (max-width: 600px) {
   .page-container {
     padding: 12px !important;
+    margin-top: 56px !important;
+  }
+  
+  /* Further reduce typography on mobile */
+  .page-container h1 {
+    font-size: 1.375rem !important;
+  }
+  
+  .page-container h4 {
+    font-size: 1.125rem !important;
+  }
+  
+  /* Compact card spacing on mobile */
+  .page-container .MuiCard-root .MuiCardContent-root {
+    padding: 12px !important;
+  }
+  
+  /* Stack action buttons vertically on mobile */
+  .page-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .page-actions > * {
+    width: 100% !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .page-container {
+    padding: 8px !important;
+  }
+  
+  /* Even more compact spacing */
+  .cards-grid {
+    gap: 12px !important;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  .page-container button,
+  .page-container .MuiIconButton-root,
+  .page-container .MuiChip-root {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .page-container .MuiListItem-root:hover {
+    background-color: transparent !important;
   }
 }
 

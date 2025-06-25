@@ -186,6 +186,7 @@ const DashboardPage = () => {
       sx={{ 
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.2s',
+        minHeight: { xs: 100, sm: 'auto' },
         '&:hover': onClick ? { 
           transform: 'translateY(-2px)', 
           boxShadow: 3
@@ -247,7 +248,7 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Active Tasks"
@@ -283,7 +284,7 @@ const DashboardPage = () => {
         </Grid>
         
         {/* Three column layout for main content */}
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           {/* Due Today section - Compact */}
           <Grid item xs={12} md={4}>
             <Paper sx={{ height: '100%' }}>
@@ -309,7 +310,7 @@ const DashboardPage = () => {
                     sx={{ ml: 1, height: 20 }}
                   />
                 </Box>
-                <IconButton size="small">
+                <IconButton size="small" sx={{ minWidth: { xs: 44, sm: 'auto' }, minHeight: { xs: 44, sm: 'auto' } }}>
                   {expandedSections.dueTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
               </Box>
@@ -324,9 +325,9 @@ const DashboardPage = () => {
                         key={task._id} 
                         button
                         onClick={() => navigate('/tasks')}
-                        sx={{ py: 1.5, px: 2 }}
+                        sx={{ py: { xs: 2, sm: 1.5 }, px: { xs: 1.5, sm: 2 } }}
                       >
-                        <ListItemIcon sx={{ minWidth: 36 }}>
+                        <ListItemIcon sx={{ minWidth: { xs: 44, sm: 36 } }}>
                           <CheckCircleOutline fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
@@ -420,7 +421,7 @@ const DashboardPage = () => {
                 Recent Activity
               </Typography>
             </Box>
-            <IconButton size="small">
+            <IconButton size="small" sx={{ minWidth: { xs: 44, sm: 'auto' }, minHeight: { xs: 44, sm: 'auto' } }}>
               {expandedSections.recentTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
           </Box>

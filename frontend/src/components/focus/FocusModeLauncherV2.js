@@ -274,18 +274,18 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
         )}
 
         {/* Quick Start Options */}
-        <Box sx={{ mb: 3 }}>
-          <ButtonGroup fullWidth variant="outlined">
+        <Box sx={{ mb: 3, overflowX: { xs: 'auto', sm: 'visible' } }}>
+          <ButtonGroup fullWidth variant="outlined" sx={{ minWidth: { xs: '400px', sm: 'auto' }, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
             {QUICK_START_OPTIONS.map((option) => (
               <Button
                 key={option.duration}
                 onClick={() => handleQuickStart(option)}
                 variant={duration === option.duration ? 'contained' : 'outlined'}
-                sx={{ py: 2 }}
+                sx={{ py: { xs: 1.5, sm: 2 }, minHeight: { xs: 60, sm: 'auto' }, flex: { xs: '1 1 50%', sm: '1' } }}
               >
                 <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6">{option.label}</Typography>
-                  <Typography variant="caption" display="block">
+                  <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>{option.label}</Typography>
+                  <Typography variant="caption" display="block" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                     {option.description}
                   </Typography>
                 </Box>
@@ -294,11 +294,11 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
             <Button
               onClick={() => setShowAdvanced(!showAdvanced)}
               variant={showAdvanced ? 'contained' : 'outlined'}
-              sx={{ py: 2 }}
+              sx={{ py: { xs: 1.5, sm: 2 }, minHeight: { xs: 60, sm: 'auto' }, flex: { xs: '1 1 100%', sm: '1' } }}
             >
               <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="h6">Custom</Typography>
-                <Typography variant="caption" display="block">
+                <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>Custom</Typography>
+                <Typography variant="caption" display="block" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                   Session
                 </Typography>
               </Box>
@@ -315,13 +315,19 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               onChange={(e, value) => value !== null && setUseSmartSelection(value)}
               size="small"
             >
-              <ToggleButton value={true}>
-                <AutoAwesome sx={{ mr: 1 }} />
-                Smart Selection
+              <ToggleButton value={true} sx={{ px: { xs: 2, sm: 3 } }}>
+                <AutoAwesome sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                <Box component="span" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  <Box sx={{ display: { xs: 'none', sm: 'inline' } }}>Smart Selection</Box>
+                  <Box sx={{ display: { xs: 'inline', sm: 'none' } }}>Smart</Box>
+                </Box>
               </ToggleButton>
-              <ToggleButton value={false}>
-                <Task sx={{ mr: 1 }} />
-                Manual Selection
+              <ToggleButton value={false} sx={{ px: { xs: 2, sm: 3 } }}>
+                <Task sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                <Box component="span" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  <Box sx={{ display: { xs: 'none', sm: 'inline' } }}>Manual Selection</Box>
+                  <Box sx={{ display: { xs: 'inline', sm: 'none' } }}>Manual</Box>
+                </Box>
               </ToggleButton>
             </ToggleButtonGroup>
           </Box>
