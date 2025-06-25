@@ -36,12 +36,7 @@ const TasksPage = () => {
     limit: 20
   });
   const [totalTasks, setTotalTasks] = useState(0);
-  const [taskStats, setTaskStats] = useState({
-    total: 0,
-    active: 0,
-    completed: 0,
-    overdue: 0
-  });
+  const [completedTasksCount, setCompletedTasksCount] = useState(0);
   
   // Modal states
   const [taskModalOpen, setTaskModalOpen] = useState(false);
@@ -66,9 +61,9 @@ const TasksPage = () => {
     fetchTasks();
   }, [filters]);
 
-  // Load stats separately (without filters)
+  // Load completed tasks count separately
   useEffect(() => {
-    fetchTaskStats();
+    fetchCompletedCount();
   }, []);
 
   // Add debugging logging function to see overdue counts
@@ -88,32 +83,19 @@ const TasksPage = () => {
     console.log('[DEBUG] Tasks Page - API filters:', filters);
   }, [tasks]);
 
-  // Fetch task stats (without filters)
-  const fetchTaskStats = async () => {
+  // Fetch completed tasks count
+  const fetchCompletedCount = async () => {
     try {
-      // Fetch all tasks to calculate stats
-      const response = await taskService.getTasks({ limit: 1000 }); // Get all tasks
-      const allTasks = response.tasks;
+      // Specifically fetch completed tasks
+      const response = await taskService.getTasks({ 
+        status: 'completed',
+        limit: 1000
+      });
       
-      // Calculate stats
-      const stats = {
-        total: allTasks.length,
-        active: allTasks.filter(task => 
-          task.status !== 'completed' && task.status !== 'archived'
-        ).length,
-        completed: allTasks.filter(task => task.status === 'completed').length,
-        overdue: allTasks.filter(task => {
-          if (!task.dueDate || task.status === 'completed' || task.status === 'archived') return false;
-          const now = new Date();
-          const dueDate = new Date(task.dueDate);
-          return dueDate < now;
-        }).length
-      };
-      
-      setTaskStats(stats);
-      setTotalTasks(stats.total);
+      console.log('Fetched completed tasks:', response);
+      setCompletedTasksCount(response.total || response.tasks.length);
     } catch (err) {
-      console.error('Error fetching task stats:', err);
+      console.error('Error fetching completed count:', err);
     }
   };
 
@@ -203,8 +185,8 @@ const TasksPage = () => {
         severity: 'success'
       });
       
-      // Refresh stats
-      fetchTaskStats();
+      // Refresh completed count
+      fetchCompletedCount();
       
     } catch (err) {
       console.error('Error submitting task:', err);
@@ -274,8 +256,8 @@ const TasksPage = () => {
         severity: 'success'
       });
       
-      // Refresh stats
-      fetchTaskStats();
+      // Refresh completed count
+      fetchCompletedCount();
       
     } catch (err) {
       console.error('Error deleting task:', err);
@@ -401,7 +383,7 @@ const TasksPage = () => {
                   Total Tasks
                 </Typography>
                 <Typography variant="h4">
-                  {taskStats.total}
+                  {totalTasks}
                 </Typography>
               </CardContent>
             </Card>
@@ -413,7 +395,9 @@ const TasksPage = () => {
                   Active Tasks
                 </Typography>
                 <Typography variant="h4" color="primary.main">
-                  {taskStats.active}
+                  {tasks.filter(task => 
+                    task.status !== 'completed' && task.status !== 'archived'
+                  ).length}
                 </Typography>
               </CardContent>
             </Card>
@@ -425,7 +409,7 @@ const TasksPage = () => {
                   Completed
                 </Typography>
                 <Typography variant="h4" color="success.main">
-                  {taskStats.completed}
+                  {completedTasksCount}
                 </Typography>
               </CardContent>
             </Card>
@@ -437,7 +421,12 @@ const TasksPage = () => {
                   Overdue
                 </Typography>
                 <Typography variant="h4" color="error.main">
-                  {taskStats.overdue}
+                  {tasks.filter(task => {
+                    if (!task.dueDate || task.status === 'completed' || task.status === 'archived') return false;
+                    const now = new Date();
+                    const dueDate = new Date(task.dueDate);
+                    return dueDate < now;
+                  }).length}
                 </Typography>
               </CardContent>
             </Card>
