@@ -238,8 +238,16 @@ const DashboardPage = () => {
   }
   
   return (
-    <div className="page-container">
-      <div className="page-content">
+    <Box 
+      sx={{ 
+        width: '100%',
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 2, sm: 2, md: 3 },
+        pb: { xs: 10, sm: 3 },
+        maxWidth: { xs: '100%', md: 1200 },
+        mx: 'auto'
+      }}
+    >
         {/* Compact Header */}
         <Box sx={{ mb: { xs: 2, sm: 3 } }}>
           <Typography 
@@ -288,8 +296,8 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 3, sm: 4 }, mx: { xs: -1, sm: 0 } }}>
-          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 3, sm: 4 }, width: '100%' }}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Active Tasks"
               value={stats.pendingTasks}
@@ -297,7 +305,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Overdue"
               value={stats.overdueCount}
@@ -305,7 +313,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Follow-ups"
               value={stats.followUpCount}
@@ -313,7 +321,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/followups')}
             />
           </Grid>
-          <Grid item xs={6} sm={6} md={3} sx={{ px: { xs: 0.5, sm: 1 } }}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Unread Emails"
               value={stats.unreadEmailCount}
@@ -556,8 +564,7 @@ const DashboardPage = () => {
             </>
           )}
         </Paper>
-      </div>
-    </div>
+    </Box>
   );
 };
 

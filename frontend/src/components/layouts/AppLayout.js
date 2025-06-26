@@ -291,7 +291,12 @@ const AppLayout = () => {
       
       <Main open={open}>
         <DrawerHeader />
-        <Box sx={{ pb: { xs: 7, md: 0 } }}>
+        <Box sx={{ 
+          pb: { xs: 7, md: 0 },
+          width: '100%',
+          maxWidth: { xs: '100%', md: 'none' },
+          px: { xs: 0, md: 0 }
+        }}>
           <Outlet />
         </Box>
       </Main>
