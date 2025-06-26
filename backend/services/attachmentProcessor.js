@@ -62,6 +62,7 @@ class AttachmentProcessor {
 
       // Parse for tasks based on configuration
       console.log(`Parsing tasks from ${document.originalName} using mode: ${this.parserMode}`);
+      console.log(`Parser mode from environment: ${process.env.DOCUMENT_PARSER_MODE || 'not set (defaulting to simple-only)'}`);
       let tasks = [];
       
       const parserContext = {
@@ -94,65 +95,10 @@ class AttachmentProcessor {
             tasks = await openaiDocumentParser.parseDocument(extractionResult.text, parserContext);
             console.log(`OpenAI parser found ${tasks.length} tasks`);
           } catch (parserError) {
-            console.warn(`OpenAI parser failed, using simple parser:`, parserError.message);
-            // EMERGENCY INLINE PARSER - TEMPORARY FIX
-          console.log('Using emergency inline parser...');
-          const lines = extractionResult.text.split(/\r?\n/);
-          tasks = [];
-          
-          lines.forEach((line, index) => {
-            const trimmed = line.trim();
-            if (!trimmed || trimmed.length < 5) return;
-            
-            let task = null;
-            
-            // Check for task patterns
-            if (trimmed.match(/TODO:/i)) {
-              task = { 
-                title: trimmed.replace(/TODO:\s*/i, '').trim(), 
-                priority: 'medium' 
-              };
-            } else if (trimmed.match(/\b(needs?|must|should|has|have)\s+(to\s+)?/i)) {
-              task = { 
-                title: trimmed, 
-                priority: 'high' 
-              };
-            } else if (trimmed.match(/^[-•*]\s+/)) {
-              task = { 
-                title: trimmed.replace(/^[-•*]\s+/, '').trim(), 
-                priority: 'medium' 
-              };
-            } else if (trimmed.match(/^\d+[.)]\s+/)) {
-              task = { 
-                title: trimmed.replace(/^\d+[.)]\s+/, '').trim(), 
-                priority: 'medium' 
-              };
-            } else if (trimmed.match(/^(Action|Task):\s*/i)) {
-              task = { 
-                title: trimmed.replace(/^(Action|Task):\s*/i, '').trim(), 
-                priority: 'high' 
-              };
-            } else if (trimmed.match(/URGENT/i)) {
-              task = { 
-                title: trimmed.replace(/URGENT:\s*/i, '').trim(), 
-                priority: 'urgent' 
-              };
-            }
-            
-            if (task && task.title.length > 3) {
-              tasks.push({
-                ...task,
-                description: trimmed,
-                confidence: 75,
-                lineNumber: index + 1,
-                sourceText: trimmed
-              });
-              console.log('Found task:', task.title);
-            }
-          });
-          
-          console.log('Inline parser found', tasks.length, 'tasks');
-          // END EMERGENCY PARSER
+            console.warn(`OpenAI parser failed, using improved simple parser:`, parserError.message);
+            // Use the improved simple parser as fallback
+            tasks = improvedSimpleParser.parseDocument(extractionResult.text);
+            console.log(`Improved simple parser found ${tasks.length} tasks`);
           }
           break;
       }

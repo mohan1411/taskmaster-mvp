@@ -171,9 +171,15 @@ class ImprovedSimpleParser {
     }
     
     // Filter and deduplicate
+    console.log(`Before filtering: ${tasks.length} tasks found`);
     const filteredTasks = this.filterAndDeduplicate(tasks);
     
-    console.log(`Enhanced parser found ${filteredTasks.length} tasks`);
+    console.log(`Enhanced parser found ${filteredTasks.length} tasks after filtering`);
+    // Log first few tasks for debugging
+    filteredTasks.slice(0, 3).forEach((task, index) => {
+      console.log(`Task ${index + 1}: "${task.title}" (confidence: ${task.confidence}, priority: ${task.priority})`);
+    });
+    
     return filteredTasks;
   }
   
