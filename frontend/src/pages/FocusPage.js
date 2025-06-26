@@ -12,7 +12,7 @@ import '../styles/GlobalPages.css';
 const FocusPage = () => {
   const navigate = useNavigate();
   const { focusSession, userMetrics } = useFocus();
-  const { tasks } = useTasks();
+  const { tasks, loadTasks } = useTasks();
   const [sessionCompleted, setSessionCompleted] = useState(false);
   const [completedSessionData, setCompletedSessionData] = useState(null);
   
@@ -22,7 +22,9 @@ const FocusPage = () => {
     setSessionCompleted(true);
   };
   
-  const handleStartNewSession = () => {
+  const handleStartNewSession = async () => {
+    // Refresh tasks to get updated status
+    await loadTasks();
     setSessionCompleted(false);
     setCompletedSessionData(null);
     // Stay on focus page to start a new session
@@ -128,19 +130,21 @@ const FocusPage = () => {
           </Grid>
         )}
 
-        {/* Focus Mode Launcher */}
-        <FocusModeLauncher tasks={tasks} />
+        {/* Focus Mode Launcher - Pass only incomplete tasks */}
+        <FocusModeLauncher tasks={tasks.filter(task => task.status !== 'completed')} />
 
-        {/* No tasks warning */}
-        {tasks.length === 0 && (
+        {/* No tasks warning - Check for incomplete tasks */}
+        {tasks.filter(task => task.status !== 'completed').length === 0 && (
           <Alert severity="info" sx={{ mt: 3 }}>
-            You don't have any tasks yet. 
+            {tasks.length === 0 
+              ? "You don't have any tasks yet." 
+              : "All tasks are completed! Great job!"} 
             <Button 
               size="small" 
               onClick={() => navigate('/tasks')}
               sx={{ ml: 1 }}
             >
-              Create Tasks
+              Create New Tasks
             </Button>
           </Alert>
         )}

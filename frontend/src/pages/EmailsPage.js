@@ -3,7 +3,6 @@ import {
   Box, 
   Typography, 
   Paper, 
-  Container, 
   Button, 
   CircularProgress, 
   Alert,
@@ -40,19 +39,28 @@ const EmailsPage = () => {
     checkConnectionAndLoadEmails();
   }, []);
 
+  // Debug: Track emails state changes
+  useEffect(() => {
+    console.log('Emails state updated:', emails);
+    console.log('Emails count:', emails.length);
+  }, [emails]);
+
   const checkConnectionAndLoadEmails = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
       // Check Gmail connection
-      const { connected } = await emailService.checkGmailConnection();
-      setIsConnected(connected);
-
-      if (connected) {
-        // Load emails if connected
-        await loadEmails();
+      try {
+        const { connected } = await emailService.checkGmailConnection();
+        setIsConnected(connected);
+      } catch (err) {
+        console.log('Gmail not connected, will show local emails');
+        setIsConnected(false);
       }
+
+      // Always load emails (both Gmail and local emails)
+      await loadEmails();
     } catch (err) {
       console.error('Error checking connection:', err);
       setError('Failed to check Gmail connection');
@@ -64,15 +72,29 @@ const EmailsPage = () => {
   const loadEmails = async () => {
     try {
       const emailData = await emailService.getEmails({ limit: 50 });
-      setEmails(emailData.emails || []);
-      setEmailStats({
-        total: emailData.total || 0,
-        unread: emailData.emails?.filter(email => !email.isRead).length || 0,
-        synced: emailData.emails?.length || 0
-      });
+      console.log('Raw API response:', emailData);
+      console.log('Response type:', typeof emailData);
+      console.log('Response keys:', Object.keys(emailData || {}));
+      
+      // The API should return { emails: [...], page: X, pages: Y, total: Z }
+      if (emailData && emailData.emails) {
+        console.log('Setting emails:', emailData.emails);
+        console.log('Email count:', emailData.emails.length);
+        
+        setEmails(emailData.emails);
+        setEmailStats({
+          total: emailData.total || 0,
+          unread: emailData.emails.filter(email => !email.isRead).length || 0,
+          synced: emailData.emails.length || 0
+        });
+      } else {
+        console.error('Unexpected email data structure:', emailData);
+        setEmails([]);
+      }
     } catch (err) {
       console.error('Error loading emails:', err);
       setError('Failed to load emails');
+      setEmails([]);
     }
   };
 
@@ -102,12 +124,9 @@ const EmailsPage = () => {
 
   const handleConnectionChange = (connected) => {
     setIsConnected(connected);
-    if (connected) {
-      loadEmails();
-    } else {
-      setEmails([]);
-      setEmailStats({ total: 0, unread: 0, synced: 0 });
-    }
+    // Always reload emails - this will show Gmail emails when connected
+    // and local/database emails when not connected
+    loadEmails();
   };
 
   const handleExtractTasks = async (email) => {
@@ -170,7 +189,7 @@ const EmailsPage = () => {
 
   return (
     <div className="page-container">
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <div className="page-content">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
             <Typography variant="h4" gutterBottom>
@@ -212,31 +231,35 @@ const EmailsPage = () => {
           </Alert>
         )}
 
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <GmailConnect 
-              onConnectionChange={handleConnectionChange}
-            />
-            
-            {!isConnected && (
-              <Paper sx={{ p: 3, mt: 3, textAlign: 'center' }}>
-                <EmailIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Connect your Gmail account to get started
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Once connected, you'll be able to sync your emails, extract tasks, and manage follow-ups.
-                </Typography>
-              </Paper>
-            )}
+        <>
+          <GmailConnect 
+            onConnectionChange={handleConnectionChange}
+          />
+          
+          {/* Debug info */}
+          {console.log('Render state - Loading:', isLoading, 'Emails:', emails.length, 'Connected:', isConnected)}
+          
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <>
+              {/* Show connection prompt only when no emails exist */}
+              {!isConnected && emails.length === 0 && (
+                <Paper sx={{ p: 3, mt: 3, textAlign: 'center' }}>
+                  <EmailIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Connect your Gmail account to get started
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Once connected, you'll be able to sync your emails, extract tasks, and manage follow-ups.
+                  </Typography>
+                </Paper>
+              )}
 
-            {isConnected && (
-              <>
-                {/* Email Stats */}
+              {/* Show email stats if we have any emails */}
+              {emails.length > 0 && (
                 <Grid container spacing={3} sx={{ mb: 3 }}>
                   <Grid item xs={12} sm={4}>
                     <Card>
@@ -275,36 +298,37 @@ const EmailsPage = () => {
                     </Card>
                   </Grid>
                 </Grid>
+              )}
 
-                {/* Use EmailList component for displaying emails */}
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={selectedEmail ? 6 : 12}>
-                    <EmailList
-                      emails={emails}
-                      loading={isLoading}
-                      error={null}
+              {/* Always show EmailList - it handles empty state internally */}
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={selectedEmail ? 6 : 12}>
+                  {console.log('Passing to EmailList:', emails, 'Length:', emails.length)}
+                  <EmailList
+                    emails={emails}
+                    loading={false}
+                    error={null}
+                    onRefresh={handleRefresh}
+                    onSelectEmail={handleSelectEmail}
+                    onExtractTasks={handleExtractTasks}
+                    onDetectFollowUp={handleDetectFollowUp}
+                  />
+                </Grid>
+                
+                {selectedEmail && (
+                  <Grid item xs={12} md={6}>
+                    <EmailDetail
+                      email={selectedEmail}
+                      onClose={handleCloseEmailDetail}
                       onRefresh={handleRefresh}
-                      onSelectEmail={handleSelectEmail}
-                      onExtractTasks={handleExtractTasks}
-                      onDetectFollowUp={handleDetectFollowUp}
                     />
                   </Grid>
-                  
-                  {selectedEmail && (
-                    <Grid item xs={12} md={6}>
-                      <EmailDetail
-                        email={selectedEmail}
-                        onClose={handleCloseEmailDetail}
-                        onRefresh={handleRefresh}
-                      />
-                    </Grid>
-                  )}
-                </Grid>
-              </>
-            )}
-          </>
-        )}
-      </Container>
+                )}
+              </Grid>
+            </>
+          )}
+        </>
+      </div>
     </div>
   );
 };

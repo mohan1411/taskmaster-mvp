@@ -35,6 +35,9 @@ import {
 } from '@mui/icons-material';
 import { useFocus } from '../../context/FocusContext';
 import BreakMode from './BreakMode';
+import FocusTimer from './FocusTimer';
+import distractionService from '../../services/distractionService';
+import axios from 'axios';
 
 // Ambient background component
 const AmbientBackground = ({ soundType, playing }) => {
@@ -245,6 +248,8 @@ const ActiveFocusSession = ({ onEndSession }) => {
     focusSession,
     focusPreferences,
     endFocusSession,
+    pauseFocusSession,
+    resumeFocusSession,
     completeCurrentTask,
     skipCurrentTask,
     trackActivity
@@ -270,6 +275,9 @@ const ActiveFocusSession = ({ onEndSession }) => {
   const [showBreakReminder, setShowBreakReminder] = useState(false);
   const [inBreakMode, setInBreakMode] = useState(false);
   const [breakType, setBreakType] = useState('short-break');
+  const [distractionStatus, setDistractionStatus] = useState(null);
+  const [isEndingSession, setIsEndingSession] = useState(false);
+  const isEndingSessionRef = useRef(false);
   
   // Calculate session stats
   const tasksCompleted = focusSession.completed?.length || 0;
@@ -291,6 +299,19 @@ const ActiveFocusSession = ({ onEndSession }) => {
     };
   }, [trackActivity]);
   
+  // Update distraction status
+  useEffect(() => {
+    const updateStatus = () => {
+      const status = distractionService.getStatus();
+      setDistractionStatus(status);
+    };
+    
+    updateStatus();
+    const interval = setInterval(updateStatus, 5000); // Update every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
+  
   // Break reminder logic
   useEffect(() => {
     if (!focusSession.active) return;
@@ -305,14 +326,87 @@ const ActiveFocusSession = ({ onEndSession }) => {
     }
   }, [focusSession.timeElapsed, focusPreferences.breakRatio, focusSession.breakTime]);
   
-  const handleEndSession = async () => {
-    await endFocusSession('user_ended');
-    onEndSession?.();
+  const handleEndSession = async (endData = {}) => {
+    if (isEndingSession || isEndingSessionRef.current) {
+      console.log('End session already in progress, ignoring click');
+      return; // Prevent multiple clicks
+    }
+    
+    console.log('Starting end session process');
+    setIsEndingSession(true);
+    isEndingSessionRef.current = true;
+    try {
+      // Capture session data BEFORE ending the session (which resets the state)
+      const allTasks = [...(focusSession.tasks || [])];
+      if (focusSession.currentTask) {
+        allTasks.unshift(focusSession.currentTask);
+      }
+      
+      const cleanTasks = allTasks.map(task => ({
+        id: task._id || task.id,
+        title: task.title,
+        estimatedDuration: task.estimatedDuration
+      }));
+      
+      const completedTaskIds = focusSession.completed.map(task => {
+        if (typeof task === 'string') return task;
+        if (typeof task === 'object' && task !== null) {
+          return task._id || task.id;
+        }
+        return null;
+      }).filter(id => id !== null);
+      
+      const sessionData = { 
+        duration: Math.round(focusSession.timeElapsed || 0),
+        sessionDuration: Math.round(focusSession.timeElapsed || 0),
+        plannedDuration: focusSession.duration || 0,
+        tasksCompleted: completedTaskIds.length,
+        tasks: cleanTasks,
+        completed: completedTaskIds,
+        flowDuration: focusSession.flowState && focusSession.flowStartTime 
+          ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
+          : 0,
+        distractionsBlocked: distractionStatus.queuedNotifications || 0,
+        ...endData 
+      };
+      
+      // Call the callback FIRST (before the session state is reset)
+      onEndSession?.(sessionData);
+      
+      // THEN end the session (which will reset the state)
+      await endFocusSession('user_ended', endData);
+      
+    } catch (error) {
+      console.error('Error in handleEndSession:', error);
+      setIsEndingSession(false); // Reset loading state on error
+      isEndingSessionRef.current = false;
+      // Still try to call onEndSession with minimal data
+      const fallbackData = { 
+        duration: focusSession.timeElapsed || 0,
+        sessionDuration: focusSession.timeElapsed || 0,
+        plannedDuration: focusSession.duration || 0,
+        tasksCompleted: focusSession.completed.length || 0,
+        tasks: [],
+        completed: [],
+        flowDuration: 0,
+        distractionsBlocked: 0,
+        ...endData 
+      };
+      onEndSession?.(fallbackData);
+    }
   };
   
   const handleCompleteTask = () => {
     completeCurrentTask();
     trackActivity('task_completion');
+  };
+  
+  const handlePauseResume = async () => {
+    if (focusSession.breakTime) {
+      await resumeFocusSession();
+    } else {
+      await pauseFocusSession();
+    }
   };
   
   const handleSkipTask = () => {
@@ -480,6 +574,15 @@ const ActiveFocusSession = ({ onEndSession }) => {
               />
             )}
             
+            {distractionStatus?.isBlocking && (
+              <Chip
+                icon={<NotesIcon />}
+                label={`${distractionStatus.blockedNotifications} Blocked`}
+                color="warning"
+                size="small"
+              />
+            )}
+            
             <Tooltip title="Minimize">
               <IconButton onClick={() => setMinimized(true)}>
                 <MinimizeIcon />
@@ -487,7 +590,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
             </Tooltip>
             
             <Tooltip title="End Session">
-              <IconButton onClick={handleEndSession} color="error">
+              <IconButton onClick={handleEndSession} color="error" disabled={isEndingSession}>
                 <CloseIcon />
               </IconButton>
             </Tooltip>
@@ -701,8 +804,8 @@ const ActiveFocusSession = ({ onEndSession }) => {
         >
           <Button
             variant="outlined"
-            startIcon={<PauseIcon />}
-            onClick={() => {/* Pause logic */}}
+            startIcon={focusSession.breakTime ? <PlayIcon /> : <PauseIcon />}
+            onClick={handlePauseResume}
             size="large"
             sx={{ 
               borderRadius: 2,
@@ -714,7 +817,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
               transition: 'all 0.2s ease'
             }}
           >
-            Pause
+            {focusSession.breakTime ? 'Resume' : 'Pause'}
           </Button>
           
           {focusSession.currentTask && (
@@ -783,6 +886,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
             startIcon={<StopIcon />}
             onClick={handleEndSession}
             size="large"
+            disabled={isEndingSession}
             sx={{ 
               borderRadius: 2,
               px: 3,
@@ -795,7 +899,7 @@ const ActiveFocusSession = ({ onEndSession }) => {
               transition: 'all 0.2s ease'
             }}
           >
-            End Session
+            {isEndingSession ? 'Ending...' : 'End Session'}
           </Button>
         </Box>
         

@@ -29,6 +29,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import FollowUpNotifications from '../notifications/FollowUpNotifications';
+import MobileBottomNav from '../navigation/MobileBottomNav';
 
 const drawerWidth = 240;
 
@@ -98,9 +99,10 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(window.innerWidth > 900);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const isMobile = theme.breakpoints.down('md');
   
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -289,8 +291,16 @@ const AppLayout = () => {
       
       <Main open={open}>
         <DrawerHeader />
-        <Outlet />
+        <Box sx={{ 
+          pb: { xs: 7, md: 0 },
+          width: '100%',
+          maxWidth: { xs: '100%', md: 'none' },
+          px: { xs: 0, md: 0 }
+        }}>
+          <Outlet />
+        </Box>
       </Main>
+      <MobileBottomNav />
     </Box>
   );
 };

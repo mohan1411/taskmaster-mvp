@@ -1,0 +1,325 @@
+/* Mobile-specific styles for FizzTask */
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Improve touch targets globally */
+@media (hover: none) and (pointer: coarse) {
+  /* All interactive elements should be at least 44x44px */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  .MuiIconButton-root,
+  .MuiButton-root,
+  .MuiChip-root {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+  
+  /* Increase padding for better touch accuracy */
+  .MuiListItem-root {
+    min-height: 48px;
+  }
+  
+  /* Remove hover states on touch devices */
+  .MuiListItem-root:hover,
+  .MuiButton-root:hover,
+  .MuiIconButton-root:hover {
+    background-color: inherit;
+  }
+  
+  /* Add active states for touch feedback */
+  .MuiButton-root:active,
+  .MuiIconButton-root:active,
+  .MuiListItem-root:active {
+    opacity: 0.8;
+  }
+}
+
+/* Mobile-optimized dialogs */
+@media (max-width: 600px) {
+  /* Make all dialogs full screen on mobile */
+  .MuiDialog-paper {
+    margin: 0;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+  }
+  
+  /* Ensure dialog content is scrollable */
+  .MuiDialogContent-root {
+    padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fixed header and footer in dialogs */
+  .MuiDialogTitle-root {
+    position: sticky;
+    top: 0;
+    background: inherit;
+    z-index: 1;
+    padding: 12px 16px;
+  }
+  
+  .MuiDialogActions-root {
+    position: sticky;
+    bottom: 0;
+    background: inherit;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  /* Stack dialog actions vertically on very small screens */
+  @media (max-width: 360px) {
+    .MuiDialogActions-root {
+      flex-direction: column;
+    }
+    
+    .MuiDialogActions-root > :not(:first-of-type) {
+      margin-left: 0;
+      margin-top: 8px;
+    }
+  }
+}
+
+/* Mobile-optimized forms */
+@media (max-width: 600px) {
+  /* Single column layout for forms */
+  .MuiGrid-container {
+    flex-direction: column;
+  }
+  
+  /* Full width form fields */
+  .MuiTextField-root,
+  .MuiSelect-root,
+  .MuiFormControl-root {
+    width: 100%;
+  }
+  
+  /* Larger input text for better readability */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Better spacing for form elements */
+  .MuiFormControl-root {
+    margin-bottom: 16px;
+  }
+}
+
+/* Mobile-optimized tables */
+@media (max-width: 768px) {
+  /* Convert tables to cards on mobile */
+  .mobile-table-as-cards table,
+  .mobile-table-as-cards thead,
+  .mobile-table-as-cards tbody,
+  .mobile-table-as-cards th,
+  .mobile-table-as-cards td,
+  .mobile-table-as-cards tr {
+    display: block;
+  }
+  
+  .mobile-table-as-cards thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  .mobile-table-as-cards tr {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    padding: 10px;
+  }
+  
+  .mobile-table-as-cards td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+  }
+  
+  .mobile-table-as-cards td:before {
+    position: absolute;
+    top: 0;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    content: attr(data-label);
+    font-weight: bold;
+  }
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 600px) {
+  /* Sticky bottom navigation for key actions */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    z-index: 1000;
+  }
+  
+  /* Adjust content to account for bottom nav */
+  .has-bottom-nav {
+    padding-bottom: 60px;
+  }
+}
+
+/* Mobile-optimized cards */
+@media (max-width: 600px) {
+  /* Full width cards with proper spacing */
+  .MuiCard-root {
+    width: 100%;
+    margin: 0;
+    border-radius: 8px;
+  }
+  
+  /* Stacked card actions */
+  .MuiCardActions-root {
+    flex-wrap: wrap;
+    padding: 8px;
+  }
+  
+  .MuiCardActions-root > button {
+    flex: 1 1 auto;
+    margin: 4px;
+  }
+}
+
+/* Improve tap highlight */
+* {
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+}
+
+/* Prevent text selection on interactive elements */
+button,
+a,
+.MuiIconButton-root,
+.MuiButton-root {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Smooth scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Loading skeleton for mobile */
+@media (max-width: 600px) {
+  .MuiSkeleton-root {
+    animation-duration: 1.5s;
+  }
+}
+
+/* Mobile-optimized floating action button */
+.mobile-fab {
+  position: fixed !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+}
+
+@media (max-width: 600px) {
+  .mobile-fab {
+    bottom: 70px !important; /* Account for bottom nav if present */
+  }
+}
+
+/* Swipe indicators */
+.swipeable-list-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipe-action {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.swipe-action-left {
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.swipe-action-right {
+  right: 0;
+  transform: translateX(100%);
+}
+
+/* Pull to refresh indicator */
+.pull-to-refresh {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  transition: transform 0.3s;
+  z-index: 2000;
+  padding: 10px;
+}
+
+.pull-to-refresh.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Reduce header height */
+  .MuiAppBar-root {
+    min-height: 48px;
+  }
+  
+  .MuiToolbar-root {
+    min-height: 48px;
+  }
+  
+  /* Reduce spacing */
+  .page-container {
+    padding: 8px !important;
+    margin-top: 48px !important;
+  }
+  
+  /* Hide less important elements */
+  .hide-on-landscape {
+    display: none !important;
+  }
+}
+
+/* Focus indicators for accessibility */
+@media (hover: none) and (pointer: coarse) {
+  *:focus {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+  }
+  
+  .MuiButton-root:focus,
+  .MuiIconButton-root:focus {
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
+  }
+}

@@ -20,7 +20,9 @@ import {
   Chip,
   Stack,
   IconButton,
-  Collapse
+  Collapse,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   CheckCircleOutline,
@@ -51,13 +53,15 @@ const priorityColors = {
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedSections, setExpandedSections] = useState({
     summary: true,
-    dueTasks: true,
-    recentTasks: true
+    dueTasks: !isMobile,
+    recentTasks: !isMobile
   });
   
   // Real stats from API calls
@@ -186,18 +190,39 @@ const DashboardPage = () => {
       sx={{ 
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.2s',
+        minHeight: { xs: 100, sm: 'auto' },
+        width: '100%',
+        height: '100%',
         '&:hover': onClick ? { 
           transform: 'translateY(-2px)', 
           boxShadow: 3
-        } : {}
+        } : {},
+        '&:active': {
+          transform: 'translateY(0)',
+          boxShadow: 1
+        }
       }}
       onClick={onClick}
     >
-      <CardContent>
-        <Typography color="textSecondary" gutterBottom>
+      <CardContent sx={{ 
+        p: { xs: 2, sm: 2.5 },
+        textAlign: 'center'
+      }}>
+        <Typography 
+          color="textSecondary" 
+          gutterBottom
+          sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+        >
           {title}
         </Typography>
-        <Typography variant="h4" color={`${color}.main`}>
+        <Typography 
+          variant="h4" 
+          color={`${color}.main`}
+          sx={{ 
+            fontSize: { xs: '1.75rem', sm: '2.125rem' },
+            fontWeight: 500
+          }}
+        >
           {value}
         </Typography>
       </CardContent>
@@ -213,15 +238,39 @@ const DashboardPage = () => {
   }
   
   return (
-    <div className="page-container">
-      <div className="page-content">
+    <Box 
+      sx={{ 
+        width: '100%',
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 2, sm: 2, md: 3 },
+        pb: { xs: 10, sm: 3 },
+        maxWidth: { xs: '100%', md: 1200 },
+        mx: 'auto'
+      }}
+    >
         {/* Compact Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontSize: '1.5rem', fontWeight: 500, mb: 0.5 }}>
-            Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontSize: { xs: '1.25rem', sm: '1.5rem' }, 
+              fontWeight: 500, 
+              mb: 0.5 
+            }}
+          >
+            Welcome back{user?.name && !isMobile ? `, ${user.name.split(' ')[0]}` : ''}!
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+          >
+            {new Date().toLocaleDateString('en-US', { 
+              weekday: 'short', 
+              month: 'short', 
+              day: 'numeric',
+              ...(isMobile ? {} : { year: 'numeric' })
+            })}
           </Typography>
         </Box>
         
@@ -247,8 +296,8 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 3, sm: 4 }, width: '100%' }}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Active Tasks"
               value={stats.pendingTasks}
@@ -256,7 +305,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Overdue"
               value={stats.overdueCount}
@@ -264,7 +313,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/tasks')}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Follow-ups"
               value={stats.followUpCount}
@@ -272,7 +321,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/followups')}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Unread Emails"
               value={stats.unreadEmailCount}
@@ -283,10 +332,10 @@ const DashboardPage = () => {
         </Grid>
         
         {/* Three column layout for main content */}
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
           {/* Due Today section - Compact */}
           <Grid item xs={12} md={4}>
-            <Paper sx={{ height: '100%' }}>
+            <Paper sx={{ height: '100%', width: '100%' }}>
               <Box 
                 sx={{ 
                   p: 2, 
@@ -309,7 +358,7 @@ const DashboardPage = () => {
                     sx={{ ml: 1, height: 20 }}
                   />
                 </Box>
-                <IconButton size="small">
+                <IconButton size="small" sx={{ minWidth: { xs: 44, sm: 'auto' }, minHeight: { xs: 44, sm: 'auto' } }}>
                   {expandedSections.dueTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
               </Box>
@@ -324,9 +373,9 @@ const DashboardPage = () => {
                         key={task._id} 
                         button
                         onClick={() => navigate('/tasks')}
-                        sx={{ py: 1.5, px: 2 }}
+                        sx={{ py: { xs: 2, sm: 1.5 }, px: { xs: 1.5, sm: 2 } }}
                       >
-                        <ListItemIcon sx={{ minWidth: 36 }}>
+                        <ListItemIcon sx={{ minWidth: { xs: 44, sm: 36 } }}>
                           <CheckCircleOutline fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
@@ -420,7 +469,7 @@ const DashboardPage = () => {
                 Recent Activity
               </Typography>
             </Box>
-            <IconButton size="small">
+            <IconButton size="small" sx={{ minWidth: { xs: 44, sm: 'auto' }, minHeight: { xs: 44, sm: 'auto' } }}>
               {expandedSections.recentTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
           </Box>
@@ -515,8 +564,7 @@ const DashboardPage = () => {
             </>
           )}
         </Paper>
-      </div>
-    </div>
+    </Box>
   );
 };
 

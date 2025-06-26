@@ -99,7 +99,7 @@ export const NotificationProvider = ({ children }) => {
         open={open}
         autoHideDuration={currentNotification?.duration || 6000}
         onClose={handleClose}
-        onExited={handleExited}
+        TransitionProps={{ onExited: handleExited }}
         TransitionComponent={SlideTransition}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         sx={{ 

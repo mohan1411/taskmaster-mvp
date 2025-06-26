@@ -20,7 +20,9 @@ import {
   IconButton,
   Tooltip,
   Alert,
-  CircularProgress
+  CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   PlayArrow,
@@ -33,11 +35,16 @@ import {
   Schedule,
   Coffee,
   GpsFixed,
-  Lightbulb
+  Lightbulb,
+  AutoAwesome
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useFocus } from '../../context/FocusContext';
 import { useNavigate } from 'react-router-dom';
+import DistractionBlocker from './DistractionBlocker';
+import SmartTaskSelector from './SmartTaskSelector';
+import EnergyLevelTracker from './EnergyLevelTracker';
+import focusService from '../../services/focusService';
 
 const QUICK_START_OPTIONS = [
   { duration: 25, label: '25 min', description: 'Quick Focus' },
@@ -66,20 +73,53 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
   const [ambientSound, setAmbientSound] = useState('lofi');
   const [suggestedTasks, setSuggestedTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [distractionSettings, setDistractionSettings] = useState({
+    blockNotifications: true,
+    blockSites: false,
+    showReminders: true,
+    strictMode: false
+  });
+  const [useSmartSelection, setUseSmartSelection] = useState(true);
+  const [recentSessions, setRecentSessions] = useState([]);
+  const [smartSelectedTasks, setSmartSelectedTasks] = useState([]);
 
   useEffect(() => {
     if (tasks && tasks.length > 0) {
-      loadSuggestedTasks();
+      if (!useSmartSelection) {
+        loadSuggestedTasks();
+      }
     }
     const currentEnergy = calculateCurrentEnergy ? calculateCurrentEnergy() : 0.7;
     setEnergyLevel(Math.round(currentEnergy * 10));
-  }, [tasks, duration]);
+    
+    // Load recent sessions for smart selection
+    loadRecentSessions();
+  }, [tasks, duration, useSmartSelection]);
+
+  // Debug effect
+  useEffect(() => {
+    console.log('Smart Selection State:', {
+      useSmartSelection,
+      smartSelectedTasks,
+      selectedTasks,
+      smartCount: smartSelectedTasks.length,
+      manualCount: selectedTasks.length
+    });
+  }, [useSmartSelection, smartSelectedTasks, selectedTasks]);
+
+  const loadRecentSessions = async () => {
+    try {
+      const response = await focusService.getSessionHistory({ days: 7 });
+      setRecentSessions(response.sessions || []);
+    } catch (error) {
+      console.error('Error loading recent sessions:', error);
+    }
+  };
 
   const loadSuggestedTasks = async () => {
-    // Filter incomplete tasks
+    // Filter incomplete tasks - include all priority levels
     const incompleteTasks = tasks.filter(task => 
       task.status !== 'completed' && 
-      task.priority !== 'low' &&
       (!task.estimatedDuration || task.estimatedDuration <= duration)
     );
 
@@ -137,21 +177,24 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
   };
 
   const handleStartSession = async () => {
+    const taskIdsToUse = useSmartSelection ? smartSelectedTasks : selectedTasks;
+    
     console.log('Starting focus session with:', {
       duration,
       sessionType,
-      selectedTasks,
-      tasksCount: selectedTasks.length
+      useSmartSelection,
+      taskIds: taskIdsToUse,
+      tasksCount: taskIdsToUse.length
     });
     
-    if (selectedTasks.length === 0) {
+    if (taskIdsToUse.length === 0) {
       alert('Please select at least one task');
       return;
     }
     
     setIsLoading(true);
     try {
-      const selectedTaskObjects = suggestedTasks.filter(t => selectedTasks.includes(t._id));
+      const selectedTaskObjects = tasks.filter(t => taskIdsToUse.includes(t._id || t.id));
       
       console.log('Starting session with tasks:', selectedTaskObjects);
       
@@ -162,9 +205,12 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
         environment: {
           ambientSound: showAdvanced ? ambientSound : 'lofi',
           pauseNotifications,
-          blockNotifications: pauseNotifications,
-          blockSites: true,
-          theme: 'focus_dark'
+          blockNotifications: distractionSettings.blockNotifications,
+          blockSites: distractionSettings.blockSites,
+          theme: 'focus_dark',
+          strictMode: distractionSettings.strictMode,
+          emergencyContacts: [],
+          customBlockedSites: []
         }
       });
       
@@ -228,18 +274,18 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
         )}
 
         {/* Quick Start Options */}
-        <Box sx={{ mb: 3 }}>
-          <ButtonGroup fullWidth variant="outlined">
+        <Box sx={{ mb: 3, overflowX: { xs: 'auto', sm: 'visible' } }}>
+          <ButtonGroup fullWidth variant="outlined" sx={{ minWidth: { xs: '400px', sm: 'auto' }, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
             {QUICK_START_OPTIONS.map((option) => (
               <Button
                 key={option.duration}
                 onClick={() => handleQuickStart(option)}
                 variant={duration === option.duration ? 'contained' : 'outlined'}
-                sx={{ py: 2 }}
+                sx={{ py: { xs: 1.5, sm: 2 }, minHeight: { xs: 60, sm: 'auto' }, flex: { xs: '1 1 50%', sm: '1' } }}
               >
                 <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6">{option.label}</Typography>
-                  <Typography variant="caption" display="block">
+                  <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>{option.label}</Typography>
+                  <Typography variant="caption" display="block" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                     {option.description}
                   </Typography>
                 </Box>
@@ -248,11 +294,11 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
             <Button
               onClick={() => setShowAdvanced(!showAdvanced)}
               variant={showAdvanced ? 'contained' : 'outlined'}
-              sx={{ py: 2 }}
+              sx={{ py: { xs: 1.5, sm: 2 }, minHeight: { xs: 60, sm: 'auto' }, flex: { xs: '1 1 100%', sm: '1' } }}
             >
               <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="h6">Custom</Typography>
-                <Typography variant="caption" display="block">
+                <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>Custom</Typography>
+                <Typography variant="caption" display="block" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                   Session
                 </Typography>
               </Box>
@@ -260,8 +306,47 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
           </ButtonGroup>
         </Box>
 
-        {/* Suggested Session */}
-        {suggestedTasks.length > 0 && (
+        {/* Smart Task Selection Toggle - Always show */}
+        {tasks && tasks.length > 0 && (
+          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+            <ToggleButtonGroup
+              value={useSmartSelection}
+              exclusive
+              onChange={(e, value) => value !== null && setUseSmartSelection(value)}
+              size="small"
+            >
+              <ToggleButton value={true} sx={{ px: { xs: 2, sm: 3 } }}>
+                <AutoAwesome sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                <Box component="span" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  <Box sx={{ display: { xs: 'none', sm: 'inline' } }}>Smart Selection</Box>
+                  <Box sx={{ display: { xs: 'inline', sm: 'none' } }}>Smart</Box>
+                </Box>
+              </ToggleButton>
+              <ToggleButton value={false} sx={{ px: { xs: 2, sm: 3 } }}>
+                <Task sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                <Box component="span" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  <Box sx={{ display: { xs: 'none', sm: 'inline' } }}>Manual Selection</Box>
+                  <Box sx={{ display: { xs: 'inline', sm: 'none' } }}>Manual</Box>
+                </Box>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
+
+        {/* Smart Task Selector or Manual Selector */}
+        {tasks && tasks.length > 0 && (
+          useSmartSelection ? (
+            <SmartTaskSelector
+              tasks={tasks}
+              sessionDuration={duration}
+              sessionType={sessionType}
+              energyLevel={energyLevel}
+              onTasksSelected={setSmartSelectedTasks}
+              recentSessions={recentSessions}
+            />
+          ) : (
+            /* Suggested Session */
+            suggestedTasks.length > 0 && (
           <Card variant="outlined" sx={{ mb: 3, p: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Lightbulb sx={{ color: theme.palette.warning.main }} />
@@ -313,7 +398,43 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               </Typography>
             </Box>
           </Card>
+            )
+          )
         )}
+
+        {/* Energy Level Tracker - Always visible */}
+        <Box sx={{ mb: 3 }}>
+          <EnergyLevelTracker
+            currentEnergy={energyLevel}
+            onEnergyChange={setEnergyLevel}
+            showRecommendations={true}
+            historicalData={[]}
+          />
+        </Box>
+
+        {/* Always show Smart Selection info */}
+        <Alert 
+          severity="info" 
+          sx={{ mb: 3 }}
+          icon={<AutoAwesome />}
+        >
+          <Typography variant="body2" gutterBottom>
+            <strong>🎯 New: Smart Task Selection with AI!</strong>
+          </Typography>
+          <Typography variant="body2">
+            {tasks && tasks.length > 0 
+              ? 'Toggle between Smart and Manual selection above to get AI-powered task recommendations.'
+              : 'Create some tasks to unlock AI-powered recommendations based on your energy, deadlines, and patterns.'}
+          </Typography>
+        </Alert>
+
+        {/* Distraction Blocking Settings */}
+        <Box sx={{ mb: 3 }}>
+          <DistractionBlocker 
+            isActive={false}
+            onSettingsChange={setDistractionSettings}
+          />
+        </Box>
 
         {/* Advanced Settings */}
         {showAdvanced && (
@@ -331,14 +452,17 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
                 value={duration}
                 onChange={(e, v) => setDuration(v)}
                 min={15}
-                max={180}
-                step={15}
+                max={120}
+                step={5}
                 marks={[
+                  { value: 15, label: '15m' },
                   { value: 25, label: '25m' },
+                  { value: 45, label: '45m' },
                   { value: 60, label: '1h' },
                   { value: 90, label: '1.5h' },
                   { value: 120, label: '2h' }
                 ]}
+                valueLabelDisplay="auto"
               />
             </Box>
 
@@ -359,23 +483,13 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
               </ButtonGroup>
             </Box>
 
-            {/* Energy Level */}
-            <Box sx={{ mb: 3 }}>
-              <Typography gutterBottom>
-                Energy Level: {energyLevel}/10
-              </Typography>
-              <Slider
-                value={energyLevel}
-                onChange={(e, v) => setEnergyLevel(v)}
-                min={1}
-                max={10}
-                marks={[
-                  { value: 1, label: 'Low' },
-                  { value: 5, label: 'Mid' },
-                  { value: 10, label: 'High' }
-                ]}
-              />
-            </Box>
+            {/* Energy Level Tracker */}
+            <EnergyLevelTracker
+              currentEnergy={energyLevel}
+              onEnergyChange={setEnergyLevel}
+              showRecommendations={true}
+              historicalData={[]}
+            />
 
             {/* Environment Settings */}
             <Box>
@@ -399,7 +513,7 @@ const FocusModeLauncherV2 = ({ tasks = [] }) => {
             size="large"
             fullWidth
             onClick={handleStartSession}
-            disabled={isLoading || selectedTasks.length === 0}
+            disabled={isLoading || (useSmartSelection ? smartSelectedTasks.length === 0 : selectedTasks.length === 0)}
             startIcon={isLoading ? <CircularProgress size={20} /> : <PlayArrow />}
           >
             {isLoading ? 'Starting...' : 'Start Focus Session'}

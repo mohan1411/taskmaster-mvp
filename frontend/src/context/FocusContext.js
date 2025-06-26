@@ -3,6 +3,8 @@ import { useNotification } from './NotificationContext';
 import { useAuth } from './AuthContext';
 import { detectFlowState, FlowTracker } from '../utils/flowDetection';
 import taskService from '../services/taskService';
+import focusService from '../services/focusService';
+import distractionService from '../services/distractionService';
 
 const FocusContext = createContext();
 
@@ -63,6 +65,7 @@ export const FocusProvider = ({ children }) => {
     return {
       active: false,
       id: null,
+      apiSessionId: null,
       startTime: null,
       duration: 0, // in minutes
       tasks: [],
@@ -71,12 +74,81 @@ export const FocusProvider = ({ children }) => {
       timeElapsed: 0,
       breakTime: false,
       flowState: false,
-      flowStartTime: null
+      flowStartTime: null,
+      status: null
     };
   };
 
   // Core focus session state
   const [focusSession, setFocusSession] = useState(loadSessionFromStorage());
+  
+  // Load active session from API on mount
+  useEffect(() => {
+    const loadActiveSession = async () => {
+      if (!user) return;
+      
+      try {
+        const activeSession = await focusService.getActiveSession();
+        if (activeSession && activeSession.session) {
+          const apiSession = activeSession.session;
+          const allTasks = apiSession.tasks.map(t => t.task);
+          const completedTaskIds = apiSession.completedTasks || [];
+          
+          // Find tasks that haven't been completed yet
+          const remainingTasks = allTasks.filter(task => !completedTaskIds.includes(task._id));
+          const currentTask = remainingTasks[0] || null;
+          
+          const restoredSession = {
+            active: true,
+            id: apiSession._id,
+            apiSessionId: apiSession._id,
+            startTime: new Date(apiSession.startTime).getTime(),
+            duration: apiSession.plannedDuration,
+            tasks: remainingTasks.slice(1), // Exclude current task
+            completed: completedTaskIds, // Store only IDs, not full objects
+            currentTask: currentTask,
+            timeElapsed: Math.floor((Date.now() - new Date(apiSession.startTime).getTime()) / 60000),
+            breakTime: apiSession.status === 'paused',
+            flowState: false,
+            flowStartTime: null,
+            status: apiSession.status
+          };
+          
+          console.log('Restored active session from API:', restoredSession);
+          setFocusSession(restoredSession);
+          
+          // Restore environment
+          if (apiSession.environment) {
+            await applyFocusEnvironment(apiSession.environment);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading active session:', error);
+        // If we get a 404, clear any stale session from localStorage
+        if (error.response?.status === 404) {
+          console.log('No active session found on server, clearing localStorage');
+          localStorage.removeItem('fizztask-active-focus-session');
+          setFocusSession({
+            active: false,
+            id: null,
+            apiSessionId: null,
+            startTime: null,
+            duration: 0,
+            tasks: [],
+            completed: [],
+            currentTask: null,
+            timeElapsed: 0,
+            breakTime: false,
+            flowState: false,
+            flowStartTime: null,
+            status: null
+          });
+        }
+      }
+    };
+    
+    loadActiveSession();
+  }, [user]);
   
   // User preferences and patterns
   const [focusPreferences, setFocusPreferences] = useState({
@@ -345,27 +417,49 @@ export const FocusProvider = ({ children }) => {
   // Start a focus session
   const startFocusSession = useCallback(async (config) => {
     try {
-      const sessionId = `focus_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
       const allTasks = config.tasks || [];
       const currentTask = allTasks[0] || null;
       const remainingTasks = allTasks.slice(1); // Remove the first task from the list
       
+      // Prepare session data for API
+      const sessionData = {
+        plannedDuration: config.duration || focusPreferences.defaultDuration,
+        duration: config.duration || focusPreferences.defaultDuration, // Support both naming
+        sessionType: config.sessionType || 'work',
+        tasks: allTasks, // Send full task objects - backend will extract IDs
+        taskIds: allTasks.map(task => task._id || task.id), // Also send just IDs
+        energyLevel: userMetrics.currentEnergyLevel * 10, // Convert 0-1 to 0-10 scale
+        environment: config.environment || {
+          soundType: focusPreferences.ambientSound,
+          blockingLevel: focusPreferences.blockLevel
+        },
+        notes: config.notes || ''
+      };
+      
+      console.log('Starting focus session with API:', sessionData);
+      
+      // Call API to start session
+      const response = await focusService.startSession(sessionData);
+      const apiSession = response.session;
+      
+      // Update local state with API response
       const newSession = {
         active: true,
-        id: sessionId,
-        startTime: Date.now(),
-        duration: config.duration || focusPreferences.defaultDuration,
+        id: apiSession._id,
+        apiSessionId: apiSession._id, // Store API session ID
+        startTime: new Date(apiSession.startTime).getTime(),
+        duration: apiSession.plannedDuration,
         tasks: remainingTasks, // Only include tasks that aren't current
         completed: [],
         currentTask: currentTask,
         timeElapsed: 0,
         breakTime: false,
         flowState: false,
-        flowStartTime: null
+        flowStartTime: null,
+        status: apiSession.status
       };
       
-      console.log('Starting focus session:', newSession);
+      console.log('Focus session started:', newSession);
       setFocusSession(newSession);
       
       // Reset realtime tracking
@@ -380,50 +474,122 @@ export const FocusProvider = ({ children }) => {
       // Apply focus environment
       await applyFocusEnvironment(config.environment);
       
+      // Start distraction blocking
+      if (config.environment?.blockNotifications || config.environment?.pauseNotifications) {
+        await distractionService.startBlocking({
+          blockNotifications: true,
+          blockSites: config.environment?.blockSites || false,
+          emergencyContacts: config.environment?.emergencyContacts || [],
+          customSites: config.environment?.customBlockedSites || []
+        });
+      }
+      
       // Initialize flow tracking
-      flowTracker.current.startSession(sessionId);
+      flowTracker.current.startSession(apiSession._id);
       
       showSuccess(`🎯 Focus session started! ${config.duration} minutes of focused work.`);
       
       // Log session start
       logFocusEvent('session_started', {
-        sessionId,
+        sessionId: apiSession._id,
         duration: config.duration,
         taskCount: config.tasks?.length || 0,
         energyLevel: userMetrics.currentEnergyLevel
       });
       
-      return sessionId;
+      return apiSession._id;
     } catch (error) {
+      console.error('Failed to start focus session:', error);
       showError('Failed to start focus session. Please try again.');
       throw error;
     }
   }, [focusPreferences, userMetrics.currentEnergyLevel, showSuccess, showError]);
   
   // End focus session
-  const endFocusSession = useCallback(async (reason = 'completed') => {
-    if (!focusSession.active) return;
+  const endFocusSession = useCallback(async (reason = 'completed', endData = {}) => {
+    console.log('endFocusSession called:', {
+      active: focusSession.active,
+      apiSessionId: focusSession.apiSessionId,
+      reason,
+      endData
+    });
+    
+    if (!focusSession.active || !focusSession.apiSessionId) {
+      console.error('Cannot end session - session not active or missing apiSessionId');
+      return;
+    }
+    
+    // Define variables outside try block so they're accessible in catch
+    let sessionDuration = 0;
+    let flowDuration = 0;
     
     try {
-      const sessionDuration = focusSession.timeElapsed;
-      const flowDuration = focusSession.flowState && focusSession.flowStartTime 
+      sessionDuration = focusSession.timeElapsed || 0;
+      flowDuration = focusSession.flowState && focusSession.flowStartTime 
         ? Math.round((Date.now() - focusSession.flowStartTime) / 60000)
         : 0;
+      
+      console.log('Session end data:', {
+        sessionDuration,
+        flowDuration,
+        focusSession,
+        completedCount: focusSession.completed?.length || 0
+      });
       
       // Ensure all completed tasks are marked as complete in the database
       if (focusSession.completed && focusSession.completed.length > 0) {
         console.log('Syncing completed tasks to database...');
-        for (const task of focusSession.completed) {
+        for (const taskId of focusSession.completed) {
           try {
-            // Skip if already marked as completed
-            if (task.status !== 'completed') {
-              await taskService.updateTaskStatus(task._id || task.id, 'completed');
-              console.log('Synced task completion:', task.title);
-            }
+            // Task IDs are already marked as completed when completeCurrentTask is called
+            console.log('Task already marked as completed:', taskId);
           } catch (error) {
-            console.error('Failed to sync task completion:', task.title, error);
+            console.error('Failed to sync task completion:', taskId, error);
           }
         }
+      }
+      
+      // Prepare end session data for API
+      const apiEndData = {
+        actualDuration: Math.round(sessionDuration),
+        energyLevel: {
+          end: endData.energyLevelEnd || userMetrics.currentEnergyLevel * 10
+        },
+        completedTasks: focusSession.completed, // Already an array of IDs
+        focusScore: Math.round((realtimeData.flowScore || 0) * 100),
+        distractions: {
+          blocked: distractionState.queuedNotifications.length,
+          encountered: realtimeData.distractionsToday
+        },
+        flowMetrics: {
+          totalFlowTime: flowDuration,
+          flowEntries: flowTracker.current.currentSession?.flowEvents?.length || 0
+        },
+        notes: endData.notes || '',
+        endReason: reason
+      };
+      
+      console.log('Ending focus session with API:', apiEndData);
+      
+      // Call API to end session
+      console.log('Calling focusService.endSession with:', {
+        sessionId: focusSession.apiSessionId,
+        data: apiEndData
+      });
+      try {
+        await focusService.endSession(focusSession.apiSessionId, apiEndData);
+      } catch (apiError) {
+        console.error('API error ending session:', apiError);
+        // If the session is already ended or not found, that's okay - continue with cleanup
+        const errorMessage = apiError.response?.data?.message || '';
+        const isSessionNotFound = apiError.response?.status === 404;
+        const isSessionAlreadyEnded = errorMessage === 'Session already ended';
+        
+        if (!isSessionNotFound && !isSessionAlreadyEnded) {
+          throw apiError; // Re-throw if it's a different error
+        }
+        
+        console.log('Session not found or already ended - continuing with local cleanup');
       }
       
       // Update metrics
@@ -436,19 +602,20 @@ export const FocusProvider = ({ children }) => {
           sessionsCompleted: prev.weeklyStats.sessionsCompleted + 1,
           averageFlowTime: flowDuration > 0 
             ? Math.round((prev.weeklyStats.averageFlowTime + flowDuration) / 2)
-            : prev.weeklyStats.averageFlowTime
+            : prev.weeklyStats.averageFlowTime,
+          distractionsBlocked: prev.weeklyStats.distractionsBlocked + distractionState.queuedNotifications.length
         }
       }));
       
       // Log session completion
       logFocusEvent('session_ended', {
-        sessionId: focusSession.id,
+        sessionId: focusSession.apiSessionId,
         duration: sessionDuration,
         plannedDuration: focusSession.duration,
         tasksCompleted: focusSession.completed.length,
         flowDuration,
         reason,
-        focusScore: realtimeData.focusScore
+        focusScore: realtimeData.flowScore
       });
       
       // End flow tracking
@@ -457,10 +624,22 @@ export const FocusProvider = ({ children }) => {
       // Clean up environment
       await restoreFocusEnvironment();
       
+      // Stop distraction blocking
+      const distractionResult = await distractionService.stopBlocking();
+      
+      // Update session data with distraction metrics
+      if (distractionResult.queuedNotifications?.length > 0) {
+        apiEndData.distractions.blocked = distractionResult.queuedNotifications.length;
+      }
+      
+      // Clear localStorage session before resetting state
+      localStorage.removeItem('fizztask-active-focus-session');
+      
       // Reset session state
       setFocusSession({
         active: false,
         id: null,
+        apiSessionId: null,
         startTime: null,
         duration: 0,
         tasks: [],
@@ -469,33 +648,46 @@ export const FocusProvider = ({ children }) => {
         timeElapsed: 0,
         breakTime: false,
         flowState: false,
-        flowStartTime: null
+        flowStartTime: null,
+        status: null
       });
       
       // Show completion message
       if (reason === 'completed' || reason === 'all_tasks_completed') {
-        showSuccess(`🎉 Focus session complete! ${sessionDuration} minutes of productive work.`);
+        showSuccess(`🎉 Focus session complete! ${Math.round(sessionDuration)} minutes of productive work.`);
       } else if (reason === 'user_ended') {
-        showInfo(`⏹️ Focus session ended. You worked for ${sessionDuration} minutes.`);
+        showInfo(`⏹️ Focus session ended. You worked for ${Math.round(sessionDuration)} minutes.`);
       } else {
-        showInfo(`⏸️ Focus session paused. You worked for ${sessionDuration} minutes.`);
+        showInfo(`⏸️ Focus session paused. You worked for ${Math.round(sessionDuration)} minutes.`);
       }
       
     } catch (error) {
+      console.error('Focus session end error - Full details:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        focusSession,
+        sessionDuration,
+        flowDuration
+      });
       showError('Error ending focus session.');
-      console.error('Focus session end error:', error);
     }
-  }, [focusSession, realtimeData.focusScore, showSuccess, showInfo, showError]);
+  }, [focusSession, realtimeData.flowScore, realtimeData.distractionsToday, userMetrics.currentEnergyLevel, distractionState.queuedNotifications, showSuccess, showInfo, showError, logFocusEvent]);
   
   // Apply focus environment settings
   const applyFocusEnvironment = useCallback(async (environment = {}) => {
     try {
       // Enable Do Not Disturb
       if ('Notification' in window && environment.blockNotifications !== false) {
-        // We can't actually block notifications, but we can track them
+        // Request notification permission if not granted
+        if (Notification.permission === 'default') {
+          await Notification.requestPermission();
+        }
+        
         setDistractionState(prev => ({
           ...prev,
-          queuedNotifications: []
+          queuedNotifications: [],
+          blockingActive: true
         }));
       }
       
@@ -508,6 +700,12 @@ export const FocusProvider = ({ children }) => {
       // Apply visual theme
       if (environment.theme === 'focus_dark') {
         document.documentElement.setAttribute('data-focus-mode', 'true');
+      }
+      
+      // Apply site blocking
+      if (environment.blockSites) {
+        // This is handled by distractionService
+        console.log('Site blocking enabled');
       }
       
     } catch (error) {
@@ -549,6 +747,13 @@ export const FocusProvider = ({ children }) => {
     
     const { source, urgency, sender } = distraction;
     
+    // Log the distraction
+    logFocusEvent('distraction_encountered', {
+      source,
+      urgency,
+      blocked: urgency !== 'critical'
+    });
+    
     // Critical interruptions always get through
     if (urgency === 'critical') {
       return { action: 'allow', reason: 'critical' };
@@ -566,6 +771,16 @@ export const FocusProvider = ({ children }) => {
         distractionsToday: prev.distractionsToday + 1
       }));
       
+      // Log to API if session is active
+      if (focusSession.apiSessionId) {
+        focusService.logDistraction(focusSession.apiSessionId, {
+          type: source,
+          severity: urgency,
+          blocked: true,
+          timestamp: Date.now()
+        }).catch(console.error);
+      }
+      
       return { action: 'block', reason: 'flow_protection' };
     }
     
@@ -581,7 +796,49 @@ export const FocusProvider = ({ children }) => {
     }
     
     return { action: 'allow' };
-  }, [focusSession.active, focusSession.flowState, focusPreferences.blockLevel]);
+  }, [focusSession.active, focusSession.flowState, focusSession.apiSessionId, focusPreferences.blockLevel, logFocusEvent]);
+  
+  // Pause focus session
+  const pauseFocusSession = useCallback(async () => {
+    if (!focusSession.active || !focusSession.apiSessionId || focusSession.breakTime) return;
+    
+    try {
+      await focusService.pauseSession(focusSession.apiSessionId);
+      
+      setFocusSession(prev => ({
+        ...prev,
+        breakTime: true,
+        status: 'paused'
+      }));
+      
+      showInfo('Focus session paused');
+      logFocusEvent('session_paused', { sessionId: focusSession.apiSessionId });
+    } catch (error) {
+      console.error('Error pausing session:', error);
+      showError('Failed to pause session');
+    }
+  }, [focusSession.active, focusSession.apiSessionId, focusSession.breakTime, showInfo, showError, logFocusEvent]);
+  
+  // Resume focus session
+  const resumeFocusSession = useCallback(async () => {
+    if (!focusSession.active || !focusSession.apiSessionId || !focusSession.breakTime) return;
+    
+    try {
+      await focusService.resumeSession(focusSession.apiSessionId);
+      
+      setFocusSession(prev => ({
+        ...prev,
+        breakTime: false,
+        status: 'active'
+      }));
+      
+      showSuccess('Focus session resumed');
+      logFocusEvent('session_resumed', { sessionId: focusSession.apiSessionId });
+    } catch (error) {
+      console.error('Error resuming session:', error);
+      showError('Failed to resume session');
+    }
+  }, [focusSession.active, focusSession.apiSessionId, focusSession.breakTime, showSuccess, showError, logFocusEvent]);
   
   // Complete current task
   const completeCurrentTask = useCallback(async () => {
@@ -605,7 +862,7 @@ export const FocusProvider = ({ children }) => {
     
     setFocusSession(prev => ({
       ...prev,
-      completed: [...prev.completed, completedTask],
+      completed: [...prev.completed, completedTask._id || completedTask.id],
       tasks: remainingTasks,
       currentTask: nextTask
     }));
@@ -668,6 +925,8 @@ export const FocusProvider = ({ children }) => {
     // Actions
     startFocusSession,
     endFocusSession,
+    pauseFocusSession,
+    resumeFocusSession,
     completeCurrentTask,
     skipCurrentTask,
     trackActivity,

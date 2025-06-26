@@ -36,6 +36,7 @@ const TasksPage = () => {
     limit: 20
   });
   const [totalTasks, setTotalTasks] = useState(0);
+  const [completedTasksCount, setCompletedTasksCount] = useState(0);
   
   // Modal states
   const [taskModalOpen, setTaskModalOpen] = useState(false);
@@ -60,6 +61,11 @@ const TasksPage = () => {
     fetchTasks();
   }, [filters]);
 
+  // Load completed tasks count separately
+  useEffect(() => {
+    fetchCompletedCount();
+  }, []);
+
   // Add debugging logging function to see overdue counts
   useEffect(() => {
     // Calculate overdue tasks
@@ -76,6 +82,22 @@ const TasksPage = () => {
     // Log the API filter used
     console.log('[DEBUG] Tasks Page - API filters:', filters);
   }, [tasks]);
+
+  // Fetch completed tasks count
+  const fetchCompletedCount = async () => {
+    try {
+      // Specifically fetch completed tasks
+      const response = await taskService.getTasks({ 
+        status: 'completed',
+        limit: 1000
+      });
+      
+      console.log('Fetched completed tasks:', response);
+      setCompletedTasksCount(response.total || response.tasks.length);
+    } catch (err) {
+      console.error('Error fetching completed count:', err);
+    }
+  };
 
   // Fetch tasks with current filters
   const fetchTasks = async () => {
@@ -163,6 +185,9 @@ const TasksPage = () => {
         severity: 'success'
       });
       
+      // Refresh completed count
+      fetchCompletedCount();
+      
     } catch (err) {
       console.error('Error submitting task:', err);
       setSubmitError('Failed to save task. Please try again.');
@@ -231,6 +256,9 @@ const TasksPage = () => {
         severity: 'success'
       });
       
+      // Refresh completed count
+      fetchCompletedCount();
+      
     } catch (err) {
       console.error('Error deleting task:', err);
       console.error('Error details:', {
@@ -295,6 +323,9 @@ const TasksPage = () => {
         message: `Task marked as ${newStatus.replace('-', ' ')}`,
         severity: 'success'
       });
+      
+      // Refresh completed count when status changes
+      fetchCompletedCount();
       
     } catch (err) {
       console.error('Error updating task status:', err);
@@ -378,7 +409,7 @@ const TasksPage = () => {
                   Completed
                 </Typography>
                 <Typography variant="h4" color="success.main">
-                  {tasks.filter(task => task.status === 'completed').length}
+                  {completedTasksCount}
                 </Typography>
               </CardContent>
             </Card>

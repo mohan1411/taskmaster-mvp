@@ -46,7 +46,6 @@ const emailSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  // We'll store email content separately, not in DB
   taskExtracted: {
     type: Boolean,
     default: false

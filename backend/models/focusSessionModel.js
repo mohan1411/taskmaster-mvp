@@ -75,6 +75,10 @@ const focusSessionSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
+    encountered: {
+      type: Number,
+      default: 0
+    },
     sources: [{
       type: String,
       timestamp: Date,
@@ -104,6 +108,19 @@ const focusSessionSchema = new mongoose.Schema({
     }
   },
   notes: String,
+  endReason: {
+    type: String,
+    enum: ['completed', 'user_ended', 'paused', 'all_tasks_completed', 'time_up'],
+    default: 'completed'
+  },
+  completedTasks: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Task'
+  }],
+  flowMetrics: {
+    totalFlowTime: Number,
+    flowEntries: Number
+  },
   metrics: {
     keystrokes: Number,
     mouseActivity: Number,

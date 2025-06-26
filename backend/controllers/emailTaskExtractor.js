@@ -87,13 +87,29 @@ const extractTasksFromEmail = async (email) => {
       
       let extractedTasks = [];
       
+      // First, try to handle markdown code blocks (```json ... ```)
+      let jsonText = responseText;
+      if (responseText.includes('```json')) {
+        const match = responseText.match(/```json\s*([\s\S]*?)\s*```/);
+        if (match && match[1]) {
+          jsonText = match[1].trim();
+          console.log('Extracted JSON from markdown code block');
+        }
+      } else if (responseText.includes('```')) {
+        const match = responseText.match(/```\s*([\s\S]*?)\s*```/);
+        if (match && match[1]) {
+          jsonText = match[1].trim();
+          console.log('Extracted content from code block');
+        }
+      }
+      
       // Check if response is valid JSON array
-      if (responseText.startsWith('[') && responseText.endsWith(']')) {
+      if (jsonText.startsWith('[') && jsonText.endsWith(']')) {
         try {
-          extractedTasks = JSON.parse(responseText);
-          console.log('Successfully parsed JSON directly');
+          extractedTasks = JSON.parse(jsonText);
+          console.log('Successfully parsed JSON');
         } catch (parseError) {
-          console.error('Error parsing direct JSON:', parseError.message);
+          console.error('Error parsing JSON:', parseError.message);
           // Continue to alternative parsing methods
         }
       }
@@ -102,7 +118,7 @@ const extractTasksFromEmail = async (email) => {
       if (extractedTasks.length === 0) {
         console.log('Trying alternative JSON extraction...');
         try {
-          const jsonMatch = responseText.match(/\[\s*\{.*\}\s*\]/s);
+          const jsonMatch = jsonText.match(/\[\s*\{.*\}\s*\]/s);
           if (jsonMatch) {
             extractedTasks = JSON.parse(jsonMatch[0]);
             console.log('Successfully extracted and parsed JSON from response');

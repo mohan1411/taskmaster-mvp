@@ -43,6 +43,14 @@ const EmailList = ({
   onExtractTasks,
   onDetectFollowUp
 }) => {
+  console.log('EmailList received props:', { emails, loading, emailsLength: emails?.length });
+  console.log('First email:', emails && emails[0]);
+  console.log('Is emails an array?', Array.isArray(emails));
+  console.log('Emails type:', typeof emails);
+  
+  // Ensure emails is always an array
+  const emailsArray = Array.isArray(emails) ? emails : [];
+  
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -114,7 +122,7 @@ const EmailList = ({
   };
 
   // Filter emails by search term
-  const filteredEmails = emails.filter(email => {
+  const filteredEmails = emailsArray.filter(email => {
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
@@ -126,12 +134,14 @@ const EmailList = ({
       (email.snippet && email.snippet.toLowerCase().includes(searchLower))
     );
   });
+  
+  console.log('Filtered emails:', filteredEmails, 'Count:', filteredEmails.length);
 
   return (
     <Box>
       {/* Search and refresh section */}
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+      <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="stretch">
           <TextField
             fullWidth
             placeholder="Search emails..."
@@ -194,10 +204,13 @@ const EmailList = ({
                   sx={{ 
                     backgroundColor: !email.isRead ? 'rgba(25, 118, 210, 0.04)' : 'transparent',
                     transition: 'all 0.2s',
-                    py: 1.5,
-                    px: 2,
+                    py: { xs: 2, sm: 1.5 },
+                    px: { xs: 1, sm: 2 },
                     '&:hover': {
                       backgroundColor: !email.isRead ? 'rgba(25, 118, 210, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                    },
+                    '&:active': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
                     },
                     position: 'relative'
                   }}
@@ -216,7 +229,7 @@ const EmailList = ({
                           sx={{ 
                             fontWeight: !email.isRead ? 700 : 400,
                             display: 'inline-block',
-                            maxWidth: { xs: '180px', sm: '250px', md: '400px' },
+                            maxWidth: { xs: '60%', sm: '250px', md: '400px' },
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
@@ -334,14 +347,14 @@ const EmailList = ({
                           )}
                         </Box>
                         
-                        {/* Quick actions - only show on hover */}
+                        {/* Quick actions - always visible on mobile, hover on desktop */}
                         <Box 
                           className="email-actions"
                           sx={{ 
                             mt: 1, 
                             display: 'flex', 
                             gap: 0.5,
-                            opacity: 0,
+                            opacity: { xs: 1, sm: 0 },
                             transition: 'opacity 0.2s',
                             '.MuiListItem-root:hover &': {
                               opacity: 1
@@ -358,10 +371,11 @@ const EmailList = ({
                                 onExtractTasks(email);
                               }}
                               sx={{
-                                fontSize: '0.75rem',
+                                fontSize: { xs: '0.8rem', sm: '0.75rem' },
                                 textTransform: 'none',
-                                px: 1.5,
-                                py: 0.25,
+                                px: { xs: 2, sm: 1.5 },
+                                py: { xs: 0.75, sm: 0.25 },
+                                minHeight: { xs: 44, sm: 'auto' },
                                 minWidth: 'auto',
                                 color: 'primary.main',
                                 '&:hover': {

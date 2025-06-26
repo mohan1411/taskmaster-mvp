@@ -5,23 +5,40 @@ const User = require('../models/userModel');
 
 // Start a new focus session
 exports.startSession = async (req, res) => {
+  console.log('Focus session start request received:', {
+    body: req.body,
+    user: req.user ? req.user._id : 'No user',
+    headers: req.headers
+  });
+  
   try {
     const {
       plannedDuration,
+      duration, // Support both naming conventions
       sessionType,
       taskIds,
+      tasks, // Support tasks array with objects
       energyLevel,
       environment
     } = req.body;
 
+    // Support both duration and plannedDuration
+    const sessionDuration = plannedDuration || duration;
+    
+    // Extract task IDs from tasks array if provided
+    let taskIdList = taskIds;
+    if (!taskIdList && tasks && Array.isArray(tasks)) {
+      taskIdList = tasks.map(task => task._id || task.id);
+    }
+
     // Validate tasks belong to user
-    if (taskIds && taskIds.length > 0) {
-      const tasks = await Task.find({
-        _id: { $in: taskIds },
+    if (taskIdList && taskIdList.length > 0) {
+      const validTasks = await Task.find({
+        _id: { $in: taskIdList },
         user: req.user._id
       });
       
-      if (tasks.length !== taskIds.length) {
+      if (validTasks.length !== taskIdList.length) {
         return res.status(400).json({ message: 'Some tasks not found or unauthorized' });
       }
     }
@@ -30,11 +47,11 @@ exports.startSession = async (req, res) => {
     const session = new FocusSession({
       user: req.user._id,
       startTime: new Date(),
-      plannedDuration,
+      plannedDuration: sessionDuration,
       sessionType: sessionType || 'regular',
-      tasks: taskIds ? taskIds.map(taskId => ({
+      tasks: taskIdList ? taskIdList.map(taskId => ({
         task: taskId,
-        plannedDuration: Math.floor(plannedDuration / taskIds.length),
+        plannedDuration: Math.floor(sessionDuration / taskIdList.length),
         completed: false,
         progress: 0
       })) : [],
@@ -60,7 +77,16 @@ exports.startSession = async (req, res) => {
     });
   } catch (error) {
     console.error('Error starting focus session:', error);
-    res.status(500).json({ message: 'Error starting focus session' });
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({ 
+      message: 'Error starting focus session',
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
@@ -217,7 +243,19 @@ exports.resumeSession = async (req, res) => {
 exports.endSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const { energyLevel, abandoned } = req.body;
+    const { 
+      actualDuration,
+      energyLevel, 
+      completedTasks,
+      focusScore,
+      distractions,
+      flowMetrics,
+      notes,
+      endReason,
+      abandoned 
+    } = req.body;
+    
+    console.log('Ending session with data:', req.body);
 
     const session = await FocusSession.findOne({
       _id: sessionId,
@@ -226,20 +264,89 @@ exports.endSession = async (req, res) => {
     });
 
     if (!session) {
+      // Check if session exists but is already completed
+      const existingSession = await FocusSession.findOne({
+        _id: sessionId,
+        user: req.user._id
+      });
+      
+      if (existingSession && existingSession.status === 'completed') {
+        console.log('Session already completed:', sessionId);
+        return res.json({
+          message: 'Session already ended',
+          session: existingSession
+        });
+      }
+      
+      console.error('Session not found or unauthorized:', {
+        sessionId,
+        userId: req.user._id,
+        existingSession: existingSession ? 'exists but different status' : 'does not exist'
+      });
       return res.status(404).json({ message: 'Session not found' });
     }
 
+    // Update session with provided data
     if (energyLevel) {
-      session.energyLevel.end = energyLevel;
+      if (typeof energyLevel === 'object' && energyLevel.end) {
+        session.energyLevel.end = energyLevel.end;
+      } else if (typeof energyLevel === 'number') {
+        session.energyLevel.end = energyLevel;
+      }
+    }
+    
+    if (actualDuration) {
+      session.actualDuration = actualDuration;
+    }
+    
+    if (completedTasks && Array.isArray(completedTasks)) {
+      session.completedTasks = completedTasks;
+    }
+    
+    if (focusScore !== undefined) {
+      session.focusScore = focusScore;
+    }
+    
+    if (distractions) {
+      session.distractions = distractions;
+    }
+    
+    if (flowMetrics) {
+      session.flowMetrics = flowMetrics;
+    }
+    
+    if (notes) {
+      session.notes = notes;
+    }
+    
+    if (endReason) {
+      session.endReason = endReason;
     }
 
     if (abandoned) {
       session.status = 'abandoned';
       session.endTime = new Date();
-      session.actualDuration = Math.round((session.endTime - session.startTime) / 1000 / 60);
+      if (!actualDuration) {
+        session.actualDuration = Math.round((session.endTime - session.startTime) / 1000 / 60);
+      }
     } else {
-      await session.endSession();
+      // Set end time and status
+      session.endTime = new Date();
+      session.status = 'completed';
+      
+      // Use provided actualDuration or calculate it
+      if (!actualDuration) {
+        session.actualDuration = Math.round((session.endTime - session.startTime) / 1000 / 60);
+      }
+      
+      // Calculate focus score if not provided
+      if (focusScore === undefined || focusScore === null) {
+        session.focusScore = session.calculateFocusScore();
+      }
     }
+    
+    // Save the session with all updates
+    await session.save();
 
     // Update focus pattern with session data
     const pattern = await FocusPattern.findOne({ user: req.user._id });
@@ -248,13 +355,18 @@ exports.endSession = async (req, res) => {
     }
 
     // Update task statuses if completed
-    const completedTaskIds = session.tasks
-      .filter(t => t.completed)
-      .map(t => t.task);
+    // Use completedTasks from request if available, otherwise check session.tasks
+    let taskIdsToComplete = completedTasks || [];
     
-    if (completedTaskIds.length > 0) {
+    if (!completedTasks || completedTasks.length === 0) {
+      taskIdsToComplete = session.tasks
+        .filter(t => t.completed)
+        .map(t => t.task);
+    }
+    
+    if (taskIdsToComplete.length > 0) {
       await Task.updateMany(
-        { _id: { $in: completedTaskIds } },
+        { _id: { $in: taskIdsToComplete } },
         { status: 'completed', completedAt: new Date() }
       );
     }

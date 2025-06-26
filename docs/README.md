@@ -1,41 +1,64 @@
-# TaskMaster Documentation
+# FizzTask Documentation
 
-## Documentation Structure
-Welcome to the TaskMaster documentation. This folder contains all project documentation in an organized structure.
+Welcome to the FizzTask documentation! This directory contains all technical documentation, guides, and resources for the project.
 
-## Folder Structure
+## 📁 Documentation Structure
 
-```
-docs/
-│
-├── architecture/         - System architecture and technical design
-│   ├── technical/        - Technical specifications and documents
-│   └── diagrams/         - Architecture diagrams and visuals
-│
-├── development/          - Development-related information
-│   ├── guides/           - Development guides and setup instructions
-│   ├── api/              - API documentation
-│   └── implementation/   - Implementation summaries and plans
-│
-├── features/             - Feature-specific documentation
-│   ├── follow_ups/       - Follow-up functionality documentation
-│   └── other features    - Documentation for other features
-│
-├── todo/                 - Implementation checklists and TODOs
-│
-└── index.md              - Documentation homepage
-```
+### 🔧 Development
+- [Git Workflow (Claude + WSL)](./development/GIT_WORKFLOW_CLAUDE_WSL.md) - Git workflow for AI-assisted development
+- [WSL Development Workflow](./development/WSL_DEVELOPMENT_WORKFLOW.md) - Setting up WSL for development
+- [Development Setup](./development/Development_Setup.md) - Initial project setup guide
 
-## Navigation
-- Start with [index.md](index.md) for an overview of all documentation
-- For feature-specific documentation, check the relevant folders under [features/](features/)
-- Review implementation progress in the [todo/](todo/) folder
+### ✨ Features
+- [Focus Mode QA Checklist](./features/FOCUS_MODE_QA_CHECKLIST.md) - Comprehensive testing guide for Focus Mode
+- [Future Features Roadmap](./features/FUTURE_FEATURES_ROADMAP.md) - Planned features and development roadmap
+- [Attention Management](./features/ATTENTION_MANAGEMENT_IMPLEMENTATION.md) - Focus Mode implementation details
+- [Document Hub](./features/DOCUMENT_HUB_IMPLEMENTATION.md) - Document management system
+- [Email Attachments](./features/EMAIL_ATTACHMENT_TASK_EXTRACTION.md) - Email integration features
 
-## Documentation Organization
-This structure was implemented according to the [Documentation Organization Plan](Documentation_Organization_Plan.md) to consolidate documentation that was previously spread across multiple folders.
+### 🚀 Deployment
+- [Deployment Guide](./deployment/FIZZTASK_DEPLOYMENT_GUIDE.md) - Complete deployment instructions
+- [Vercel Deployment](./deployment/VERCEL-DEPLOYMENT-GUIDE.md) - Vercel-specific deployment
+- [Railway Environment Variables](./deployment/RAILWAY_ENV_VARS.md) - Railway platform configuration
 
-## Contribution Guidelines
-- Always place new documentation in the appropriate folder based on its category
-- Link related documents to each other for easier navigation
-- Update the index.md file when adding significant new documentation
-- Follow Markdown formatting standards for consistency
+### 🧪 Testing
+- [E2E Testing Guide](./testing/E2E-Testing-Guide.md) - End-to-end testing procedures
+- [Mobile Testing Checklist](./testing/mobile-testing-checklist.md) - Mobile responsiveness testing
+
+### 🏗️ Architecture
+- [Technical Architecture](./architecture/Technical_Architecture.md) - System architecture overview
+- [API Integration](./architecture/API_Integration.md) - API design and integration guide
+
+## 🔍 Quick Links
+
+### For New Developers
+1. Start with [Development Setup](./development/Development_Setup.md)
+2. Read [Git Workflow](./development/GIT_WORKFLOW_CLAUDE_WSL.md)
+3. Review [Technical Architecture](./architecture/Technical_Architecture.md)
+
+### For Testing
+1. Use [Focus Mode QA Checklist](./features/FOCUS_MODE_QA_CHECKLIST.md) for current feature testing
+2. Follow [E2E Testing Guide](./testing/E2E-Testing-Guide.md) for comprehensive testing
+
+### For Deployment
+1. Follow [Deployment Guide](./deployment/FIZZTASK_DEPLOYMENT_GUIDE.md)
+2. Configure environment variables per platform requirements
+
+## 📝 Documentation Standards
+
+- All documentation should be in Markdown format
+- Include clear headings and table of contents for long documents
+- Add code examples where applicable
+- Keep documentation up to date with code changes
+
+## 🤝 Contributing
+
+When adding new documentation:
+1. Place it in the appropriate subdirectory
+2. Update this README with a link to your document
+3. Follow the existing naming conventions
+4. Include creation/update dates in your documents
+
+---
+
+Last updated: June 17, 2025

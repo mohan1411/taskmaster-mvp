@@ -19,7 +19,9 @@ import {
   Select,
   Tooltip,
   LinearProgress,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -95,6 +97,9 @@ const TaskList = ({
   onStatusChange,
   onFilterChange
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   // Filter and sort state
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -211,8 +216,8 @@ const TaskList = ({
     <Box>
       {/* Search and filter section */}
       <Card sx={{ mb: 2 }}>
-        <CardContent>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center" mb={2}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="stretch" mb={2}>
             <TextField
               fullWidth
               placeholder="Search tasks..."
@@ -232,7 +237,7 @@ const TaskList = ({
               variant="outlined" 
               startIcon={<FilterListIcon />}
               onClick={() => setFiltersOpen(!filtersOpen)}
-              sx={{ minWidth: 120 }}
+              sx={{ minWidth: { xs: '100%', sm: 120 } }}
             >
               Filters
             </Button>
@@ -240,7 +245,7 @@ const TaskList = ({
               variant="contained" 
               color="primary"
               onClick={applyFilters}
-              sx={{ minWidth: 120 }}
+              sx={{ minWidth: { xs: '100%', sm: 120 } }}
             >
               Apply
             </Button>
@@ -412,7 +417,7 @@ const TaskList = ({
                     )}
                     
                     {task.labels && task.labels.length > 0 && (
-                      <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 0.5 }}>
+                      <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: { xs: 0.75, sm: 0.5 } }}>
                         {task.labels.map(label => (
                           <Chip key={label} label={label} size="small" variant="outlined" />
                         ))}
@@ -428,7 +433,11 @@ const TaskList = ({
                     <IconButton 
                       aria-label="task actions"
                       onClick={(e) => handleOpenMenu(e, task)}
-                      sx={{ color: theme => theme.palette.text.primary }}
+                      sx={{ 
+                        color: theme => theme.palette.text.primary,
+                        minWidth: { xs: 44, sm: 'auto' },
+                        minHeight: { xs: 44, sm: 'auto' }
+                      }}
                     >
                       <MoreVertIcon />
                     </IconButton>
@@ -438,7 +447,7 @@ const TaskList = ({
               
               {/* Quick action buttons */}
               {task.status !== 'completed' && task.status !== 'archived' && (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: { xs: 1.5, sm: 1 } }}>
                   {task.status === 'pending' && (
                     <Button
                       size="small"

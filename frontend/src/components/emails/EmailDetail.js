@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Paper,
@@ -20,7 +21,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  LinearProgress
+  LinearProgress,
+  useMediaQuery
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -43,6 +45,9 @@ import emailService from '../../services/emailService';
 import followupService from '../../services/followupService';
 
 const EmailDetail = ({ email, onClose, onRefresh }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   // Loading states
   const [isExtracting, setIsExtracting] = useState(false);
   const [isDetectingFollowUp, setIsDetectingFollowUp] = useState(false);
@@ -212,14 +217,27 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
   if (!email) return null;
 
   return (
-    <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Paper sx={{ 
+      height: { xs: 'auto', sm: '100%' }, 
+      maxHeight: { xs: '100vh', sm: '100%' },
+      display: 'flex', 
+      flexDirection: 'column', 
+      overflow: 'hidden' 
+    }}>
       {/* Header */}
       <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="h6" component="h2">
             {email.subject || '(No Subject)'}
           </Typography>
-          <IconButton onClick={onClose} size="small">
+          <IconButton 
+            onClick={onClose} 
+            size="small"
+            sx={{ 
+              minWidth: { xs: 44, sm: 'auto' },
+              minHeight: { xs: 44, sm: 'auto' }
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
@@ -261,8 +279,8 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
               label="Files" 
               size="small" 
               sx={{
-                height: 20,
-                fontSize: '0.75rem',
+                height: { xs: 24, sm: 20 },
+                fontSize: { xs: '0.8rem', sm: '0.75rem' },
                 bgcolor: 'grey.100',
                 color: 'grey.700',
                 border: 'none',
@@ -279,8 +297,8 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
               label="Tasks Extracted" 
               size="small" 
               sx={{
-                height: 20,
-                fontSize: '0.75rem',
+                height: { xs: 24, sm: 20 },
+                fontSize: { xs: '0.8rem', sm: '0.75rem' },
                 bgcolor: 'success.50',
                 color: 'success.700',
                 border: 'none',
@@ -299,8 +317,8 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
               label="Follow-up" 
               size="small" 
               sx={{
-                height: 20,
-                fontSize: '0.75rem',
+                height: { xs: 24, sm: 20 },
+                fontSize: { xs: '0.8rem', sm: '0.75rem' },
                 bgcolor: 'warning.50',
                 color: 'warning.700',
                 border: 'none',
@@ -317,8 +335,8 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
       </Box>
       
       {/* Action buttons - Compact Style */}
-      <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
-        <Stack direction="row" spacing={1} alignItems="center">
+      <Box sx={{ px: { xs: 1.5, sm: 2 }, py: 1.5, borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           <Button
             size="small"
             variant={email.taskExtracted ? "outlined" : "contained"}
@@ -327,9 +345,10 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
             onClick={handleExtractTasks}
             disabled={isExtracting}
             sx={{
-              px: 2,
-              py: 0.5,
-              fontSize: '0.813rem',
+              px: { xs: 2.5, sm: 2 },
+              py: { xs: 1, sm: 0.5 },
+              fontSize: { xs: '0.875rem', sm: '0.813rem' },
+              minHeight: { xs: 40, sm: 'auto' },
               textTransform: 'none',
               fontWeight: 500,
               ...(email.taskExtracted && {
@@ -354,9 +373,10 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
             onClick={handleDetectFollowUp}
             disabled={isDetectingFollowUp || email.needsFollowUp}
             sx={{
-              px: 2,
-              py: 0.5,
-              fontSize: '0.813rem',
+              px: { xs: 2.5, sm: 2 },
+              py: { xs: 1, sm: 0.5 },
+              fontSize: { xs: '0.875rem', sm: '0.813rem' },
+              minHeight: { xs: 40, sm: 'auto' },
               textTransform: 'none',
               fontWeight: 500,
               bgcolor: 'warning.50',
@@ -424,14 +444,20 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
       )}
       
       {/* Email content */}
-      <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
-        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+      <Box sx={{ flexGrow: 1, overflow: 'auto', p: { xs: 1.5, sm: 2 } }}>
+        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           {email.body || email.snippet || 'Loading email content...'}
         </Typography>
       </Box>
       
       {/* Follow-up dialog */}
-      <Dialog open={openFollowUpDialog} onClose={() => setOpenFollowUpDialog(false)} maxWidth="md" fullWidth>
+      <Dialog 
+        open={openFollowUpDialog} 
+        onClose={() => setOpenFollowUpDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+        fullScreen={isMobile}
+      >
         <DialogTitle>Create Follow-up</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 2 }}>
@@ -479,7 +505,12 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
                   size="small"
                   sx={{ flexGrow: 1, mr: 1 }}
                 />
-                <Button onClick={handleAddKeyPoint} variant="outlined" disabled={!newKeyPoint.trim()}>
+                <Button 
+                  onClick={handleAddKeyPoint} 
+                  variant="outlined" 
+                  disabled={!newKeyPoint.trim()}
+                  sx={{ minHeight: { xs: 40, sm: 'auto' } }}
+                >
                   Add
                 </Button>
               </Box>
@@ -489,7 +520,11 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
                     <Typography variant="body2" sx={{ flexGrow: 1 }}>
                       • {point}
                     </Typography>
-                    <IconButton size="small" onClick={() => handleRemoveKeyPoint(index)}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleRemoveKeyPoint(index)}
+                      sx={{ minWidth: { xs: 40, sm: 'auto' }, minHeight: { xs: 40, sm: 'auto' } }}
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   </Box>

@@ -1,67 +1,157 @@
 import api from './api';
 
-export const focusService = {
-  // Session management
-  startSession: async (config) => {
-    const response = await api.post('/focus/sessions/start', config);
-    return response.data.session;
+const focusService = {
+  // Start a new focus session
+  startSession: async (sessionData) => {
+    try {
+      const response = await api.post('/api/focus/sessions/start', sessionData);
+      return response.data;
+    } catch (error) {
+      console.error('Error starting focus session:', error);
+      if (error.response) {
+        console.error('Error response:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+      }
+      throw error;
+    }
   },
 
+  // Get current active session
   getActiveSession: async () => {
-    const response = await api.get('/focus/sessions/active');
-    return response.data.session;
+    try {
+      const response = await api.get('/api/focus/sessions/active');
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return null; // No active session
+      }
+      throw error;
+    }
   },
 
-  updateSession: async (sessionId, updates) => {
-    const response = await api.put(`/focus/sessions/${sessionId}`, updates);
-    return response.data.session;
+  // Update session (pause/resume/task updates)
+  updateSession: async (sessionId, updateData) => {
+    try {
+      const response = await api.put(`/api/focus/sessions/${sessionId}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating session:', error);
+      throw error;
+    }
   },
 
+  // Pause session
   pauseSession: async (sessionId) => {
-    const response = await api.post(`/focus/sessions/${sessionId}/pause`);
-    return response.data.session;
+    try {
+      const response = await api.post(`/api/focus/sessions/${sessionId}/pause`);
+      return response.data;
+    } catch (error) {
+      console.error('Error pausing session:', error);
+      throw error;
+    }
   },
 
+  // Resume session
   resumeSession: async (sessionId) => {
-    const response = await api.post(`/focus/sessions/${sessionId}/resume`);
-    return response.data.session;
+    try {
+      const response = await api.post(`/api/focus/sessions/${sessionId}/resume`);
+      return response.data;
+    } catch (error) {
+      console.error('Error resuming session:', error);
+      throw error;
+    }
   },
 
-  endSession: async (sessionId, data) => {
-    const response = await api.post(`/focus/sessions/${sessionId}/end`, data);
-    return response.data.session;
+  // End session
+  endSession: async (sessionId, endData) => {
+    try {
+      console.log('focusService.endSession called with:', {
+        sessionId,
+        endData,
+        url: `/api/focus/sessions/${sessionId}/end`
+      });
+      const response = await api.post(`/api/focus/sessions/${sessionId}/end`, endData);
+      console.log('focusService.endSession response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error ending session in focusService:', {
+        error,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw error;
+    }
   },
 
+  // Log distraction
   logDistraction: async (sessionId, distraction) => {
-    const response = await api.post(`/focus/sessions/${sessionId}/distraction`, distraction);
-    return response.data.distractions;
+    try {
+      const response = await api.post(`/api/focus/sessions/${sessionId}/distraction`, distraction);
+      return response.data;
+    } catch (error) {
+      console.error('Error logging distraction:', error);
+      throw error;
+    }
   },
 
-  // Analytics and history
+  // Get session history
   getSessionHistory: async (params = {}) => {
-    const response = await api.get('/focus/sessions/history', { params });
-    return response.data;
+    try {
+      const response = await api.get('/api/focus/sessions/history', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching session history:', error);
+      throw error;
+    }
   },
 
-  getFocusStats: async (period = 'week') => {
-    const response = await api.get('/focus/stats', { params: { period } });
-    return response.data.stats;
+  // Get focus statistics
+  getFocusStats: async (days = 30) => {
+    try {
+      const response = await api.get('/api/focus/stats', { params: { days } });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching focus stats:', error);
+      throw error;
+    }
   },
 
+  // Get focus pattern
   getFocusPattern: async () => {
-    const response = await api.get('/focus/pattern');
-    return response.data;
+    try {
+      const response = await api.get('/api/focus/pattern');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching focus pattern:', error);
+      throw error;
+    }
   },
 
+  // Update focus preferences
   updateFocusPreferences: async (preferences) => {
-    const response = await api.put('/focus/preferences', preferences);
-    return response.data;
+    try {
+      const response = await api.put('/api/focus/preferences', preferences);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+      throw error;
+    }
   },
 
-  getOptimalTimeForTask: async (taskType, duration) => {
-    const response = await api.get('/focus/optimal-time', {
-      params: { taskType, duration }
-    });
-    return response.data;
+  // Get optimal time for task
+  getOptimalTimeForTask: async (taskId) => {
+    try {
+      const response = await api.get('/api/focus/optimal-time', { params: { taskId } });
+      return response.data;
+    } catch (error) {
+      console.error('Error getting optimal time:', error);
+      throw error;
+    }
   }
 };
+
+export default focusService;
