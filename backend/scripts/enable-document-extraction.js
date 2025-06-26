@@ -15,7 +15,9 @@ const requiredPackages = [
   'mammoth', 
   'xlsx',
   'natural',
-  'compromise'
+  'compromise',
+  'file-type',
+  'mime-types'
 ];
 
 const missingPackages = [];

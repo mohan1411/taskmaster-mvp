@@ -50,6 +50,8 @@
     "xlsx": "^0.18.5",
     "natural": "^6.10.0",
     "compromise": "^14.10.0",
+    "file-type": "^16.5.4",
+    "mime-types": "^2.1.35",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "xss": "^1.0.14"
