@@ -157,8 +157,7 @@ exports.scanEmailAttachments = async (req, res) => {
     });
     
     // Download attachments from Gmail
-    const gmailService = new gmailAttachmentService();
-    const downloadedAttachments = await gmailService.downloadEmailAttachments(
+    const downloadedAttachments = await gmailAttachmentService.downloadEmailAttachments(
       oauth2Client,
       email.messageId,
       email
