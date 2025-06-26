@@ -478,20 +478,15 @@ const extractTasksFromEmail = async (req, res) => {
     // Extract message body
     let messageBody = '';
     
-    // First check if the email has a body stored in the database (for sample/test emails)
-    if (email.body) {
-      console.log('Using email body from database');
-      messageBody = email.body;
-    } else {
-      // Try to fetch from Gmail if connected
-      const settings = await Settings.findOne({ user: req.user._id });
-      
-      if (!settings || !settings.integrations.google.connected) {
-        console.log('Gmail not connected and no body in database');
-        return res.status(400).json({ message: 'Email body not available. Gmail integration not connected.' });
-      }
-      
-      const tokenInfo = settings.integrations.google.tokenInfo;
+    // Fetch from Gmail API
+    const settings = await Settings.findOne({ user: req.user._id });
+    
+    if (!settings || !settings.integrations.google.connected) {
+      console.log('Gmail not connected');
+      return res.status(400).json({ message: 'Email body not available. Gmail integration not connected.' });
+    }
+    
+    const tokenInfo = settings.integrations.google.tokenInfo;
       
       // Create OAuth2 client
       const oauth2Client = createOAuth2Client({

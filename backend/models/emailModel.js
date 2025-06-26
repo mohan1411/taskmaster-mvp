@@ -46,12 +46,6 @@ const emailSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  // Email body - for testing/sample emails only
-  // Production emails fetch body from Gmail API
-  body: {
-    type: String,
-    required: false
-  },
   taskExtracted: {
     type: Boolean,
     default: false
