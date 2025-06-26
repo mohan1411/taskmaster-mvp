@@ -1,9 +1,13 @@
 const Document = require('../models/documentModel');
 const Email = require('../models/emailModel');
 const Task = require('../models/taskModel');
+const Settings = require('../models/settingsModel');
 const attachmentProcessor = require('../services/attachmentProcessor');
+const gmailAttachmentService = require('../services/gmailAttachmentService');
 const fileTypeDetector = require('../utils/fileTypeDetector');
+const { google } = require('googleapis');
 const path = require('path');
+const fs = require('fs').promises;
 
 exports.scanDocument = async (req, res) => {
   try {
@@ -136,11 +140,35 @@ exports.scanEmailAttachments = async (req, res) => {
       });
     }
 
-    // Only process if no documents exist
+    // Get user's Gmail credentials
+    const settings = await Settings.findOne({ user: req.user._id });
+    
+    if (!settings || !settings.integrations.google.connected) {
+      return res.status(400).json({ error: 'Gmail not connected. Please connect your Gmail account in Settings.' });
+    }
+    
+    const tokenInfo = settings.integrations.google.tokenInfo;
+    
+    // Create OAuth2 client
+    const oauth2Client = new google.auth.OAuth2();
+    oauth2Client.setCredentials({
+      access_token: tokenInfo.accessToken,
+      refresh_token: tokenInfo.refreshToken
+    });
+    
+    // Download attachments from Gmail
+    const gmailService = new gmailAttachmentService();
+    const downloadedAttachments = await gmailService.downloadEmailAttachments(
+      oauth2Client,
+      email.messageId,
+      email
+    );
+    
+    // Process downloaded attachments
     const results = await attachmentProcessor.processEmailAttachments(
       emailId,
-      email.attachments.map(att => ({
-        ...att.toObject ? att.toObject() : att,
+      downloadedAttachments.map(att => ({
+        ...att,
         userId: req.user.id
       }))
     );
