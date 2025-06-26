@@ -482,11 +482,19 @@ const extractTasksFromEmail = async (req, res) => {
     const settings = await Settings.findOne({ user: req.user._id });
     
     if (!settings || !settings.integrations.google.connected) {
-      console.log('Gmail not connected');
-      return res.status(400).json({ message: 'Email body not available. Gmail integration not connected.' });
+      console.log('Gmail not connected for user:', req.user._id);
+      console.log('Settings:', settings ? 'exists' : 'not found');
+      console.log('Google integration:', settings?.integrations?.google);
+      return res.status(400).json({ message: 'Gmail integration not connected. Please reconnect your Gmail account in Settings.' });
     }
     
     const tokenInfo = settings.integrations.google.tokenInfo;
+    
+    // Check if token exists
+    if (!tokenInfo || !tokenInfo.accessToken) {
+      console.log('No access token found for user:', req.user._id);
+      return res.status(400).json({ message: 'Gmail access token not found. Please reconnect your Gmail account in Settings.' });
+    }
     
     // Create OAuth2 client
     const oauth2Client = createOAuth2Client({
@@ -497,12 +505,13 @@ const extractTasksFromEmail = async (req, res) => {
     // Create Gmail API client
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
     
-    // Get full message content
-    const messageData = await gmail.users.messages.get({
-      userId: 'me',
-      id: email.messageId,
-      format: 'full'
-    });
+    try {
+      // Get full message content
+      const messageData = await gmail.users.messages.get({
+        userId: 'me',
+        id: email.messageId,
+        format: 'full'
+      });
     
     if (messageData.data.payload.parts) {
       // Multipart message
@@ -529,6 +538,21 @@ const extractTasksFromEmail = async (req, res) => {
         .replace(/&nbsp;/g, ' ')  // Replace &nbsp; with spaces
         .replace(/\s+/g, ' ')     // Normalize whitespace
         .trim();
+    }
+    } catch (gmailError) {
+      console.error('Gmail API error:', gmailError);
+      console.error('Error details:', gmailError.response?.data);
+      
+      // Check if it's an auth error
+      if (gmailError.code === 401 || gmailError.message?.includes('unauthorized')) {
+        return res.status(401).json({ 
+          message: 'Gmail authentication expired. Please reconnect your Gmail account in Settings.' 
+        });
+      }
+      
+      return res.status(500).json({ 
+        message: 'Failed to fetch email content from Gmail. Please try again or reconnect your Gmail account.' 
+      });
     }
     
     // Create email object for extraction
