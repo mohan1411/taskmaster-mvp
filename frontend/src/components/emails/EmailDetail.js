@@ -43,6 +43,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import CustomDatePicker from '../common/CustomDatePicker';
 import emailService from '../../services/emailService';
 import followupService from '../../services/followupService';
+import EmailAttachments from './EmailAttachments';
 
 const EmailDetail = ({ email, onClose, onRefresh }) => {
   const theme = useTheme();
@@ -445,6 +446,17 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
       
       {/* Email content */}
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: { xs: 1.5, sm: 2 } }}>
+        {/* Email Attachments */}
+        {email.hasAttachments && (
+          <EmailAttachments 
+            email={email} 
+            onTasksExtracted={(result) => {
+              // Refresh the email list to show updated task status
+              if (onRefresh) onRefresh();
+            }}
+          />
+        )}
+        
         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           {email.body || email.snippet || 'Loading email content...'}
         </Typography>

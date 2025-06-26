@@ -147,6 +147,21 @@ const syncEmails = async (req, res) => {
       
       const recipients = [...toRecipients, ...ccRecipients, ...bccRecipients];
       
+      // Extract attachment information
+      const attachments = [];
+      if (messageData.data.payload.parts) {
+        messageData.data.payload.parts.forEach(part => {
+          if (part.filename && part.filename.length > 0) {
+            attachments.push({
+              filename: part.filename,
+              mimeType: part.mimeType,
+              size: part.body.size,
+              attachmentId: part.body.attachmentId
+            });
+          }
+        });
+      }
+      
       // Create new email record
       const newEmail = await Email.create({
         user: req.user._id,
@@ -156,9 +171,8 @@ const syncEmails = async (req, res) => {
         recipients,
         subject: getHeader('Subject'),
         snippet: messageData.data.snippet,
-        hasAttachments: messageData.data.payload.parts ? 
-          messageData.data.payload.parts.some(part => part.filename && part.filename.length > 0) : 
-          false,
+        hasAttachments: attachments.length > 0,
+        attachments: attachments,
         labels: messageData.data.labelIds || [],
         receivedAt: new Date(getHeader('Date')),
         isRead: !messageData.data.labelIds.includes('UNREAD')

@@ -38,6 +38,12 @@ const emailSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  attachments: [{
+    filename: String,
+    mimeType: String,
+    size: Number,
+    attachmentId: String
+  }],
   labels: [String],
   receivedAt: {
     type: Date
