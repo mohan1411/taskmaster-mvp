@@ -69,6 +69,19 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
   });
   const [newKeyPoint, setNewKeyPoint] = useState('');
   
+  // Debug email data
+  useEffect(() => {
+    if (email) {
+      console.log('Email Detail - Email data:', {
+        id: email._id,
+        subject: email.subject,
+        hasAttachments: email.hasAttachments,
+        attachments: email.attachments,
+        attachmentCount: email.attachments?.length || 0
+      });
+    }
+  }, [email]);
+
   // Get task count when email changes
   useEffect(() => {
     const fetchTaskCount = async () => {
@@ -448,13 +461,26 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: { xs: 1.5, sm: 2 } }}>
         {/* Email Attachments */}
         {email.hasAttachments && (
-          <EmailAttachments 
-            email={email} 
-            onTasksExtracted={(result) => {
-              // Refresh the email list to show updated task status
-              if (onRefresh) onRefresh();
-            }}
-          />
+          <>
+            {/* Temporary debug info */}
+            {(!email.attachments || email.attachments.length === 0) && (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <AlertTitle>Attachment Data Missing</AlertTitle>
+                This email has attachments but the details are not loaded. 
+                Please click "Sync Emails" to refresh the attachment information.
+              </Alert>
+            )}
+            
+            {email.attachments && email.attachments.length > 0 && (
+              <EmailAttachments 
+                email={email} 
+                onTasksExtracted={(result) => {
+                  // Refresh the email list to show updated task status
+                  if (onRefresh) onRefresh();
+                }}
+              />
+            )}
+          </>
         )}
         
         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
