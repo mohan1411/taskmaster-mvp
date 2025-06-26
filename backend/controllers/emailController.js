@@ -520,7 +520,6 @@ const extractTasksFromEmail = async (req, res) => {
         const bodyData = messageData.data.payload.body.data;
         messageBody = Buffer.from(bodyData, 'base64').toString('utf8');
       }
-    }
     
     // Strip HTML if present
     if (messageBody.includes('<html') || messageBody.includes('<body')) {
