@@ -487,39 +487,39 @@ const extractTasksFromEmail = async (req, res) => {
     }
     
     const tokenInfo = settings.integrations.google.tokenInfo;
-      
-      // Create OAuth2 client
-      const oauth2Client = createOAuth2Client({
-        access_token: tokenInfo.accessToken,
-        refresh_token: tokenInfo.refreshToken,
-      });
-      
-      // Create Gmail API client
-      const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-      
-      // Get full message content
-      const messageData = await gmail.users.messages.get({
-        userId: 'me',
-        id: email.messageId,
-        format: 'full'
-      });
-      
-      if (messageData.data.payload.parts) {
-        // Multipart message
-        messageData.data.payload.parts.forEach(part => {
-          if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
-            const bodyData = part.body.data;
-            if (bodyData) {
-              const decodedBody = Buffer.from(bodyData, 'base64').toString('utf8');
-              messageBody += decodedBody;
-            }
+    
+    // Create OAuth2 client
+    const oauth2Client = createOAuth2Client({
+      access_token: tokenInfo.accessToken,
+      refresh_token: tokenInfo.refreshToken,
+    });
+    
+    // Create Gmail API client
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+    
+    // Get full message content
+    const messageData = await gmail.users.messages.get({
+      userId: 'me',
+      id: email.messageId,
+      format: 'full'
+    });
+    
+    if (messageData.data.payload.parts) {
+      // Multipart message
+      messageData.data.payload.parts.forEach(part => {
+        if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
+          const bodyData = part.body.data;
+          if (bodyData) {
+            const decodedBody = Buffer.from(bodyData, 'base64').toString('utf8');
+            messageBody += decodedBody;
           }
-        });
-      } else if (messageData.data.payload.body && messageData.data.payload.body.data) {
-        // Single part message
-        const bodyData = messageData.data.payload.body.data;
-        messageBody = Buffer.from(bodyData, 'base64').toString('utf8');
-      }
+        }
+      });
+    } else if (messageData.data.payload.body && messageData.data.payload.body.data) {
+      // Single part message
+      const bodyData = messageData.data.payload.body.data;
+      messageBody = Buffer.from(bodyData, 'base64').toString('utf8');
+    }
     
     // Strip HTML if present
     if (messageBody.includes('<html') || messageBody.includes('<body')) {
