@@ -96,14 +96,11 @@ const syncEmails = async (req, res) => {
         continue; // Skip if already synced
       }
       
-      // Get message details
+      // Get message details with full payload to include parts/attachments
       const messageData = await gmail.users.messages.get({
         userId: 'me',
         id: message.id,
-        format: 'metadata',
-        metadataHeaders: [
-          'From', 'To', 'Cc', 'Bcc', 'Subject', 'Date'
-        ]
+        format: 'full'
       });
       
       const headers = messageData.data.payload.headers;
@@ -147,18 +144,39 @@ const syncEmails = async (req, res) => {
       
       const recipients = [...toRecipients, ...ccRecipients, ...bccRecipients];
       
-      // Extract attachment information
+      // Extract attachment information (handle nested parts)
       const attachments = [];
-      if (messageData.data.payload.parts) {
-        messageData.data.payload.parts.forEach(part => {
+      const extractAttachments = (parts) => {
+        if (!parts) return;
+        
+        parts.forEach(part => {
+          // Check if this part has a filename (is an attachment)
           if (part.filename && part.filename.length > 0) {
             attachments.push({
               filename: part.filename,
               mimeType: part.mimeType,
-              size: part.body.size,
-              attachmentId: part.body.attachmentId
+              size: part.body ? part.body.size : 0,
+              attachmentId: part.body ? part.body.attachmentId : null
             });
           }
+          
+          // Recursively check for nested parts
+          if (part.parts) {
+            extractAttachments(part.parts);
+          }
+        });
+      };
+      
+      // Start extraction from payload parts
+      if (messageData.data.payload.parts) {
+        extractAttachments(messageData.data.payload.parts);
+      }
+      
+      // Log attachment detection for debugging
+      if (attachments.length > 0) {
+        console.log(`Found ${attachments.length} attachments in email: ${getHeader('Subject')}`);
+        attachments.forEach(att => {
+          console.log(`  - ${att.filename} (${att.mimeType}, ${att.size} bytes)`);
         });
       }
       

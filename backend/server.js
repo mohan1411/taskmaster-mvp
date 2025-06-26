@@ -141,7 +141,7 @@ const onboardingRoutes = require('./routes/onboardingRoutes');
 const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
 const focusRoutes = require('./routes/focusRoutes');
 const agentRoutes = require('./routes/agentRoutes');
-// const documentRoutes = require('./routes/documentRoutes'); // Missing: file-type, mime-types
+const documentRoutes = require('./routes/documentRoutes');
 // const testAuthRoutes = require('./routes/testAuthRoutes'); // Temporarily disabled - missing file
 
 // Swagger UI - serve API documentation
@@ -164,7 +164,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/unified-email', unifiedEmailRoutes);
 app.use('/api/focus', focusRoutes);
 app.use('/api/agents', agentRoutes);
-// app.use('/api/documents', documentRoutes); // Missing: file-type, mime-types
+app.use('/api/documents', documentRoutes);
 // app.use('/api/test-auth', testAuthRoutes); // Temporarily disabled - missing file
 
 // Error handling middleware
