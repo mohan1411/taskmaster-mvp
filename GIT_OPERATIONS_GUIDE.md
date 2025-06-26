@@ -3,8 +3,8 @@
 ## Current Git Structure
 
 ### Branches
-- **main**: Primary development branch (default)
-- **develop**: Feature development branch (exists but not actively used)
+- **main**: Production-ready branch (stable releases)
+- **develop**: Active development branch (all new features and fixes)
 - **bugfix/critical-security-fixes**: Security fixes branch
 - **bugfix/input-validation**: Input validation fixes
 - **improvement/database-indexes**: Database optimization branch
@@ -14,35 +14,76 @@
 
 ## Git Workflow
 
-### 1. Regular Development
+### 1. Development Workflow (Day-to-Day Development)
+
+**Important**: All development work should be done on the `develop` branch!
+
 ```bash
-# Always work on main branch for now
-git checkout main
-git pull origin main
+# Switch to develop branch
+git checkout develop
+git pull origin develop
 
 # Make changes
 git add -A
 git commit -m "Your commit message"
-git push origin main
+git push origin develop
 ```
 
-### 2. Creating a New Release
+### 2. Releasing to Production
 
-**Important**: We use TAGS for releases, NOT branches!
+When ready to release develop changes to production:
 
 ```bash
-# Ensure you're on main with latest changes
+# Step 1: Ensure develop is up to date
+git checkout develop
+git pull origin develop
+
+# Step 2: Merge develop into main
 git checkout main
 git pull origin main
+git merge develop
+git push origin main
 
-# Create annotated tag
+# Step 3: Create release tag
 git tag -a v1.1.5 -m "Release v1.1.5 - Description of changes"
-
-# Push tag to remote
 git push origin v1.1.5
+
+# Step 4: Deploy on Railway using the tag
 ```
 
-### 3. Production Deployment Strategy
+### 3. Hotfix Workflow (Emergency Production Fixes)
+
+For urgent production fixes:
+
+```bash
+# Create hotfix from main
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-issue
+
+# Make fixes
+git add -A
+git commit -m "Hotfix: Description"
+
+# Merge to main
+git checkout main
+git merge hotfix/critical-issue
+git push origin main
+
+# Create hotfix tag
+git tag -a v1.1.5-hotfix1 -m "Hotfix: Description"
+git push origin v1.1.5-hotfix1
+
+# Merge back to develop
+git checkout develop
+git merge main
+git push origin develop
+
+# Delete hotfix branch
+git branch -D hotfix/critical-issue
+```
+
+### 4. Production Deployment Strategy
 
 When deploying to production (Railway), we need to exclude test-only changes:
 
@@ -56,7 +97,7 @@ When deploying to production (Railway), we need to exclude test-only changes:
    - All performance improvements
    - Email attachment functionality (restored)
 
-### 4. Common Git Operations
+### 5. Common Git Operations
 
 #### Check Current Status
 ```bash
@@ -137,29 +178,56 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Quick Reference Commands
 
+### For Development Work
+```bash
+# Always start by updating develop
+git checkout develop
+git pull origin develop
+
+# Make changes and commit
+git add -A
+git commit -m "Your commit message"
+git push origin develop
+```
+
 ### For Production Release
 ```bash
-# 1. Ensure on main with latest
+# 1. Update both branches
+git checkout develop
+git pull origin develop
 git checkout main
 git pull origin main
 
-# 2. Create and push tag
+# 2. Merge develop to main
+git merge develop
+git push origin main
+
+# 3. Create and push tag
 git tag -a v1.1.5 -m "Release v1.1.5 - Your description"
 git push origin v1.1.5
 
-# 3. Deploy on Railway using tag v1.1.5
+# 4. Deploy on Railway using tag v1.1.5
 ```
 
-### For Committing Changes
+### Syncing Develop with Latest Production
 ```bash
-git add -A
-git commit -m "Your commit message"
-git push origin main
+# After a hotfix or direct main branch update
+git checkout develop
+git pull origin develop
+git merge main
+git push origin develop
 ```
 
 ## Notes for Future Sessions
+- Development happens on `develop` branch
+- Production releases go to `main` branch
 - We use tags (not branches) for releases
 - Current production version is v1.1.4
-- Main branch is the primary development branch
 - All recent fixes are included in v1.1.4 tag
 - Task extraction now properly finds multiple tasks in documents
+
+## Current State (as of 2025-06-26)
+- **develop branch**: Behind main (needs to be synced with latest fixes)
+- **main branch**: Contains all latest fixes including task extraction
+- **Latest tag**: v1.1.4 (on main branch)
+- **Next steps**: Sync develop with main before starting new development
