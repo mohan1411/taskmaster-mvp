@@ -446,8 +446,8 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
       
       {/* Email content */}
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: { xs: 1.5, sm: 2 } }}>
-        {/* Email Attachments */}
-        {email.hasAttachments && (
+        {/* Email Attachments - Temporarily disabled until document processing packages are installed */}
+        {/* {email.hasAttachments && (
           <EmailAttachments 
             email={email} 
             onTasksExtracted={(result) => {
@@ -455,7 +455,7 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
               if (onRefresh) onRefresh();
             }}
           />
-        )}
+        )} */}
         
         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           {email.body || email.snippet || 'Loading email content...'}
