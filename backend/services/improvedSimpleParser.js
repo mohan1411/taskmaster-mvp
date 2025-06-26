@@ -1,6 +1,9 @@
+const { createLogger } = require('../utils/logger');
+const logger = createLogger('ImprovedSimpleParser');
+
 class ImprovedSimpleParser {
   parseDocument(text) {
-    console.log('Using enhanced simple parser...');
+    logger.debug('Using enhanced simple parser...');
     
     const lines = text.split(/\r?\n/);
     const tasks = [];
@@ -171,14 +174,16 @@ class ImprovedSimpleParser {
     }
     
     // Filter and deduplicate
-    console.log(`Before filtering: ${tasks.length} tasks found`);
+    logger.debug(`Before filtering: ${tasks.length} tasks found`);
     const filteredTasks = this.filterAndDeduplicate(tasks);
     
-    console.log(`Enhanced parser found ${filteredTasks.length} tasks after filtering`);
+    logger.info(`Enhanced parser found ${filteredTasks.length} tasks after filtering`);
     // Log first few tasks for debugging
-    filteredTasks.slice(0, 3).forEach((task, index) => {
-      console.log(`Task ${index + 1}: "${task.title}" (confidence: ${task.confidence}, priority: ${task.priority})`);
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      filteredTasks.slice(0, 3).forEach((task, index) => {
+        logger.debug(`Task ${index + 1}: "${task.title}" (confidence: ${task.confidence}, priority: ${task.priority})`);
+      });
+    }
     
     return filteredTasks;
   }

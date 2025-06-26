@@ -257,7 +257,14 @@ git push origin develop
 
 Before merging to main (production):
 
-1. **Test Locally**
+1. **Check for Test-Only Code**
+   ```bash
+   cd backend
+   npm run check:test-code
+   ```
+   See `TEST_CODE_PATTERNS.md` for details
+
+2. **Test Locally**
    ```bash
    # Backend tests
    cd backend
@@ -268,18 +275,18 @@ Before merging to main (production):
    npm run build
    ```
 
-2. **Check for Package Updates**
+3. **Check for Package Updates**
    ```bash
    # If package.json was modified
    cd backend && npm install
    cd ../frontend && npm install
    ```
 
-3. **Environment Variables**
+4. **Environment Variables**
    - Ensure all new env variables are added to Railway
    - Check `.env.example` is updated
 
-4. **Database Changes**
+5. **Database Changes**
    - Document any schema changes
    - Prepare migration scripts if needed
    - Backup production database before deployment

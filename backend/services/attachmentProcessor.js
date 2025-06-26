@@ -5,8 +5,11 @@ const simpleTaskParser = require('./simpleTaskParser');
 const openaiDocumentParser = require('./openaiDocumentParser');
 const improvedSimpleParser = require('./improvedSimpleParser');
 const fileTypeDetector = require('../utils/fileTypeDetector');
+const { createLogger } = require('../utils/logger');
 const fs = require('fs').promises;
 const path = require('path');
+
+const logger = createLogger('AttachmentProcessor');
 
 class AttachmentProcessor {
   constructor() {
@@ -22,7 +25,7 @@ class AttachmentProcessor {
   async processDocument(documentId, filePath) {
     // Prevent duplicate processing
     if (this.processingQueue.has(documentId)) {
-      console.log(`Document ${documentId} already being processed`);
+      logger.info(`Document ${documentId} already being processed`);
       return;
     }
 
@@ -51,7 +54,7 @@ class AttachmentProcessor {
       }
 
       // Extract text
-      console.log(`Extracting text from ${document.originalName}`);
+      logger.info(`Extracting text from ${document.originalName}`);
       const extractionResult = await documentExtractor.extractFromFile(
         filePath, 
         document.mimeType
@@ -61,8 +64,8 @@ class AttachmentProcessor {
       const documentType = await fileTypeDetector.detectDocumentType(extractionResult.text);
 
       // Parse for tasks based on configuration
-      console.log(`Parsing tasks from ${document.originalName} using mode: ${this.parserMode}`);
-      console.log(`Parser mode from environment: ${process.env.DOCUMENT_PARSER_MODE || 'not set (defaulting to simple-only)'}`);
+      logger.info(`Parsing tasks from ${document.originalName} using mode: ${this.parserMode}`);
+      logger.debug(`Parser mode from environment: ${process.env.DOCUMENT_PARSER_MODE || 'not set (defaulting to simple-only)'}`);
       let tasks = [];
       
       const parserContext = {
@@ -77,15 +80,15 @@ class AttachmentProcessor {
       switch (this.parserMode) {
         case 'simple-only':
           // Use improved simple parser
-          console.log('Using improved simple parser...');
+          logger.debug('Using improved simple parser...');
           tasks = improvedSimpleParser.parseDocument(extractionResult.text);
-          console.log(`Parser found ${tasks.length} tasks`);
+          logger.info(`Parser found ${tasks.length} tasks`);
           break;
           
         case 'openai-only':
           // Use OpenAI only (will fail if not configured)
           tasks = await openaiDocumentParser.parseDocument(extractionResult.text, parserContext);
-          console.log(`OpenAI parser found ${tasks.length} tasks`);
+          logger.info(`OpenAI parser found ${tasks.length} tasks`);
           break;
           
         case 'openai-first':
@@ -93,12 +96,12 @@ class AttachmentProcessor {
           // Try OpenAI first, fallback to simple
           try {
             tasks = await openaiDocumentParser.parseDocument(extractionResult.text, parserContext);
-            console.log(`OpenAI parser found ${tasks.length} tasks`);
+            logger.info(`OpenAI parser found ${tasks.length} tasks`);
           } catch (parserError) {
-            console.warn(`OpenAI parser failed, using improved simple parser:`, parserError.message);
+            logger.warn(`OpenAI parser failed, using improved simple parser:`, parserError.message);
             // Use the improved simple parser as fallback
             tasks = improvedSimpleParser.parseDocument(extractionResult.text);
-            console.log(`Improved simple parser found ${tasks.length} tasks`);
+            logger.info(`Improved simple parser found ${tasks.length} tasks`);
           }
           break;
       }
@@ -117,14 +120,14 @@ class AttachmentProcessor {
         }
       });
 
-      console.log(`Successfully processed ${document.originalName}: Found ${tasks.length} tasks`);
+      logger.info(`Successfully processed ${document.originalName}: Found ${tasks.length} tasks`);
 
       // Don't clean up file to allow reprocessing
       // await this.cleanupFile(filePath);
 
       return document;
     } catch (error) {
-      console.error(`Error processing document ${documentId}:`, error);
+      logger.error(`Error processing document ${documentId}:`, error);
 
       // Mark as failed
       try {
@@ -133,7 +136,7 @@ class AttachmentProcessor {
           await document.markAsFailed(error);
         }
       } catch (updateError) {
-        console.error('Failed to update document status:', updateError);
+        logger.error('Failed to update document status:', updateError);
       }
 
       // Don't clean up file on error to allow retry
@@ -155,7 +158,7 @@ class AttachmentProcessor {
       try {
         // Check if supported
         if (!fileTypeDetector.isSupported(attachment.mimeType)) {
-          console.log(`Skipping unsupported file type: ${attachment.mimeType}`);
+          logger.info(`Skipping unsupported file type: ${attachment.mimeType}`);
           continue;
         }
 
@@ -173,7 +176,7 @@ class AttachmentProcessor {
 
         // Process asynchronously
         this.processDocument(document._id, attachment.path)
-          .catch(error => console.error(`Failed to process attachment ${attachment.filename}:`, error));
+          .catch(error => logger.error(`Failed to process attachment ${attachment.filename}:`, error));
 
         results.push({
           documentId: document._id,
@@ -181,7 +184,7 @@ class AttachmentProcessor {
           status: 'processing'
         });
       } catch (error) {
-        console.error(`Error creating document for ${attachment.filename}:`, error);
+        logger.error(`Error creating document for ${attachment.filename}:`, error);
         results.push({
           filename: attachment.filename,
           status: 'failed',
@@ -209,7 +212,7 @@ class AttachmentProcessor {
         emailBody: email.body ? email.body.substring(0, 500) : '' // First 500 chars
       };
     } catch (error) {
-      console.error('Error fetching email context:', error);
+      logger.error('Error fetching email context:', error);
       return null;
     }
   }
@@ -220,9 +223,9 @@ class AttachmentProcessor {
   async cleanupFile(filePath) {
     try {
       await fs.unlink(filePath);
-      console.log(`Cleaned up file: ${filePath}`);
+      logger.info(`Cleaned up file: ${filePath}`);
     } catch (error) {
-      console.error(`Failed to cleanup file ${filePath}:`, error);
+      logger.error(`Failed to cleanup file ${filePath}:`, error);
     }
   }
 
@@ -232,17 +235,17 @@ class AttachmentProcessor {
   async processPendingDocuments() {
     try {
       const pendingDocs = await Document.findPendingDocuments();
-      console.log(`Found ${pendingDocs.length} pending documents`);
+      logger.info(`Found ${pendingDocs.length} pending documents`);
 
       for (const doc of pendingDocs) {
         try {
           await this.processDocument(doc._id, doc.path);
         } catch (error) {
-          console.error(`Failed to process pending document ${doc._id}:`, error);
+          logger.error(`Failed to process pending document ${doc._id}:`, error);
         }
       }
     } catch (error) {
-      console.error('Error processing pending documents:', error);
+      logger.error('Error processing pending documents:', error);
     }
   }
 
@@ -307,7 +310,7 @@ class AttachmentProcessor {
         await fs.access(document.path);
         fileExists = true;
       } catch (error) {
-        console.log('Original file no longer exists, cannot reprocess');
+        logger.info('Original file no longer exists, cannot reprocess');
       }
     }
 
@@ -339,7 +342,7 @@ class AttachmentProcessor {
     const validModes = ['simple-only', 'openai-first', 'openai-only'];
     if (validModes.includes(mode)) {
       this.parserMode = mode;
-      console.log(`Document parser mode set to: ${mode}`);
+      logger.info(`Document parser mode set to: ${mode}`);
       return true;
     }
     return false;
