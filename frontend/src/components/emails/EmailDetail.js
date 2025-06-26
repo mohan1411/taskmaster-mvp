@@ -446,9 +446,8 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
       
       {/* Email content */}
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: { xs: 1.5, sm: 2 } }}>
-        {/* Email Attachments - Temporarily disabled until NLP packages are installed */}
-        {/* TODO: Re-enable after npm install: natural, compromise packages */}
-        {/* {email.hasAttachments && (
+        {/* Email Attachments */}
+        {email.hasAttachments && (
           <EmailAttachments 
             email={email} 
             onTasksExtracted={(result) => {
@@ -456,7 +455,7 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
               if (onRefresh) onRefresh();
             }}
           />
-        )} */}
+        )}
         
         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           {email.body || email.snippet || 'Loading email content...'}

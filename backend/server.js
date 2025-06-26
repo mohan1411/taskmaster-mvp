@@ -141,8 +141,7 @@ const onboardingRoutes = require('./routes/onboardingRoutes');
 const unifiedEmailRoutes = require('./routes/unifiedEmailRoutes');
 const focusRoutes = require('./routes/focusRoutes');
 const agentRoutes = require('./routes/agentRoutes');
-// TODO: Re-enable after npm install: natural, compromise packages
-// const documentRoutes = require('./routes/documentRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 // const testAuthRoutes = require('./routes/testAuthRoutes'); // Temporarily disabled - missing file
 
 // Swagger UI - serve API documentation
@@ -165,8 +164,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/unified-email', unifiedEmailRoutes);
 app.use('/api/focus', focusRoutes);
 app.use('/api/agents', agentRoutes);
-// TODO: Re-enable after npm install: natural, compromise packages
-// app.use('/api/documents', documentRoutes);
+app.use('/api/documents', documentRoutes);
 // app.use('/api/test-auth', testAuthRoutes); // Temporarily disabled - missing file
 
 // Error handling middleware
