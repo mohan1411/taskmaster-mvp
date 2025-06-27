@@ -121,6 +121,7 @@ class AttachmentProcessor {
       });
 
       logger.info(`Successfully processed ${document.originalName}: Found ${tasks.length} tasks`);
+      console.log(`[ATTACHMENT PROCESSOR] Document ${document.originalName}: Extracted ${tasks.length} tasks, saving to DB...`);
 
       // Don't clean up file to allow reprocessing
       // await this.cleanupFile(filePath);
