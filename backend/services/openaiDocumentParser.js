@@ -20,22 +20,25 @@ class OpenAIDocumentParser {
       console.log('[OPENAI PARSER] Document preview (first 500 chars):', text.substring(0, 500));
       
       const prompt = `
-You are a task extraction expert. Extract ONLY the main actionable tasks from the following document.
+You are a task extraction expert. Extract ALL actionable tasks from the following document.
 
 IMPORTANT RULES:
-1. Extract only TOP-LEVEL tasks, not sub-items or details
-2. Each task should be a complete, standalone action item
-3. Include sub-bullets as part of the task description, not as separate tasks
-4. A task must be something someone needs to DO, not just information
-5. Combine related sub-items into a single task
+1. Extract EVERY individual task, including sub-tasks and detailed items
+2. Each task should be a specific, actionable item
+3. If a document has numbered lists or bullet points, treat each as a separate task
+4. Include tasks at all levels - don't combine or summarize them
+5. A task must be something someone needs to DO, not just information
+6. Even if tasks seem related, list them separately
 
 For each task, provide:
-- title: Clear, action-oriented title (the main task)
-- description: Include all relevant sub-items and details as a single description
+- title: Clear, specific action item (don't combine multiple tasks)
+- description: Additional details if any (can be empty)
 - priority: urgent, high, medium, or low
 - dueDate: in ISO format if mentioned
 - assignee: if mentioned
 - confidence: 0-100 (how confident you are this is a real task)
+
+Note: If a document has 20 specific tasks, return all 20. Don't limit or summarize.
 
 Format as JSON array:
 [
@@ -60,7 +63,7 @@ ${text}
         messages: [
           { 
             role: "system", 
-            content: "You are a task extraction expert. Extract only main actionable tasks, not sub-items. Always respond with valid JSON only."
+            content: "You are a task extraction expert. Extract ALL individual tasks including sub-tasks and detailed items. Do not summarize or combine tasks. Always respond with valid JSON only."
           },
           { 
             role: "user", 
