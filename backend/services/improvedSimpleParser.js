@@ -102,7 +102,7 @@ class ImprovedSimpleParser {
       for (const pattern of mainTaskPatterns) {
         const match = trimmed.match(pattern.regex);
         if (match) {
-          console.log(`[PARSER] Pattern matched: ${pattern.type} on line ${index + 1}: "${trimmed.substring(0, 60)}..."`);
+          console.log(`[PARSER MATCH] Line ${index + 1} matched pattern "${pattern.type}": "${trimmed}"`);
           
           // Save previous task if exists
           if (currentTask && currentTask.title.length > 5) {
