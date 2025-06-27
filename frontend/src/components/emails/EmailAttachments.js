@@ -348,14 +348,26 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
           </DialogTitle>
           
           <DialogContent sx={{ p: 0 }}>
-            {console.log('Passing to TaskExtractionReview:', {
-              extractedTasks: extractionResults.documents[0].tasks,
-              documentId: extractionResults.documents[0].documentId
-            })}
-            <TaskExtractionReview
-              extractedTasks={extractionResults.documents[0].tasks}
-              documentId={extractionResults.documents[0].documentId}
-              onTasksCreated={(result) => {
+            {(() => {
+              // Combine all tasks from all documents
+              const allTasks = extractionResults.documents.flatMap(doc => 
+                doc.tasks.map(task => ({
+                  ...task,
+                  source: doc.filename // Add source document info
+                }))
+              );
+              
+              console.log('Passing to TaskExtractionReview:', {
+                totalTasks: allTasks.length,
+                fromDocuments: extractionResults.documents.length,
+                documentId: extractionResults.documents[0].documentId
+              });
+              
+              return (
+                <TaskExtractionReview
+                  extractedTasks={allTasks}
+                  documentId={extractionResults.documents[0].documentId}
+                  onTasksCreated={(result) => {
                 try {
                   setShowTaskReview(false);
                   setExtractionResults(null);
@@ -368,9 +380,11 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
                 } catch (err) {
                   console.error('Error in onTasksCreated callback:', err);
                 }
-              }}
-              onClose={() => setShowTaskReview(false)}
-            />
+                  }}
+                  onClose={() => setShowTaskReview(false)}
+                />
+              );
+            })()}
           </DialogContent>
         </Dialog>
       )}
