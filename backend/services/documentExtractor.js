@@ -48,12 +48,50 @@ class DocumentExtractor {
       const buffer = await fs.readFile(filePath);
       const data = await pdf(buffer);
       
+      // Log raw extracted text for debugging
+      console.log('\n[PDF EXTRACTOR] Raw extracted text:');
+      console.log('=====================================');
+      console.log(data.text.substring(0, 1000)); // First 1000 chars
+      console.log('=====================================');
+      console.log(`Total text length: ${data.text.length} characters`);
+      console.log(`Number of pages: ${data.numpages}`);
+      
+      // Log text before and after cleaning
+      const cleanedText = this.cleanText(data.text);
+      console.log('\n[PDF EXTRACTOR] Cleaned text:');
+      console.log('=====================================');
+      console.log(cleanedText.substring(0, 1000)); // First 1000 chars
+      console.log('=====================================');
+      console.log(`Cleaned text length: ${cleanedText.length} characters`);
+      
+      // Check for potential formatting issues
+      const potentialIssues = [];
+      if (data.text.includes('\t\t')) potentialIssues.push('Multiple tabs detected');
+      if (data.text.match(/\d\s+\d\s+[A-Z]/)) potentialIssues.push('Possible column formatting issues');
+      if (data.text.match(/[A-Z]{2,}\s*:/)) potentialIssues.push('Headers detected');
+      if (data.text.split('\n').some(line => line.length > 200)) potentialIssues.push('Very long lines detected');
+      
+      if (potentialIssues.length > 0) {
+        console.log('\n[PDF EXTRACTOR] Potential formatting issues:');
+        potentialIssues.forEach(issue => console.log(`  - ${issue}`));
+      }
+      
+      // Try to detect and fix column-based layouts
+      let finalText = cleanedText;
+      if (potentialIssues.includes('Possible column formatting issues')) {
+        console.log('\n[PDF EXTRACTOR] Attempting to fix column formatting...');
+        finalText = this.fixColumnFormatting(cleanedText);
+      }
+      
       return {
-        text: this.cleanText(data.text),
+        text: finalText,
         metadata: {
           pages: data.numpages,
           info: data.info,
-          wordCount: this.countWords(data.text)
+          wordCount: this.countWords(data.text),
+          rawTextLength: data.text.length,
+          cleanedTextLength: cleanedText.length,
+          potentialIssues: potentialIssues
         }
       };
     } catch (error) {
@@ -215,15 +253,41 @@ class DocumentExtractor {
   cleanText(text) {
     if (!text) return '';
     
-    return text
+    // Log problematic patterns before cleaning
+    const multipleSpaces = (text.match(/ {2,}/g) || []).length;
+    const multipleTabs = (text.match(/\t{2,}/g) || []).length;
+    const formFeeds = (text.match(/\f/g) || []).length;
+    
+    if (multipleSpaces > 10 || multipleTabs > 5 || formFeeds > 0) {
+      console.log(`[CLEANER] Found formatting issues: ${multipleSpaces} multiple spaces, ${multipleTabs} multiple tabs, ${formFeeds} form feeds`);
+    }
+    
+    // Be more careful with space replacement - preserve some formatting
+    const cleaned = text
       .replace(/\r\n/g, '\n') // Normalize line endings
-      .replace(/\t/g, ' ') // Replace tabs with spaces
+      .replace(/\t+/g, '  ') // Replace tabs with double spaces (preserve some structure)
       .replace(/\u0000/g, '') // Remove null characters
       .replace(/\f/g, '\n\n') // Form feeds to double newlines
       .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces
-      .replace(/ +/g, ' ') // Multiple spaces to single
+      .replace(/ {3,}/g, '  ') // Multiple spaces to double (not single)
       .replace(/\n{3,}/g, '\n\n') // Multiple newlines to double
       .trim();
+    
+    // Check if we might have column-based formatting
+    const lines = cleaned.split('\n');
+    let columnFormatDetected = false;
+    for (const line of lines.slice(0, 20)) { // Check first 20 lines
+      if (line.match(/\d+\s{2,}\d+\s{2,}/) || line.match(/\w+\s{10,}\w+/)) {
+        columnFormatDetected = true;
+        break;
+      }
+    }
+    
+    if (columnFormatDetected) {
+      console.log('[CLEANER] WARNING: Column-based formatting detected. Text may need special handling.');
+    }
+    
+    return cleaned;
   }
 
   /**
@@ -418,6 +482,57 @@ class DocumentExtractor {
     );
     
     return hasTaskColumn || hasDateColumn;
+  }
+
+  /**
+   * Fix column formatting issues in PDF text
+   */
+  fixColumnFormatting(text) {
+    const lines = text.split('\n');
+    const fixedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Check for patterns like "3 3 TODO:" or similar column artifacts
+      const columnMatch = line.match(/^(\d+)\s+(\d+)\s+(TODO|TASK|ACTION):\s*(.+)/i);
+      if (columnMatch) {
+        // Extract just the task part
+        fixedLines.push(`${columnMatch[3]}: ${columnMatch[4]}`);
+        console.log(`[COLUMN FIX] Fixed line: "${line}" -> "${columnMatch[3]}: ${columnMatch[4]}"`);
+        continue;
+      }
+      
+      // Check for other column patterns (e.g., numbered lists that got split)
+      const numberedMatch = line.match(/^(\d+)\s+(\d+)\s+(.+)/);
+      if (numberedMatch && !line.match(/\d{4}/)) { // Avoid dates
+        // This might be a split numbered list
+        fixedLines.push(`${numberedMatch[1]}. ${numberedMatch[3]}`);
+        console.log(`[COLUMN FIX] Fixed numbered: "${line}" -> "${numberedMatch[1]}. ${numberedMatch[3]}"`);
+        continue;
+      }
+      
+      // Check if line has excessive spacing that might indicate columns
+      if (line.match(/\s{10,}/)) {
+        // Split by large spaces and try to reconstruct
+        const parts = line.split(/\s{10,}/);
+        if (parts.length > 1) {
+          // Take the most meaningful part (usually the longest)
+          const meaningful = parts.reduce((a, b) => a.length > b.length ? a : b);
+          fixedLines.push(meaningful.trim());
+          console.log(`[COLUMN FIX] Extracted from columns: "${line}" -> "${meaningful.trim()}"`);
+          continue;
+        }
+      }
+      
+      // Default: keep the line as is
+      fixedLines.push(line);
+    }
+    
+    const fixedText = fixedLines.join('\n');
+    console.log(`[COLUMN FIX] Fixed ${lines.length - fixedLines.filter(l => l === lines[fixedLines.indexOf(l)]).length} lines`);
+    
+    return fixedText;
   }
 }
 

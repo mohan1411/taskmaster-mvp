@@ -5,7 +5,26 @@ class ImprovedSimpleParser {
   parseDocument(text) {
     logger.debug('Using enhanced simple parser...');
     
+    // Log the first part of the text for debugging
+    console.log('\n[IMPROVED PARSER] Received text for parsing:');
+    console.log('=====================================');
+    console.log(text.substring(0, 800)); // First 800 chars
+    console.log('=====================================');
+    console.log(`Total text length: ${text.length} characters`);
+    
     const lines = text.split(/\r?\n/);
+    console.log(`[IMPROVED PARSER] Split into ${lines.length} lines`);
+    
+    // Log first 10 non-empty lines
+    console.log('\n[IMPROVED PARSER] First 10 non-empty lines:');
+    let nonEmptyCount = 0;
+    for (let i = 0; i < lines.length && nonEmptyCount < 10; i++) {
+      if (lines[i].trim()) {
+        console.log(`Line ${i + 1}: "${lines[i]}"`);
+        nonEmptyCount++;
+      }
+    }
+    
     const tasks = [];
     let currentTask = null;
     let inSubItems = false;
@@ -20,7 +39,10 @@ class ImprovedSimpleParser {
       { regex: /^(.+?)\s*-\s*(Due|By|Before|Deadline):\s*(.+)/i, type: 'with-deadline' },
       { regex: /^(.+?)\s*-\s*(Priority|Level):\s*(High|Medium|Low|Urgent)/i, type: 'with-priority' },
       { regex: /^(Need to|Must|Should|Has to|Have to)\s+(.+)/i, type: 'imperative' },
-      { regex: /^(.+?)\s*-\s*[A-Z]\w+\s+\d{1,2},?\s+\d{4}/i, type: 'task-with-date' }
+      { regex: /^(.+?)\s*-\s*[A-Z]\w+\s+\d{1,2},?\s+\d{4}/i, type: 'task-with-date' },
+      // Handle potential PDF formatting issues
+      { regex: /^\d+\s+\d+\s+(TODO|TASK|ACTION):\s*(.+)/i, type: 'pdf-formatted' },
+      { regex: /^\d+\s+(.+?)\s+(TODO|TASK|ACTION):\s*(.+)/i, type: 'pdf-formatted-2' }
     ];
     
     // Patterns for sub-items (should be grouped with parent)
@@ -80,8 +102,11 @@ class ImprovedSimpleParser {
       for (const pattern of mainTaskPatterns) {
         const match = trimmed.match(pattern.regex);
         if (match) {
+          console.log(`[PARSER] Pattern matched: ${pattern.type} on line ${index + 1}: "${trimmed.substring(0, 60)}..."`);
+          
           // Save previous task if exists
           if (currentTask && currentTask.title.length > 5) {
+            console.log(`[PARSER] Saving previous task: "${currentTask.title}"`);
             tasks.push(this.finalizeTask(currentTask));
           }
           
@@ -97,6 +122,14 @@ class ImprovedSimpleParser {
             title = match[1];
           } else if (pattern.type === 'imperative') {
             title = trimmed;
+          } else if (pattern.type === 'pdf-formatted') {
+            // Handle "3 3 TODO: Complete..." format
+            title = match[2];
+            console.log(`[PARSER] PDF-formatted task detected: "${title}"`);
+          } else if (pattern.type === 'pdf-formatted-2') {
+            // Handle "3 Something TODO: Complete..." format
+            title = match[3];
+            console.log(`[PARSER] PDF-formatted-2 task detected: "${title}"`);
           } else {
             title = match[2] || match[1] || trimmed;
           }
@@ -170,12 +203,23 @@ class ImprovedSimpleParser {
     
     // Don't forget the last task
     if (currentTask && currentTask.title.length > 5) {
+      console.log(`[PARSER] Saving final task: "${currentTask.title}"`);
       tasks.push(this.finalizeTask(currentTask));
     }
     
     // Filter and deduplicate
+    console.log(`\n[PARSER] Before filtering: ${tasks.length} tasks found`);
+    tasks.forEach((task, index) => {
+      console.log(`  Task ${index + 1}: "${task.title}" (line: ${task.lineNumber}, confidence: ${task.confidence})`);
+    });
+    
     logger.debug(`Before filtering: ${tasks.length} tasks found`);
     const filteredTasks = this.filterAndDeduplicate(tasks);
+    
+    console.log(`\n[PARSER] After filtering: ${filteredTasks.length} tasks`);
+    filteredTasks.forEach((task, index) => {
+      console.log(`  Task ${index + 1}: "${task.title}" (priority: ${task.priority}, due: ${task.dueDate || 'none'})`);
+    });
     
     logger.info(`Enhanced parser found ${filteredTasks.length} tasks after filtering`);
     // Log first few tasks for debugging
