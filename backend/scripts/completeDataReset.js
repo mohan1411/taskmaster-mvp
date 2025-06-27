@@ -34,6 +34,20 @@ Sarah Chen
 Project Manager`,
     receivedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     hasAttachments: true,
+    attachments: [
+      {
+        filename: "Q1_Project_Timeline.xlsx",
+        mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        size: 45678,
+        attachmentId: "attachment-001"
+      },
+      {
+        filename: "Marketing_Budget_Draft.pdf",
+        mimeType: "application/pdf",
+        size: 234567,
+        attachmentId: "attachment-002"
+      }
+    ],
     tags: ['project', 'urgent', 'planning']
   },
   {
@@ -60,6 +74,26 @@ Thanks,
 Mike`,
     receivedAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
     hasAttachments: true,
+    attachments: [
+      {
+        filename: "Press_Release_Draft.docx",
+        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        size: 34567,
+        attachmentId: "attachment-003"
+      },
+      {
+        filename: "Social_Media_Schedule.pdf",
+        mimeType: "application/pdf",
+        size: 123456,
+        attachmentId: "attachment-004"
+      },
+      {
+        filename: "Launch_Event_Checklist.xlsx",
+        mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        size: 23456,
+        attachmentId: "attachment-005"
+      }
+    ],
     tags: ['product-launch', 'marketing', 'urgent']
   },
   {
@@ -169,6 +203,20 @@ Robert
 CFO`,
     receivedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
     hasAttachments: true,
+    attachments: [
+      {
+        filename: "Budget_Template_Q1_2025.xlsx",
+        mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        size: 78901,
+        attachmentId: "attachment-006"
+      },
+      {
+        filename: "Vendor_Contracts_Summary.pdf",
+        mimeType: "application/pdf",
+        size: 345678,
+        attachmentId: "attachment-007"
+      }
+    ],
     tags: ['finance', 'budget', 'meeting']
   }
 ];
