@@ -130,39 +130,40 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
             for (const doc of response.data.results) {
               if (doc.documentId) {
                 try {
-                console.log('Fetching tasks for document:', doc.documentId);
-                const tasksResponse = await documentService.getDocumentTasks(doc.documentId);
-                console.log('Tasks response from backend:', tasksResponse.data);
-                
-                // Check if document is still processing
-                if (tasksResponse.data.status === 'processing') {
-                  console.log(`Document ${doc.filename} is still processing...`);
-                  continue; // Skip this document for now
-                }
-                
-                if (tasksResponse.data.status === 'failed') {
-                  console.error(`Document ${doc.filename} processing failed:`, tasksResponse.data.error);
-                  continue;
-                }
-                
-                // Log the full response for debugging
-                console.log('Full tasks response:', {
-                  documentId: doc.documentId,
-                  filename: doc.filename,
-                  status: tasksResponse.data.status,
-                  totalTasks: tasksResponse.data.tasks?.length || 0,
-                  tasks: tasksResponse.data.tasks
-                });
-                
-                if (tasksResponse.data.tasks && tasksResponse.data.tasks.length > 0) {
-                  documentsWithTasks.push({
+                  console.log('Fetching tasks for document:', doc.documentId);
+                  const tasksResponse = await documentService.getDocumentTasks(doc.documentId);
+                  console.log('Tasks response from backend:', tasksResponse.data);
+                  
+                  // Check if document is still processing
+                  if (tasksResponse.data.status === 'processing') {
+                    console.log(`Document ${doc.filename} is still processing...`);
+                    continue; // Skip this document for now
+                  }
+                  
+                  if (tasksResponse.data.status === 'failed') {
+                    console.error(`Document ${doc.filename} processing failed:`, tasksResponse.data.error);
+                    continue;
+                  }
+                  
+                  // Log the full response for debugging
+                  console.log('Full tasks response:', {
                     documentId: doc.documentId,
                     filename: doc.filename,
+                    status: tasksResponse.data.status,
+                    totalTasks: tasksResponse.data.tasks?.length || 0,
                     tasks: tasksResponse.data.tasks
                   });
+                  
+                  if (tasksResponse.data.tasks && tasksResponse.data.tasks.length > 0) {
+                    documentsWithTasks.push({
+                      documentId: doc.documentId,
+                      filename: doc.filename,
+                      tasks: tasksResponse.data.tasks
+                    });
+                  }
+                } catch (err) {
+                  console.error(`Error fetching tasks for document ${doc.documentId}:`, err);
                 }
-              } catch (err) {
-                console.error(`Error fetching tasks for document ${doc.documentId}:`, err);
               }
             }
             
