@@ -118,19 +118,38 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
           }
         }
         
-        // If no pre-extracted tasks, wait and fetch them
+        // If no pre-extracted tasks, wait and fetch them with retries
         if (documentsWithTasks.length === 0) {
           console.log('No pre-extracted tasks, waiting for processing...');
-          await new Promise(resolve => setTimeout(resolve, 3000));
           
-          for (const doc of response.data.results) {
-            if (doc.documentId) {
-              try {
+          // Try up to 3 times with increasing delays
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            console.log(`Attempt ${attempt} to fetch tasks...`);
+            await new Promise(resolve => setTimeout(resolve, attempt * 2000)); // 2s, 4s, 6s
+            
+            for (const doc of response.data.results) {
+              if (doc.documentId) {
+                try {
                 console.log('Fetching tasks for document:', doc.documentId);
                 const tasksResponse = await documentService.getDocumentTasks(doc.documentId);
-                console.log('Tasks response from backend:', {
+                console.log('Tasks response from backend:', tasksResponse.data);
+                
+                // Check if document is still processing
+                if (tasksResponse.data.status === 'processing') {
+                  console.log(`Document ${doc.filename} is still processing...`);
+                  continue; // Skip this document for now
+                }
+                
+                if (tasksResponse.data.status === 'failed') {
+                  console.error(`Document ${doc.filename} processing failed:`, tasksResponse.data.error);
+                  continue;
+                }
+                
+                // Log the full response for debugging
+                console.log('Full tasks response:', {
                   documentId: doc.documentId,
                   filename: doc.filename,
+                  status: tasksResponse.data.status,
                   totalTasks: tasksResponse.data.tasks?.length || 0,
                   tasks: tasksResponse.data.tasks
                 });
@@ -145,6 +164,12 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
               } catch (err) {
                 console.error(`Error fetching tasks for document ${doc.documentId}:`, err);
               }
+            }
+            
+            // Break out of retry loop if we found tasks
+            if (documentsWithTasks.length > 0) {
+              console.log(`Found tasks on attempt ${attempt}`);
+              break;
             }
           }
         }
