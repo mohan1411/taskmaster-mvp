@@ -16,7 +16,7 @@ class AttachmentProcessor {
     this.processingQueue = new Map();
     // Configuration: Set parser preference
     // Options: 'openai-first', 'simple-only', 'openai-only'
-    this.parserMode = process.env.DOCUMENT_PARSER_MODE || 'simple-only';
+    this.parserMode = process.env.DOCUMENT_PARSER_MODE || 'openai-first';
   }
 
   /**

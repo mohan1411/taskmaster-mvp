@@ -16,7 +16,8 @@ class OpenAIDocumentParser {
     }
 
     try {
-      console.log('Using OpenAI to extract tasks from document...');
+      console.log('[OPENAI PARSER] Using OpenAI to extract tasks from document...');
+      console.log('[OPENAI PARSER] Document preview (first 500 chars):', text.substring(0, 500));
       
       const prompt = `
 You are a task extraction expert. Extract ONLY the main actionable tasks from the following document.
@@ -98,7 +99,10 @@ ${text}
         }
       }
 
-      console.log(`OpenAI extracted ${extractedTasks.length} main tasks`);
+      console.log(`[OPENAI PARSER] Extracted ${extractedTasks.length} main tasks`);
+      extractedTasks.forEach((task, index) => {
+        console.log(`[OPENAI PARSER] Task ${index + 1}: "${task.title}" (priority: ${task.priority})`);
+      });
       
       // Ensure all tasks have required fields and add line numbers
       return extractedTasks.map((task, index) => ({
