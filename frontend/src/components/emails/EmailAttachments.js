@@ -67,9 +67,16 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
 
   // Check if file is processable
   const isProcessableFile = (filename) => {
+    if (!filename) {
+      console.log('No filename provided');
+      return false;
+    }
     const extension = filename.split('.').pop()?.toLowerCase();
+    console.log(`Checking file: ${filename}, extension: ${extension}`);
     const supportedTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt'];
-    return supportedTypes.includes(extension);
+    const isSupported = supportedTypes.includes(extension);
+    console.log(`Is ${extension} supported? ${isSupported}`);
+    return isSupported;
   };
 
   // Get file type description
@@ -187,6 +194,13 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
   const processableAttachments = email.attachments.filter(att => 
     isProcessableFile(att.filename)
   );
+  
+  // Debug logging
+  console.log('Email attachments:', email.attachments);
+  console.log('Processable attachments:', processableAttachments);
+  email.attachments.forEach(att => {
+    console.log(`Attachment: ${att.filename}, Is processable: ${isProcessableFile(att.filename)}`);
+  });
 
   return (
     <Box sx={{ mt: 2 }}>
