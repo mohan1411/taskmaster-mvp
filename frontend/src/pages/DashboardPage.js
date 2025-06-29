@@ -294,11 +294,11 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} className="stat-grid" sx={{ 
-          mb: { xs: 3, sm: 4 }, 
-          width: '100%',
-          overflow: 'visible'
-        }}>
+        <Box className="stat-grid-container" sx={{ mb: { xs: 3, sm: 4 } }}>
+          <Grid container spacing={{ xs: 0, sm: 2, md: 3 }} className="stat-grid" sx={{ 
+            width: '100%',
+            overflow: 'visible'
+          }}>
           <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Active Tasks"
@@ -332,6 +332,7 @@ const DashboardPage = () => {
             />
           </Grid>
         </Grid>
+        </Box>
         
         {/* Three column layout for main content */}
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>

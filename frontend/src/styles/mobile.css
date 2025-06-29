@@ -302,11 +302,18 @@ a,
 
 /* Stat grid specific styles */
 @media (max-width: 600px) {
+  /* Container for stat grids to go edge-to-edge */
+  .stat-grid-container {
+    margin: 0 -8px !important;
+    width: calc(100% + 16px) !important;
+    overflow: hidden !important;
+  }
+  
   .stat-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 8px !important;
-    padding: 0 !important;
+    padding: 0 8px !important;
     margin: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
@@ -317,11 +324,25 @@ a,
     padding: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    margin: 0 !important;
   }
   
   .stat-grid .MuiCard-root {
     margin: 0 !important;
     width: 100% !important;
+  }
+  
+  /* Override MUI Grid system completely for stat grids */
+  .stat-grid.MuiGrid-container {
+    display: grid !important;
+    flex-wrap: unset !important;
+    flex-direction: unset !important;
+  }
+  
+  .stat-grid > .MuiGrid-item {
+    flex-basis: unset !important;
+    flex-grow: unset !important;
+    max-width: 100% !important;
   }
 }
 
