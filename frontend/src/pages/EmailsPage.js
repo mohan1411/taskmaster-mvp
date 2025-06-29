@@ -175,8 +175,25 @@ const EmailsPage = () => {
     }
   };
 
-  const handleSelectEmail = (email) => {
-    setSelectedEmail(email);
+  const handleSelectEmail = async (email) => {
+    // If email has attachments but no attachment data, fetch the full email
+    if (email.hasAttachments && (!email.attachments || email.attachments.length === 0)) {
+      try {
+        // Find the full email data from our emails list
+        const fullEmail = emails.find(e => e._id === email._id);
+        if (fullEmail && fullEmail.attachments && fullEmail.attachments.length > 0) {
+          setSelectedEmail(fullEmail);
+        } else {
+          // If still no attachments, set the email anyway but user will see the sync message
+          setSelectedEmail(email);
+        }
+      } catch (error) {
+        console.error('Error getting full email data:', error);
+        setSelectedEmail(email);
+      }
+    } else {
+      setSelectedEmail(email);
+    }
   };
 
   const handleCloseEmailDetail = () => {

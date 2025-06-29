@@ -352,6 +352,18 @@ const getEmails = async (req, res) => {
       .skip(skip)
       .limit(limit);
     
+    // Debug: Log first email with attachments
+    const emailWithAttachments = emails.find(e => e.hasAttachments);
+    if (emailWithAttachments) {
+      console.log('Email with attachments found:', {
+        id: emailWithAttachments._id,
+        subject: emailWithAttachments.subject,
+        hasAttachments: emailWithAttachments.hasAttachments,
+        attachmentCount: emailWithAttachments.attachments?.length || 0,
+        attachments: emailWithAttachments.attachments
+      });
+    }
+    
     // Get total count for pagination
     const total = await Email.countDocuments(query);
     
