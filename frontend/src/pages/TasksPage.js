@@ -381,7 +381,7 @@ const TasksPage = () => {
         
         {/* Summary Cards - Consistent with Follow-ups page */}
         <Box className="stat-grid-container" sx={{ mb: 4 }}>
-          <Grid container spacing={{ xs: 0, sm: 2, md: 3 }} className="stat-grid" sx={{ mb: 0 }}>
+          <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} className="stat-grid" sx={{ mb: 0, margin: 0 }}>
           <Grid item xs={6} sm={6} md={3}>
             <Card sx={{ 
               height: '100%', 

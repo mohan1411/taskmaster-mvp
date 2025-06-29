@@ -1,0 +1,100 @@
+/* OnePlus and other mobile device specific fixes */
+
+/* Ensure no desktop margins on any mobile device */
+@media (max-width: 900px) {
+  /* Reset all desktop margins and widths */
+  .page-container,
+  .MuiContainer-root,
+  main,
+  #root > * {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Ensure proper stat grid display */
+  .stat-grid-container {
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  
+  .stat-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .stat-grid > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Small mobile devices including OnePlus */
+@media (max-width: 600px) {
+  /* Page container fix */
+  .page-container {
+    padding: 8px !important;
+    margin: 0 !important;
+    margin-top: 56px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Stat cards should fill available space */
+  .stat-grid .MuiCard-root {
+    width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Prevent any horizontal overflow */
+  body,
+  html,
+  #root {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+  
+  /* Fix MUI Grid spacing issues */
+  .MuiGrid-spacing-xs-1 > .MuiGrid-item {
+    padding: 4px !important;
+  }
+}
+
+/* Specific viewport width fixes for common OnePlus devices */
+@media (max-width: 412px) {
+  /* OnePlus 8, 9, 10 series typical viewport */
+  .stat-grid {
+    gap: 6px !important;
+  }
+  
+  .page-container {
+    padding: 6px !important;
+  }
+}
+
+/* Fix for persistent desktop styles */
+@supports (-webkit-touch-callout: none) {
+  /* iOS specific */
+  @media (max-width: 900px) {
+    .page-container {
+      margin-left: 0 !important;
+    }
+  }
+}
+
+@supports not (-webkit-touch-callout: none) {
+  /* Android specific */
+  @media (max-width: 900px) {
+    .page-container {
+      margin-left: 0 !important;
+    }
+  }
+}

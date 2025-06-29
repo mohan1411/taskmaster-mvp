@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import notificationInterceptor from './utils/notificationInterceptor';
 import './styles/mobile.css';
+import './styles/oneplus-fix.css';
 
 // Pages
 import LoginPage from './pages/LoginPage';

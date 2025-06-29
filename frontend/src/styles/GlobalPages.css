@@ -1,16 +1,17 @@
 /* Compact Global Design System */
 
-/* Base page container */
+/* Base page container - Mobile First */
 .page-container {
   position: relative !important;
-  min-height: calc(100vh - 64px) !important;
-  margin-left: 240px !important; /* Account for sidebar width */
-  margin-top: 64px !important;
-  padding: 20px 24px !important; /* Reduced from 24px 32px */
-  padding-bottom: 24px !important;
+  min-height: calc(100vh - 56px) !important;
+  margin: 0 !important;
+  margin-top: 56px !important;
+  padding: 8px !important;
+  padding-bottom: 80px !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
-  width: calc(100% - 240px) !important; /* Subtract sidebar width */
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Content wrapper */
@@ -116,15 +117,19 @@
   overflow-x: auto !important;
 }
 
-/* Mobile responsiveness */
+/* Tablet adjustments */
+@media (min-width: 600px) and (max-width: 899px) {
+  .page-container {
+    padding: 12px !important;
+  }
+}
+
+/* Mobile adjustments */
 @media (max-width: 900px) {
+  /* Ensure no desktop margins on mobile */
   .page-container {
     margin-left: 0 !important;
     width: 100% !important;
-    margin-top: 56px !important;
-    padding: 12px !important;
-    min-height: calc(100vh - 56px) !important;
-    max-width: 100% !important;
   }
   
   .cards-grid-2,
@@ -142,25 +147,8 @@
     font-size: 1.25rem !important;
   }
 }
-
-/* Small mobile devices */
+/* Small mobile typography */
 @media (max-width: 600px) {
-  .page-container {
-    padding: 8px !important;
-    padding-bottom: 80px !important; /* Account for bottom navigation */
-    margin-top: 56px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-  
-  .page-content {
-    padding: 0 !important;
-  }
-  
-  /* Further reduce typography on mobile */
   .page-container h1 {
     font-size: 1.375rem !important;
   }
@@ -177,17 +165,6 @@
   
   .page-container .MuiCard-root .MuiCardContent-root:last-child {
     padding-bottom: 12px !important;
-  }
-  
-  /* Ensure cards don't overflow */
-  .page-container .MuiCard-root {
-    overflow: visible !important;
-    min-height: auto !important;
-  }
-  
-  /* Typography adjustments for mobile stat cards */
-  .page-container .MuiCard-root .MuiTypography-h4 {
-    line-height: 1.2 !important;
   }
   
   /* Stack action buttons vertically on mobile */
@@ -210,6 +187,18 @@
   /* Even more compact spacing */
   .cards-grid {
     gap: 12px !important;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 900px) {
+  .page-container {
+    min-height: calc(100vh - 64px) !important;
+    margin-left: 240px !important; /* Account for sidebar width */
+    margin-top: 64px !important;
+    padding: 20px 24px !important;
+    padding-bottom: 24px !important;
+    width: calc(100% - 240px) !important; /* Subtract sidebar width */
   }
 }
 
@@ -251,8 +240,8 @@
   height: 200px !important;
 }
 
-/* Production environment specific adjustments */
-@media screen {
+/* Production environment specific adjustments - DESKTOP ONLY */
+@media screen and (min-width: 900px) {
   .page-container {
     /* Use viewport-relative units for better cross-environment compatibility */
     position: relative !important;
@@ -296,6 +285,13 @@
 
 /* Additional mobile fixes for stat cards */
 @media (max-width: 600px) {
+  /* Ensure mobile page container has no desktop styles */
+  .page-container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
   /* Prevent stat card overflow */
   .page-container .MuiCard-root {
     max-width: 100% !important;

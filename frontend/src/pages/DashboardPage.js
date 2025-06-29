@@ -295,9 +295,10 @@ const DashboardPage = () => {
         
         {/* Stats Grid - Consistent with Follow-ups page */}
         <Box className="stat-grid-container" sx={{ mb: { xs: 3, sm: 4 } }}>
-          <Grid container spacing={{ xs: 0, sm: 2, md: 3 }} className="stat-grid" sx={{ 
+          <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} className="stat-grid" sx={{ 
             width: '100%',
-            overflow: 'visible'
+            overflow: 'visible',
+            margin: 0
           }}>
           <Grid item xs={6} sm={6} md={3}>
             <StatCard
