@@ -375,26 +375,61 @@ const TasksPage = () => {
         </Box>
         
         {/* Summary Cards - Consistent with Follow-ups page */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: 4 }}>
+          <Grid item xs={6} sm={6} md={3}>
+            <Card sx={{ height: '100%', overflow: 'visible' }}>
+              <CardContent sx={{ 
+                p: { xs: 2, sm: 2.5 },
+                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+              }}>
+                <Typography 
+                  color="textSecondary" 
+                  gutterBottom
+                  sx={{ 
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    mb: { xs: 0.5, sm: 1 }
+                  }}
+                >
                   Total Tasks
                 </Typography>
-                <Typography variant="h4">
+                <Typography 
+                  variant="h4"
+                  sx={{ 
+                    fontSize: { xs: '1.75rem', sm: '2.125rem' },
+                    lineHeight: 1.2,
+                    fontWeight: 500
+                  }}
+                >
                   {totalTasks}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+          <Grid item xs={6} sm={6} md={3}>
+            <Card sx={{ height: '100%', overflow: 'visible' }}>
+              <CardContent sx={{ 
+                p: { xs: 2, sm: 2.5 },
+                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+              }}>
+                <Typography 
+                  color="textSecondary" 
+                  gutterBottom
+                  sx={{ 
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    mb: { xs: 0.5, sm: 1 }
+                  }}
+                >
                   Active Tasks
                 </Typography>
-                <Typography variant="h4" color="primary.main">
+                <Typography 
+                  variant="h4" 
+                  color="primary.main"
+                  sx={{ 
+                    fontSize: { xs: '1.75rem', sm: '2.125rem' },
+                    lineHeight: 1.2,
+                    fontWeight: 500
+                  }}
+                >
                   {tasks.filter(task => 
                     task.status !== 'completed' && task.status !== 'archived'
                   ).length}
@@ -402,25 +437,61 @@ const TasksPage = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+          <Grid item xs={6} sm={6} md={3}>
+            <Card sx={{ height: '100%', overflow: 'visible' }}>
+              <CardContent sx={{ 
+                p: { xs: 2, sm: 2.5 },
+                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+              }}>
+                <Typography 
+                  color="textSecondary" 
+                  gutterBottom
+                  sx={{ 
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    mb: { xs: 0.5, sm: 1 }
+                  }}
+                >
                   Completed
                 </Typography>
-                <Typography variant="h4" color="success.main">
+                <Typography 
+                  variant="h4" 
+                  color="success.main"
+                  sx={{ 
+                    fontSize: { xs: '1.75rem', sm: '2.125rem' },
+                    lineHeight: 1.2,
+                    fontWeight: 500
+                  }}
+                >
                   {completedTasksCount}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" gutterBottom>
+          <Grid item xs={6} sm={6} md={3}>
+            <Card sx={{ height: '100%', overflow: 'visible' }}>
+              <CardContent sx={{ 
+                p: { xs: 2, sm: 2.5 },
+                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+              }}>
+                <Typography 
+                  color="textSecondary" 
+                  gutterBottom
+                  sx={{ 
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    mb: { xs: 0.5, sm: 1 }
+                  }}
+                >
                   Overdue
                 </Typography>
-                <Typography variant="h4" color="error.main">
+                <Typography 
+                  variant="h4" 
+                  color="error.main"
+                  sx={{ 
+                    fontSize: { xs: '1.75rem', sm: '2.125rem' },
+                    lineHeight: 1.2,
+                    fontWeight: 500
+                  }}
+                >
                   {tasks.filter(task => {
                     if (!task.dueDate || task.status === 'completed' || task.status === 'archived') return false;
                     const now = new Date();

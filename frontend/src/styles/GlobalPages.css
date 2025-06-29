@@ -166,7 +166,23 @@
   
   /* Compact card spacing on mobile */
   .page-container .MuiCard-root .MuiCardContent-root {
-    padding: 12px !important;
+    padding: 12px 16px !important;
+    overflow: visible !important;
+  }
+  
+  .page-container .MuiCard-root .MuiCardContent-root:last-child {
+    padding-bottom: 12px !important;
+  }
+  
+  /* Ensure cards don't overflow */
+  .page-container .MuiCard-root {
+    overflow: visible !important;
+    min-height: auto !important;
+  }
+  
+  /* Typography adjustments for mobile stat cards */
+  .page-container .MuiCard-root .MuiTypography-h4 {
+    line-height: 1.2 !important;
   }
   
   /* Stack action buttons vertically on mobile */
@@ -271,5 +287,26 @@
 
 .page-container .MuiBox-root {
   max-width: none !important;
+}
+
+/* Additional mobile fixes for stat cards */
+@media (max-width: 600px) {
+  /* Prevent stat card overflow */
+  .page-container .MuiCard-root {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Ensure Typography doesn't overflow */
+  .page-container .MuiTypography-root {
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+  }
+  
+  /* Fix Grid container margins on mobile */
+  .page-container .MuiGrid-root.MuiGrid-container {
+    margin: 0 !important;
+    width: 100% !important;
+  }
 }
 

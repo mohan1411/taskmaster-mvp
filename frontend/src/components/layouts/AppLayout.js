@@ -295,7 +295,10 @@ const AppLayout = () => {
           pb: { xs: 7, md: 0 },
           width: '100%',
           maxWidth: { xs: '100%', md: 'none' },
-          px: { xs: 0, md: 0 }
+          px: { xs: 0, md: 0 },
+          overflowX: { xs: 'hidden', md: 'visible' },
+          overflowY: { xs: 'visible', md: 'visible' },
+          minHeight: { xs: 'calc(100vh - 120px)', md: 'auto' }
         }}>
           <Outlet />
         </Box>

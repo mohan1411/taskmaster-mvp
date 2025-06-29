@@ -190,9 +190,10 @@ const DashboardPage = () => {
       sx={{ 
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.2s',
-        minHeight: { xs: 100, sm: 'auto' },
+        minHeight: { xs: 'auto', sm: 'auto' },
         width: '100%',
         height: '100%',
+        overflow: 'visible',
         '&:hover': onClick ? { 
           transform: 'translateY(-2px)', 
           boxShadow: 3
@@ -206,12 +207,16 @@ const DashboardPage = () => {
     >
       <CardContent sx={{ 
         p: { xs: 2, sm: 2.5 },
-        textAlign: 'center'
+        textAlign: 'center',
+        '&:last-child': { pb: { xs: 2, sm: 2.5 } }
       }}>
         <Typography 
           color="textSecondary" 
           gutterBottom
-          sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+          sx={{ 
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            mb: { xs: 0.5, sm: 1 }
+          }}
         >
           {title}
         </Typography>
@@ -220,7 +225,8 @@ const DashboardPage = () => {
           color={`${color}.main`}
           sx={{ 
             fontSize: { xs: '1.75rem', sm: '2.125rem' },
-            fontWeight: 500
+            fontWeight: 500,
+            lineHeight: 1.2
           }}
         >
           {value}
@@ -296,7 +302,11 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 3, sm: 4 }, width: '100%' }}>
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ 
+          mb: { xs: 3, sm: 4 }, 
+          width: '100%',
+          overflow: 'visible'
+        }}>
           <Grid item xs={6} sm={6} md={3}>
             <StatCard
               title="Active Tasks"
