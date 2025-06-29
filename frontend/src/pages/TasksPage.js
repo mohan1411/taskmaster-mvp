@@ -375,12 +375,16 @@ const TasksPage = () => {
         </Box>
         
         {/* Summary Cards - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: 4 }}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: 4, ml: { xs: -1 }, mr: { xs: -1 } }}>
           <Grid item xs={6} sm={6} md={3}>
-            <Card sx={{ height: '100%', overflow: 'visible' }}>
+            <Card sx={{ 
+              height: '100%', 
+              overflow: 'visible',
+              mx: { xs: 0.5 }
+            }}>
               <CardContent sx={{ 
-                p: { xs: 2, sm: 2.5 },
-                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+                p: { xs: 1.5, sm: 2.5 },
+                '&:last-child': { pb: { xs: 1.5, sm: 2.5 } }
               }}>
                 <Typography 
                   color="textSecondary" 
@@ -406,10 +410,14 @@ const TasksPage = () => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={6} md={3}>
-            <Card sx={{ height: '100%', overflow: 'visible' }}>
+            <Card sx={{ 
+              height: '100%', 
+              overflow: 'visible',
+              mx: { xs: 0.5 }
+            }}>
               <CardContent sx={{ 
-                p: { xs: 2, sm: 2.5 },
-                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+                p: { xs: 1.5, sm: 2.5 },
+                '&:last-child': { pb: { xs: 1.5, sm: 2.5 } }
               }}>
                 <Typography 
                   color="textSecondary" 
@@ -438,10 +446,14 @@ const TasksPage = () => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={6} md={3}>
-            <Card sx={{ height: '100%', overflow: 'visible' }}>
+            <Card sx={{ 
+              height: '100%', 
+              overflow: 'visible',
+              mx: { xs: 0.5 }
+            }}>
               <CardContent sx={{ 
-                p: { xs: 2, sm: 2.5 },
-                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+                p: { xs: 1.5, sm: 2.5 },
+                '&:last-child': { pb: { xs: 1.5, sm: 2.5 } }
               }}>
                 <Typography 
                   color="textSecondary" 
@@ -468,10 +480,14 @@ const TasksPage = () => {
             </Card>
           </Grid>
           <Grid item xs={6} sm={6} md={3}>
-            <Card sx={{ height: '100%', overflow: 'visible' }}>
+            <Card sx={{ 
+              height: '100%', 
+              overflow: 'visible',
+              mx: { xs: 0.5 }
+            }}>
               <CardContent sx={{ 
-                p: { xs: 2, sm: 2.5 },
-                '&:last-child': { pb: { xs: 2, sm: 2.5 } }
+                p: { xs: 1.5, sm: 2.5 },
+                '&:last-child': { pb: { xs: 1.5, sm: 2.5 } }
               }}>
                 <Typography 
                   color="textSecondary" 
