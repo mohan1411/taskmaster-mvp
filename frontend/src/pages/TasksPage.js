@@ -364,8 +364,7 @@ const TasksPage = () => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          mb: 3,
-          px: { xs: 1, sm: 0 }
+          mb: 3
         }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Tasks

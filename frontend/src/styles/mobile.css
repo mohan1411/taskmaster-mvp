@@ -183,6 +183,18 @@ html, body {
   }
 }
 
+/* Page content wrapper for mobile */
+@media (max-width: 600px) {
+  .page-container {
+    overflow-x: hidden !important;
+  }
+  
+  .page-content {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+}
+
 /* Mobile-optimized cards */
 @media (max-width: 600px) {
   /* Full width cards with proper spacing */
@@ -291,20 +303,20 @@ a,
 /* Stat grid specific styles */
 @media (max-width: 600px) {
   .stat-grid {
-    display: flex !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
     gap: 8px !important;
-    padding: 0 8px !important;
+    padding: 0 !important;
     margin: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   
   .stat-grid > .MuiGrid-item {
-    flex: 0 0 calc(50% - 4px) !important;
-    max-width: calc(50% - 4px) !important;
-    width: calc(50% - 4px) !important;
+    grid-column: span 1 !important;
     padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   
   .stat-grid .MuiCard-root {

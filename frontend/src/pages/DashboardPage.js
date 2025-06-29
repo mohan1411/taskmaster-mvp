@@ -244,19 +244,10 @@ const DashboardPage = () => {
   }
   
   return (
-    <Box 
-      sx={{ 
-        width: '100%',
-        px: { xs: 0, sm: 2, md: 3 },
-        py: { xs: 2, sm: 2, md: 3 },
-        pb: { xs: 10, sm: 3 },
-        maxWidth: { xs: '100%', md: 1200 },
-        mx: 'auto',
-        boxSizing: 'border-box'
-      }}
-    >
+    <div className="page-container">
+      <div className="page-content">
         {/* Compact Header */}
-        <Box sx={{ mb: { xs: 2, sm: 3 }, px: { xs: 1, sm: 0 } }}>
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
           <Typography 
             variant="h4" 
             sx={{ 
@@ -575,7 +566,8 @@ const DashboardPage = () => {
             </>
           )}
         </Paper>
-    </Box>
+      </div>
+    </div>
   );
 };
 
