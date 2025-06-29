@@ -1,10 +1,21 @@
 # Sample Tasks for Testing TaskMaster
+## Date Reference: June 29, 2025 (Today)
+
+### Tasks Due Today
+- Complete daily standup report by 5 PM today
+- Submit timesheet for this week - Due: June 29, 2025
+- Review and approve pending PRs - End of day June 29
+
+### Tasks Due This Week
+- Finish code review by July 2, 2025
+- Update project documentation by July 4, 2025
+- Schedule team retrospective before July 5, 2025
 
 ## High Priority Tasks
 
-1. Complete quarterly financial report by December 15, 2025
+1. Complete quarterly financial report by July 15, 2025
 2. Schedule team meeting for Q3 2025 planning - URGENT
-3. Review and approve marketing budget proposal - Due: January 10, 2025
+3. Review and approve marketing budget proposal - Due: July 10, 2025
 4. Fix production server performance issues - CRITICAL by end of day
 
 ## Medium Priority Tasks
@@ -18,11 +29,11 @@
 
 ## Tasks with Specific Deadlines
 
-11. Submit tax documents - Deadline: April 15, 2025
-12. Complete performance reviews - Due by March 31, 2025
-13. Renew SSL certificates before January 30, 2025
-14. Finalize Q1 roadmap by January 5, 2025
-15. Submit expense reports by Friday, January 3, 2025
+11. Submit quarterly reports - Deadline: July 31, 2025
+12. Complete mid-year performance reviews - Due by July 15, 2025
+13. Renew SSL certificates before July 30, 2025
+14. Finalize Q3 roadmap by July 5, 2025
+15. Submit expense reports by Friday, July 4, 2025
 
 ## Development Tasks
 
@@ -106,9 +117,9 @@
 
 ## Compliance and Security Tasks
 
-58. Complete annual security training - Due: February 28, 2025
+58. Complete security training module - Due: July 31, 2025
 59. Update privacy policy for GDPR compliance
-60. Conduct penetration testing - Schedule for Q2
+60. Conduct penetration testing - Schedule for Q3
 61. Review and update disaster recovery plan
 62. Implement two-factor authentication for all users
 
@@ -133,7 +144,7 @@
 73. Upgrade server operating systems to latest version
 74. Implement automated backup verification
 75. Configure monitoring alerts for critical services
-76. Plan data center migration - Target: Q3 2025
+76. Plan data center migration - Target: Q4 2025
 77. Review and optimize cloud resource usage
 
 ## Customer Success Tasks
@@ -149,8 +160,8 @@
 83. Launch email marketing campaign for new feature
 84. Update website content with latest case studies
 85. Create social media content calendar
-86. Analyze Google Analytics data for Q4
-87. Prepare for upcoming trade show - March 2025
+86. Analyze Google Analytics data for Q2
+87. Prepare for upcoming trade show - September 2025
 
 ## Quality Assurance Tasks
 
