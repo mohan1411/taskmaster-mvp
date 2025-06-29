@@ -1,0 +1,72 @@
+/* Emergency mobile override - ensure no desktop margins */
+
+/* Reset all elements on mobile */
+@media (max-width: 900px) {
+  * {
+    margin-left: 0 !important;
+  }
+  
+  /* Target all possible containers */
+  html,
+  body,
+  #root,
+  main,
+  .page-container,
+  .page-content,
+  .MuiContainer-root,
+  .MuiBox-root,
+  div[class*="Main-"],
+  div[class*="main"],
+  div[role="main"] {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    transform: translateX(0) !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Page container specific */
+  .page-container {
+    position: relative !important;
+    margin: 0 !important;
+    margin-top: 56px !important;
+    padding: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Ensure stat grids work properly */
+  .stat-grid-container {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  .stat-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+}
+
+/* Extra specificity for stubborn elements */
+@media screen and (max-width: 900px) {
+  body main.MuiBox-root,
+  body main[class*="Main-root"] {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Nuclear option for OnePlus devices */
+@media (max-width: 600px) {
+  body * {
+    margin-left: 0 !important;
+  }
+  
+  /* Fix any transform-based positioning */
+  * {
+    transform: none !important;
+  }
+}

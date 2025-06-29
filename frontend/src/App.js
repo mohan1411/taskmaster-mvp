@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext';
 import notificationInterceptor from './utils/notificationInterceptor';
 import './styles/mobile.css';
 import './styles/oneplus-fix.css';
+import './styles/mobile-override.css';
 
 // Pages
 import LoginPage from './pages/LoginPage';

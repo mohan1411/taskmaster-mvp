@@ -40,20 +40,15 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     backgroundColor: theme.palette.background.default,
     color: theme.palette.text.primary,
     minHeight: '100vh',
-    marginLeft: 0, // Ensure no margin on mobile
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+    marginLeft: 0, // Always start with no margin
+    width: '100%',
     [theme.breakpoints.up('md')]: {
-      marginLeft: `-${drawerWidth}px`,
-      ...(open && {
-        transition: theme.transitions.create('margin', {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
       }),
+      marginLeft: open ? `${drawerWidth}px` : 0,
+      width: open ? `calc(100% - ${drawerWidth}px)` : '100%',
     },
   }),
 );

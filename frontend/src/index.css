@@ -42,11 +42,7 @@ html, body {
   padding-top: 88px; /* Additional top padding for fixed app bar */
 }
 
-@media (min-width: 900px) {
-  .main-content {
-    padding-left: 280px; /* Space for the sidebar on desktop */
-  }
-}
+/* Removed desktop padding-left to prevent conflicts */
 
 .centered-box {
   display: flex;

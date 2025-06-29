@@ -6,6 +6,7 @@
   min-height: calc(100vh - 56px) !important;
   margin: 0 !important;
   margin-top: 56px !important;
+  margin-left: 0 !important; /* Explicitly set for mobile */
   padding: 8px !important;
   padding-bottom: 80px !important;
   box-sizing: border-box !important;
@@ -190,15 +191,14 @@
   }
 }
 
-/* Desktop styles */
+/* Desktop styles - only when drawer is open */
 @media (min-width: 900px) {
   .page-container {
     min-height: calc(100vh - 64px) !important;
-    margin-left: 240px !important; /* Account for sidebar width */
     margin-top: 64px !important;
     padding: 20px 24px !important;
     padding-bottom: 24px !important;
-    width: calc(100% - 240px) !important; /* Subtract sidebar width */
+    /* Don't set margin-left here - let the Main component handle it */
   }
 }
 
@@ -240,20 +240,7 @@
   height: 200px !important;
 }
 
-/* Production environment specific adjustments - DESKTOP ONLY */
-@media screen and (min-width: 900px) {
-  .page-container {
-    /* Use viewport-relative units for better cross-environment compatibility */
-    position: relative !important;
-    margin-left: 240px !important; /* Account for sidebar width */
-    margin-top: 64px !important;
-    width: calc(100% - 240px) !important; /* Subtract sidebar width */
-    min-height: calc(100vh - 64px) !important;
-    padding: 20px 24px !important;
-    box-sizing: border-box !important;
-    overflow-y: auto !important;
-  }
-}
+/* Production environment specific adjustments - Removed to prevent conflicts */
 
 /* Fallback for environments with layout issues */
 .page-container.fallback-layout {

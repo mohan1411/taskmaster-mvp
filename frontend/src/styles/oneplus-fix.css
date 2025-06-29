@@ -1,15 +1,28 @@
 /* OnePlus and other mobile device specific fixes */
 
+/* Force reset ALL margins and positions */
+* {
+  margin-left: 0 !important;
+}
+
 /* Ensure no desktop margins on any mobile device */
 @media (max-width: 900px) {
   /* Reset all desktop margins and widths */
   .page-container,
   .MuiContainer-root,
   main,
-  #root > * {
+  #root,
+  #root > *,
+  body > * {
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+  }
+  
+  /* Force main element to have no margin */
+  main[class*="Main"] {
+    margin-left: 0 !important;
+    width: 100% !important;
   }
   
   /* Ensure proper stat grid display */
