@@ -70,7 +70,11 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
     if (!filename) return false;
     const extension = filename.split('.').pop()?.toLowerCase();
     const supportedTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt'];
-    return supportedTypes.includes(extension);
+    // Also check for common variations
+    const supportedMimeTypes = ['pdf', 'document', 'spreadsheet', 'text'];
+    const isSupported = supportedTypes.includes(extension) || 
+                       supportedMimeTypes.some(type => filename.toLowerCase().includes(type));
+    return isSupported;
   };
 
   // Get file type description
@@ -210,15 +214,29 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  // Debug logging
+  console.log('EmailAttachments Debug:', {
+    hasAttachments: email.hasAttachments,
+    attachments: email.attachments,
+    attachmentCount: email.attachments?.length || 0
+  });
+
   // If no attachments, don't render anything
   if (!email.attachments || email.attachments.length === 0) {
+    console.log('No attachments found, returning null');
     return null;
   }
 
   // Count processable attachments
-  const processableAttachments = email.attachments.filter(att => 
-    isProcessableFile(att.filename)
-  );
+  const processableAttachments = email.attachments.filter(att => {
+    const isProcessable = isProcessableFile(att.filename);
+    console.log('Attachment check:', {
+      filename: att.filename,
+      isProcessable: isProcessable,
+      extension: att.filename?.split('.').pop()?.toLowerCase()
+    });
+    return isProcessable;
+  });
 
   return (
     <Box sx={{ mt: 2 }}>
