@@ -16,7 +16,7 @@
 1. Complete quarterly financial report by July 15, 2025
 2. Schedule team meeting for Q3 2025 planning - URGENT
 3. Review and approve marketing budget proposal - Due: July 10, 2025
-4. Fix production server performance issues - CRITICAL by end of day
+4. Fix production server performance issues - URGENT by end of day
 
 ## Medium Priority Tasks
 
@@ -87,7 +87,7 @@
 
 46. URGENT: Fix critical bug affecting user login
 47. ASAP: Respond to security vulnerability report
-48. CRITICAL: Restore backup after data corruption
+48. URGENT: Restore backup after data corruption
 49. HIGH PRIORITY: Prepare for compliance audit tomorrow
 50. IMMEDIATE: Address payment processing failure
 

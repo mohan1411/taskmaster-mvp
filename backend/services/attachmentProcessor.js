@@ -106,14 +106,47 @@ class AttachmentProcessor {
           break;
       }
 
+      // Validate and normalize tasks before saving
+      const validatedTasks = tasks.map(task => {
+        // Ensure priority is valid enum value
+        const validPriorities = ['urgent', 'high', 'medium', 'low'];
+        let priority = task.priority || 'medium';
+        
+        // Map invalid priorities
+        if (priority === 'critical') priority = 'urgent';
+        if (!validPriorities.includes(priority)) priority = 'medium';
+        
+        // Ensure dueDate is valid or null
+        let dueDate = task.dueDate;
+        if (dueDate && typeof dueDate === 'string') {
+          // Check if it's a valid date string
+          const parsed = new Date(dueDate);
+          if (isNaN(parsed.getTime())) {
+            // Try to parse common formats
+            const lower = dueDate.toLowerCase();
+            if (lower === 'end of day' || lower === 'eod' || lower === 'today') {
+              dueDate = new Date().toISOString().split('T')[0];
+            } else {
+              dueDate = null; // Invalid date, set to null
+            }
+          }
+        }
+        
+        return {
+          ...task,
+          priority,
+          dueDate
+        };
+      });
+
       // Update document with results
       await document.markAsCompleted({
         text: extractionResult.text,
-        tasks: tasks,
+        tasks: validatedTasks,
         metadata: {
           ...extractionResult.metadata,
           documentType: documentType,
-          hasDeadlines: tasks.some(t => t.dueDate),
+          hasDeadlines: validatedTasks.some(t => t.dueDate),
           language: 'en', // TODO: Implement language detection
           extractionVersion: '1.0',
           parserUsed: this.parserMode

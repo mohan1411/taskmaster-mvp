@@ -52,7 +52,7 @@ class ImprovedSimpleParser {
       /^[a-z]\)\s+/i
     ];
     
-    // Priority keywords - enhanced
+    // Priority keywords - enhanced (critical maps to urgent since it's not a valid enum)
     const priorityKeywords = {
       urgent: ['urgent', 'asap', 'immediately', 'critical', 'today', 'end of day', 'eod'],
       high: ['high', 'important', 'priority', 'by tomorrow', 'soon', 'before'],
@@ -252,6 +252,7 @@ class ImprovedSimpleParser {
   
   detectPriority(text) {
     const lower = text.toLowerCase();
+    // Map "critical" to "urgent" since critical is not a valid enum value
     if (lower.includes('urgent') || lower.includes('asap') || lower.includes('critical')) return 'urgent';
     if (lower.includes('high') || lower.includes('important') || lower.includes('priority')) return 'high';
     if (lower.includes('low') || lower.includes('minor')) return 'low';
@@ -266,7 +267,7 @@ class ImprovedSimpleParser {
       const lower = dateStr.toLowerCase();
       const today = new Date();
       
-      if (lower === 'today' || lower === 'end of day') {
+      if (lower === 'today' || lower === 'end of day' || lower === 'eod') {
         return today.toISOString().split('T')[0];
       }
       if (lower === 'tomorrow') {
