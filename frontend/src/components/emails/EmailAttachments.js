@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -44,6 +44,21 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [expandedAttachment, setExpandedAttachment] = useState(null);
+  const [emailId, setEmailId] = useState(email._id);
+  const [attachmentCount, setAttachmentCount] = useState(email.attachments?.length || 0);
+
+  // Force re-render when email or attachments change
+  useEffect(() => {
+    const currentAttachmentCount = email.attachments?.length || 0;
+    if (email._id !== emailId || currentAttachmentCount !== attachmentCount) {
+      setEmailId(email._id);
+      setAttachmentCount(currentAttachmentCount);
+      setExtractionResults(null);
+      setShowTaskReview(false);
+      setError(null);
+      setSuccess(null);
+    }
+  }, [email._id, email.attachments, emailId, attachmentCount]);
 
   // Get file icon based on type
   const getFileIcon = (filename) => {
@@ -214,29 +229,15 @@ const EmailAttachments = ({ email, onTasksExtracted }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Debug logging
-  console.log('EmailAttachments Debug:', {
-    hasAttachments: email.hasAttachments,
-    attachments: email.attachments,
-    attachmentCount: email.attachments?.length || 0
-  });
-
   // If no attachments, don't render anything
   if (!email.attachments || email.attachments.length === 0) {
-    console.log('No attachments found, returning null');
     return null;
   }
 
   // Count processable attachments
-  const processableAttachments = email.attachments.filter(att => {
-    const isProcessable = isProcessableFile(att.filename);
-    console.log('Attachment check:', {
-      filename: att.filename,
-      isProcessable: isProcessable,
-      extension: att.filename?.split('.').pop()?.toLowerCase()
-    });
-    return isProcessable;
-  });
+  const processableAttachments = email.attachments.filter(att => 
+    isProcessableFile(att.filename)
+  );
 
   return (
     <Box sx={{ mt: 2 }}>

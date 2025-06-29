@@ -473,6 +473,7 @@ const EmailDetail = ({ email, onClose, onRefresh }) => {
             
             {email.attachments && email.attachments.length > 0 && (
               <EmailAttachments 
+                key={`${email._id}-${email.attachments.length}`}
                 email={email} 
                 onTasksExtracted={(result) => {
                   // Refresh the email list to show updated task status
