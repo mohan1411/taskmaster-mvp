@@ -146,7 +146,7 @@
 /* Small mobile devices */
 @media (max-width: 600px) {
   .page-container {
-    padding: 4px !important;
+    padding: 0 !important;
     padding-bottom: 80px !important; /* Account for bottom navigation */
     margin-top: 56px !important;
     margin-left: 0 !important;

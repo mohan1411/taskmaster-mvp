@@ -93,8 +93,8 @@ html, body {
 
 /* Mobile-optimized forms */
 @media (max-width: 600px) {
-  /* Single column layout for forms */
-  .MuiGrid-container {
+  /* Single column layout for forms - but not for stat grids */
+  .MuiGrid-container:not(.stat-grid) {
     flex-direction: column;
   }
   
@@ -286,6 +286,31 @@ a,
 
 .pull-to-refresh.visible {
   transform: translateX(-50%) translateY(0);
+}
+
+/* Stat grid specific styles */
+@media (max-width: 600px) {
+  .stat-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .stat-grid > .MuiGrid-item {
+    flex: 0 0 calc(50% - 4px) !important;
+    max-width: calc(50% - 4px) !important;
+    width: calc(50% - 4px) !important;
+    padding: 0 !important;
+  }
+  
+  .stat-grid .MuiCard-root {
+    margin: 0 !important;
+    width: 100% !important;
+  }
 }
 
 /* Landscape mode adjustments */

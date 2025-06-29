@@ -194,7 +194,6 @@ const DashboardPage = () => {
         width: '100%',
         height: '100%',
         overflow: 'visible',
-        mx: { xs: 0.5 },
         '&:hover': onClick ? { 
           transform: 'translateY(-2px)', 
           boxShadow: 3
@@ -248,7 +247,7 @@ const DashboardPage = () => {
     <Box 
       sx={{ 
         width: '100%',
-        px: { xs: 0.5, sm: 2, md: 3 },
+        px: { xs: 0, sm: 2, md: 3 },
         py: { xs: 2, sm: 2, md: 3 },
         pb: { xs: 10, sm: 3 },
         maxWidth: { xs: '100%', md: 1200 },
@@ -257,7 +256,7 @@ const DashboardPage = () => {
       }}
     >
         {/* Compact Header */}
-        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+        <Box sx={{ mb: { xs: 2, sm: 3 }, px: { xs: 1, sm: 0 } }}>
           <Typography 
             variant="h4" 
             sx={{ 
@@ -304,12 +303,10 @@ const DashboardPage = () => {
         )}
         
         {/* Stats Grid - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ 
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} className="stat-grid" sx={{ 
           mb: { xs: 3, sm: 4 }, 
           width: '100%',
-          overflow: 'visible',
-          ml: { xs: -1 },
-          mr: { xs: -1 }
+          overflow: 'visible'
         }}>
           <Grid item xs={6} sm={6} md={3}>
             <StatCard

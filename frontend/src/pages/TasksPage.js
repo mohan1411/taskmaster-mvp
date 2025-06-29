@@ -360,7 +360,13 @@ const TasksPage = () => {
     <div className="page-container">
       <div className="page-content">
         {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 3,
+          px: { xs: 1, sm: 0 }
+        }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Tasks
           </Typography>
@@ -375,12 +381,11 @@ const TasksPage = () => {
         </Box>
         
         {/* Summary Cards - Consistent with Follow-ups page */}
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: 4, ml: { xs: -1 }, mr: { xs: -1 } }}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} className="stat-grid" sx={{ mb: 4 }}>
           <Grid item xs={6} sm={6} md={3}>
             <Card sx={{ 
               height: '100%', 
-              overflow: 'visible',
-              mx: { xs: 0.5 }
+              overflow: 'visible'
             }}>
               <CardContent sx={{ 
                 p: { xs: 1.5, sm: 2.5 },
@@ -412,8 +417,7 @@ const TasksPage = () => {
           <Grid item xs={6} sm={6} md={3}>
             <Card sx={{ 
               height: '100%', 
-              overflow: 'visible',
-              mx: { xs: 0.5 }
+              overflow: 'visible'
             }}>
               <CardContent sx={{ 
                 p: { xs: 1.5, sm: 2.5 },
@@ -448,8 +452,7 @@ const TasksPage = () => {
           <Grid item xs={6} sm={6} md={3}>
             <Card sx={{ 
               height: '100%', 
-              overflow: 'visible',
-              mx: { xs: 0.5 }
+              overflow: 'visible'
             }}>
               <CardContent sx={{ 
                 p: { xs: 1.5, sm: 2.5 },
@@ -482,8 +485,7 @@ const TasksPage = () => {
           <Grid item xs={6} sm={6} md={3}>
             <Card sx={{ 
               height: '100%', 
-              overflow: 'visible',
-              mx: { xs: 0.5 }
+              overflow: 'visible'
             }}>
               <CardContent sx={{ 
                 p: { xs: 1.5, sm: 2.5 },
