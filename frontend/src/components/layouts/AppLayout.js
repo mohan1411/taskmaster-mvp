@@ -40,11 +40,11 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     backgroundColor: theme.palette.background.default,
     color: theme.palette.text.primary,
     minHeight: '100vh',
+    marginLeft: 0, // Ensure no margin on mobile
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: 0,
     [theme.breakpoints.up('md')]: {
       marginLeft: `-${drawerWidth}px`,
       ...(open && {
